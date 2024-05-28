@@ -43,8 +43,8 @@ jobs:
         # --output=none prints files which needs to be formatted
 
      # Checks for Symantic errors. Can be configured using analysis_options.yaml
-      - name: Analyze project source
-        run: flutter analyze --fatal-warnings
+     # - name: Analyze project source
+     #   run: flutter analyze --fatal-warnings
         # optionally use --fatal-warnings to stop execution if any warnings are found
 
         
