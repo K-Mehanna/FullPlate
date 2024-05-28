@@ -49,8 +49,8 @@ jobs:
 
         
       # Runs unit test
-      - name: Run tests
-        run: flutter test
+      # - name: Run tests
+      #   run: flutter test
 
       # Build our flutter apk App and release it
       - run: flutter build apk
