@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,8 +12,9 @@ class KitchenHomePage extends StatefulWidget {
 }
 
 class _KitchenHomePageState extends State<KitchenHomePage> {
+  final Completer<GoogleMapController> _controller = Completer();
   late GoogleMapController mapController;
-  Position? currentPosition;
+  late Future<Position> currentPositionFuture;
 
   Future<Position> getCurrentLocation() async {
     LocationPermission permission = await Geolocator.requestPermission();
@@ -21,7 +24,7 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-
+    print("The position is $position");
     return position;
   }
 
@@ -32,7 +35,7 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
   @override
   void initState() {
     super.initState();
-    getCurrentLocation();
+    currentPositionFuture = getCurrentLocation();
   }
 
   List<Map<String, dynamic>> donors = [
@@ -60,14 +63,27 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
           title: const Text('Available donors'),
           elevation: 2,
         ),
-        body: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: LatLng(currentPosition?.latitude ?? 0.0,
-                currentPosition?.longitude ?? 0.0),
-            zoom: 16.0,
-          ),
-          markers: createMarkers(),
+        body: FutureBuilder<Position>(
+          future: currentPositionFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (snapshot.hasData) {
+              Position position = snapshot.data!;
+              return GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(position.latitude, position.longitude),
+                  zoom: 16.0,
+                ),
+                markers: createMarkers(),
+              );
+            } else {
+              return Center(child: Text('Unable to get location'));
+            }
+          },
         ),
       ),
     );
