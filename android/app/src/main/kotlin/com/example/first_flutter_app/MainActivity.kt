@@ -1,4 +1,4 @@
-package com.example.cibu
+package com.DRP39.cibu
 
 import io.flutter.embedding.android.FlutterActivity
 
