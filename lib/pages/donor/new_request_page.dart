@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cibu/models/request_item.dart';
 
-
 class NewRequestPage extends StatefulWidget {
   final Function(RequestItem) addRequestCallback;
 
-  const NewRequestPage({required this.addRequestCallback, Key? key}) : super(key: key);
+  const NewRequestPage({required this.addRequestCallback, Key? key})
+      : super(key: key);
 
   @override
-  _NewRequestPageState createState() => _NewRequestPageState();
+  NewRequestPageState createState() => NewRequestPageState();
 }
 
-class _NewRequestPageState extends State<NewRequestPage> {
+class NewRequestPageState extends State<NewRequestPage> {
   final TextEditingController titleController = TextEditingController();
   final List<String> categories = ["Egg", "Bread", "Milk", "Cheese", "Butter"];
   String selectedCategory = "Egg";
@@ -120,8 +120,7 @@ class _NewRequestPageState extends State<NewRequestPage> {
                 onPressed: submitRequest,
                 icon: Icon(Icons.check),
                 label: Text("Done"),
-                style: ElevatedButton.styleFrom(
-                ),
+                style: ElevatedButton.styleFrom(),
               ),
             ),
           ],
