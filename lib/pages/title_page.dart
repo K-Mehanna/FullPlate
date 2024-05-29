@@ -8,9 +8,6 @@ class TitlePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Cibu"),
-      ),
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
@@ -35,7 +32,7 @@ class TitlePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DonorHomePage()),
+                            builder: (context) => DonorHomePage()),
                         );
                       },
                       child: Text("Donor"),
