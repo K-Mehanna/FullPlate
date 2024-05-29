@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "195101899668",
+    "project_id": "cibu-17d8f",
+    "storage_bucket": "cibu-17d8f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195101899668:android:6dcc38108b60b0c322ad81",
+        "android_client_info": {
+          "package_name": "com.DRP39.Cibu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdimaGKGQ6DL9wNFl0FonJu9rZeJ5aJs8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
