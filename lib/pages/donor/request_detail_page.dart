@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'donor_home_page.dart';
+import 'donor_dashboard_page.dart';
 
 class RequestDetailPage extends StatelessWidget {
   final RequestItem item;
@@ -19,12 +19,11 @@ class RequestDetailPage extends StatelessWidget {
           children: [
             _buildDetailRow("Title", "\"${item.title}\""),
             SizedBox(height: 16),
-            _buildDetailRow("Kitchen", "${item.location}\n${item.address}", withIcon: true),
-            SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildDetailColumn("Quantity", item.quantity.toString()),
+                _buildDetailColumn("Category", item.category),
                 _buildDetailColumn("Size", item.size),
               ],
             ),

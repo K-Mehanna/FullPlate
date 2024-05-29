@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'donor_home_page.dart';
+import 'donor_dashboard_page.dart';
 
 class NewRequestPage extends StatefulWidget {
   final Function(RequestItem) addRequestCallback;
@@ -38,6 +38,7 @@ class _NewRequestPageState extends State<NewRequestPage> {
       address: "",
       quantity: quantity,
       size: selectedSize,
+      category: selectedCategory,
       status: "Waiting to be claimed",
     );
     widget.addRequestCallback(newItem);
@@ -48,7 +49,7 @@ class _NewRequestPageState extends State<NewRequestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Make New Request"),
+        title: Text("Add new item"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
