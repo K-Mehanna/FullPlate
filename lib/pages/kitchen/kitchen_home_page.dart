@@ -41,12 +41,12 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
   List<Map<String, dynamic>> donors = [
     {
       'id': '1',
-      'name': 'PAUL',
+      'name': 'PAUL bilokon',
       'location': LatLng(51.4945, -0.1730),
     },
     {
       'id': '2',
-      'name': 'Venci',
+      'name': 'Venchi',
       'location': LatLng(51.5012, -0.1775),
     },
   ];
@@ -92,7 +92,7 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
           position: donor['location'],
           infoWindow: InfoWindow(
             title: '${donor['name']}',
-            snippet: 'SIUUUUUUU',
+            snippet: 'SIUUUUUUUUUUUUUUUUUUUUUUUUUUUU',
             onTap: () {
               Navigator.push(
                 context,
