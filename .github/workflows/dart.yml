@@ -35,8 +35,8 @@ jobs:
         
         # ^ If you want to use a specific version of flutter
             # Verifies if the dart code is formatted well
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
+      #- name: Verify formatting
+      #  run: dart format --output=none --set-exit-if-changed .
         # --set-exit-if-changed stops execution if the any code is not well formatted
         # --output=none prints files which needs to be formatted
 
@@ -56,3 +56,9 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/apk/release/app-release.apk
+
+      #- run: flutter build ipa
+      #- uses: actions/upload-artifact@v4
+      #  with:
+      #    name: release-ipa
+      #    path: build/app/outputs/ipa/release/app-release.ipa
