@@ -1,6 +1,6 @@
 {
-    "name": "first_flutter_app",
-    "short_name": "first_flutter_app",
+    "name": "cibu",
+    "short_name": "cibu",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
