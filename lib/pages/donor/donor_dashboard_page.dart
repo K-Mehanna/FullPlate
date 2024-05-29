@@ -1,26 +1,7 @@
 import 'package:flutter/material.dart';
-import 'request_detail_page.dart';
 import 'new_request_page.dart';
-
-class RequestItem {
-  final String title;
-  final String location;
-  final String address;
-  final int quantity;
-  final String size;
-  final String category;
-  final String status;
-
-  RequestItem({
-    required this.title,
-    required this.location,
-    required this.address,
-    required this.quantity,
-    required this.size,
-    required this.category,
-    required this.status,
-  });
-}
+import 'package:cibu/widgets/build_list_item.dart';
+import 'package:cibu/models/request_item.dart';
 
 class DonorDashboard extends StatefulWidget {
   DonorDashboard({super.key});
@@ -38,7 +19,7 @@ class DonorDashboardState extends State<DonorDashboard> {
       quantity: 15,
       size: "M",
       category: "Veg",
-      status: "",
+      claimed: true,
     ),
     RequestItem(
       title: "banana",
@@ -47,7 +28,7 @@ class DonorDashboardState extends State<DonorDashboard> {
       quantity: 10,
       size: "L",
       category: "Fruit",
-      status: "",
+      claimed: true,
     ),
     RequestItem(
       title: "carrot",
@@ -56,7 +37,7 @@ class DonorDashboardState extends State<DonorDashboard> {
       quantity: 20,
       size: "S",
       category: "Veg",
-      status: "",
+      claimed: true,
     ),
   ];
 
@@ -68,7 +49,7 @@ class DonorDashboardState extends State<DonorDashboard> {
       quantity: 0,
       size: "N/A",
       category: "Veg",
-      status: "Waiting to be claimed",
+      claimed: false,
     ),
   ];
 
@@ -109,10 +90,10 @@ class DonorDashboardState extends State<DonorDashboard> {
               child: ListView(
                 children: [
                   _buildSectionTitle("Waiting to load", waitingToLoad.length),
-                  ...waitingToLoad.map((item) => _buildListItem(context, item)).toList(),
+                  ...waitingToLoad.map((item) => buildListItem(context, item)).toList(),
                   SizedBox(height: 16),
                   _buildSectionTitle("Pending", pending.length),
-                  ...pending.map((item) => _buildListItem(context, item)).toList(),
+                  ...pending.map((item) => buildListItem(context, item)).toList(),
                 ],
               ),
             ),
@@ -126,20 +107,5 @@ class DonorDashboardState extends State<DonorDashboard> {
     return Text("$title ($count)", style: TextStyle(fontWeight: FontWeight.bold));
   }
 
-  Widget _buildListItem(BuildContext context, RequestItem item) {
-    return ListTile(
-      leading: Icon(Icons.person),
-      title: Text("\"${item.title}\""),
-      trailing: Text(item.location.isEmpty ? item.status : item.location),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RequestDetailPage(item: item),
-          ),
-        );
-      },
-    );
-  }
 }
 

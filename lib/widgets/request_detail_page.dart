@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'donor_dashboard_page.dart';
+import 'package:cibu/models/request_item.dart';
 
 class RequestDetailPage extends StatelessWidget {
   final RequestItem item;

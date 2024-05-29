@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'donor_dashboard_page.dart';
+import 'package:cibu/models/request_item.dart';
+
 
 class NewRequestPage extends StatefulWidget {
   final Function(RequestItem) addRequestCallback;
@@ -39,7 +40,7 @@ class _NewRequestPageState extends State<NewRequestPage> {
       quantity: quantity,
       size: selectedSize,
       category: selectedCategory,
-      status: "Waiting to be claimed",
+      claimed: false,
     );
     widget.addRequestCallback(newItem);
     Navigator.pop(context);
