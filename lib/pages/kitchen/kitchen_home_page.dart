@@ -68,6 +68,8 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
           } else if (snapshot.hasData) {
             Position position = snapshot.data!;
             return GoogleMap(
+              myLocationButtonEnabled: false,
+              myLocationEnabled: true,
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
                 target: LatLng(position.latitude, position.longitude),

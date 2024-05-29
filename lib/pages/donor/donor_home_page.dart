@@ -1,4 +1,5 @@
 import 'package:cibu/pages/donor/donor_dashboard_page.dart';
+import 'package:cibu/pages/donor/donor_profile_page.dart';
 import 'package:flutter/material.dart';
 
 class DonorHomePage extends StatefulWidget {
@@ -13,7 +14,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   final List<Widget> _pages = [
     DonorDashboard(),
-    const Placeholder()
+    DonorProfilePage()
   ];
 
   @override
