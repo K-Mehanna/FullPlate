@@ -1,110 +1,41 @@
-import 'dart:async';
-
-import 'package:cibu/pages/title_page.dart';
+import 'package:cibu/pages/kitchen/kitchen_map_page.dart';
+import 'package:cibu/pages/kitchen/kitchen_dashboard_page.dart';
+import 'package:cibu/pages/kitchen/kitchen_profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 
 class KitchenHomePage extends StatefulWidget {
-  KitchenHomePage({super.key});
+  const KitchenHomePage({super.key});
 
   @override
   State<KitchenHomePage> createState() => _KitchenHomePageState();
 }
 
 class _KitchenHomePageState extends State<KitchenHomePage> {
-  late GoogleMapController mapController;
-  late Future<Position> currentPositionFuture;
+  int _selectedIndex = 1;
 
-  Future<Position> getCurrentLocation() async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    print("The position is $position");
-    return position;
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    currentPositionFuture = getCurrentLocation();
-  }
-
-  List<Map<String, dynamic>> donors = [
-    {
-      'id': '1',
-      'name': 'PAUL bilokon',
-      'location': LatLng(51.4945, -0.1730),
-    },
-    {
-      'id': '2',
-      'name': 'Venchi',
-      'location': LatLng(51.5012, -0.1775),
-    },
+  final List<Widget> _pages = [
+    KitchenDashboardPage(),
+    KitchenMapPage(),
+    KitchenProfilePage()
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Available donors'),
-        elevation: 2,
-      ),
-      body: FutureBuilder<Position>(
-        future: currentPositionFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            Position position = snapshot.data!;
-            return GoogleMap(
-              myLocationButtonEnabled: true,
-              myLocationEnabled: true,
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(position.latitude, position.longitude),
-                zoom: 16.0,
-              ),
-              markers: createMarkers(),
-            );
-          } else {
-            return Center(child: Text('Unable to get location'));
-          }
-        },
-      ),
+      body: SafeArea(child: _pages[_selectedIndex]),
+      bottomNavigationBar: NavigationBar(
+          selectedIndex: _selectedIndex,
+          destinations: const [
+            NavigationDestination(
+                icon: Icon(Icons.dashboard), label: 'Dashboard'),
+            NavigationDestination(icon: Icon(Icons.map), label: 'Profile'),
+            NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+          ],
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }),
     );
-  }
-
-  Set<Marker> createMarkers() {
-    var markers = <Marker>{};
-    for (var donor in donors) {
-      markers.add(
-        Marker(
-          markerId: MarkerId(donor['id']),
-          position: donor['location'],
-          infoWindow: InfoWindow(
-            title: '${donor['name']}',
-            snippet: 'SIUUUUUUUUUUUUUUUUUUUUUUUUUUUU',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TitlePage()),
-              );
-            },
-          ),
-        ),
-      );
-    }
-    return markers;
   }
 }
