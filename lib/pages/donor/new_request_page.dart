@@ -1,22 +1,21 @@
+import 'package:cibu/database/orders_manager.dart';
+import 'package:cibu/models/order_info.dart';
+import 'package:cibu/pages/donor/donor_dashboard_page.dart';
 import 'package:flutter/material.dart';
-import 'package:cibu/models/request_item.dart';
 
 class NewRequestPage extends StatefulWidget {
-  final Function(RequestItem) addRequestCallback;
-
-  const NewRequestPage({required this.addRequestCallback, Key? key})
-      : super(key: key);
+  const NewRequestPage({super.key});
 
   @override
   NewRequestPageState createState() => NewRequestPageState();
 }
 
 class NewRequestPageState extends State<NewRequestPage> {
+  final OrdersManager ordersManager = OrdersManager();
   final TextEditingController titleController = TextEditingController();
-  final List<String> categories = ["Egg", "Bread", "Milk", "Cheese", "Butter"];
-  String selectedCategory = "Egg";
   int quantity = 1;
-  String selectedSize = "M";
+  OrderCategory selectedCategory = OrderCategory.BREAD;
+  OrderSize selectedSize = OrderSize.MEDIUM;
 
   void incrementQuantity() {
     setState(() {
@@ -33,17 +32,24 @@ class NewRequestPageState extends State<NewRequestPage> {
   }
 
   void submitRequest() {
-    final newItem = RequestItem(
-      title: titleController.text,
-      location: "",
-      address: "",
+    final newItem = OrderInfo(
+      name: titleController.text,
       quantity: quantity,
-      size: selectedSize,
       category: selectedCategory,
-      claimed: false,
+      size: selectedSize,
+      timeCreated: DateTime.now(),
+      donorId: "sec0ABRO6ReQz1hxiKfJ",
+      status: OrderStatus.PENDING,
     );
-    widget.addRequestCallback(newItem);
+    ordersManager.addPendingOrder(newItem, null);
     Navigator.pop(context);
+    // Navigator.pop(context);
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => DonorDashboard(),
+    //   ),
+    // );
   }
 
   @override
@@ -62,12 +68,12 @@ class NewRequestPageState extends State<NewRequestPage> {
               decoration: InputDecoration(labelText: "Title"),
             ),
             SizedBox(height: 16),
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<OrderCategory>(
               value: selectedCategory,
-              items: categories.map((category) {
+              items: OrderCategory.values.map((category) {
                 return DropdownMenuItem(
                   value: category,
-                  child: Text(category),
+                  child: Text(category.value),
                 );
               }).toList(),
               onChanged: (value) {
@@ -101,9 +107,9 @@ class NewRequestPageState extends State<NewRequestPage> {
             Text("Size"),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: ["S", "M", "L"].map((size) {
+              children: OrderSize.values.map((size) {
                 return ChoiceChip(
-                  label: Text(size),
+                  label: Text(size.value),
                   selected: selectedSize == size,
                   onSelected: (selected) {
                     setState(() {

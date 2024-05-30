@@ -1,10 +1,10 @@
+import 'package:cibu/models/order_info.dart';
 import 'package:flutter/material.dart';
-import 'package:cibu/models/request_item.dart';
 
 class RequestDetailPage extends StatelessWidget {
-  final RequestItem item;
+  final OrderInfo item;
 
-  const RequestDetailPage({required this.item, Key? key}) : super(key: key);
+  const RequestDetailPage({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -17,14 +17,14 @@ class RequestDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Title", "\"${item.title}\""),
+            _buildDetailRow("Title", "\"${item.name}\""),
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildDetailColumn("Quantity", item.quantity.toString()),
-                _buildDetailColumn("Category", item.category),
-                _buildDetailColumn("Size", item.size),
+                _buildDetailColumn("Category", item.category.value),
+                _buildDetailColumn("Size", item.size.value),
               ],
             ),
           ],

@@ -1,6 +1,9 @@
 import 'dart:async';
 
-import 'package:cibu/models/request_item.dart';
+import 'package:cibu/database/donors_manager.dart';
+import 'package:cibu/database/orders_manager.dart';
+import 'package:cibu/models/donor_info.dart';
+import 'package:cibu/models/order_info.dart';
 import 'package:cibu/pages/kitchen/donor_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,8 +17,12 @@ class KitchenMapPage extends StatefulWidget {
 }
 
 class _KitchenMapPageState extends State<KitchenMapPage> {
+  final OrdersManager ordersManager = OrdersManager();
+  final DonorsManager donorsManager = DonorsManager();
   late GoogleMapController mapController;
   late Future<Position> currentPositionFuture;
+  late List<OrderInfo> orders = [];
+  late Set<Marker> markers = {};
 
   Future<Position> getCurrentLocation() async {
     LocationPermission permission = await Geolocator.requestPermission();
@@ -36,36 +43,10 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   @override
   void initState() {
     super.initState();
+    ordersManager.getOrdersCompletion(
+        OrderStatus.PENDING, false, null, null, createMarkers);
     currentPositionFuture = getCurrentLocation();
   }
-
-  // void _addNewRequest() {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => NewRequestPage(
-  //         addRequestCallback: (RequestItem item) => {
-  //           setState(() {
-  //             pending.add(item);
-  //           })
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  List<Map<String, dynamic>> donors = [
-    {
-      'id': '1',
-      'name': 'PAUL',
-      'location': LatLng(51.4945, -0.1730),
-    },
-    {
-      'id': '2',
-      'name': 'Venchi',
-      'location': LatLng(51.5012, -0.1775),
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +72,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                 target: LatLng(position.latitude, position.longitude),
                 zoom: 16.0,
               ),
-              markers: createMarkers(),
+              markers: markers,
             );
           } else {
             return Center(child: Text('Unable to get location'));
@@ -101,38 +82,32 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     );
   }
 
-  final RequestItem item = RequestItem(
-    title: "avocado",
-    location: "",
-    address: "",
-    quantity: 0,
-    size: "N/A",
-    category: "Veg",
-    claimed: false,
-  );
-
-  Set<Marker> createMarkers() {
-    var markers = <Marker>{};
-    for (var donor in donors) {
-      markers.add(
-        Marker(
-          markerId: MarkerId(donor['id']),
-          position: donor['location'],
-          infoWindow: InfoWindow(
-            title: '${donor['name']}',
-            snippet: 'SIUUUUUUUUUUUUUUUUUUUUUUUUUUUU',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DonorDetailPage(item: item),
-                ),
-              );
-            },
-          ),
-        ),
-      );
-    }
-    return markers;
+  void createMarkers(List<OrderInfo> orders) {
+    setState(() {
+      for (var order in orders) {
+        donorsManager.getDonorCompletion(order.donorId, (donor) {
+          print(donor.address);
+          print(donor.name);
+          markers.add(
+            Marker(
+              markerId: MarkerId(order.orderId),
+              position: donor.location,
+              infoWindow: InfoWindow(
+                title: donor.name,
+                snippet: donor.address,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DonorDetailPage(order: order),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        });
+      }
+    });
   }
 }

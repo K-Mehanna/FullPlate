@@ -19,6 +19,12 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
     KitchenProfilePage()
   ];
 
+  void onTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,14 +34,10 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
           destinations: const [
             NavigationDestination(
                 icon: Icon(Icons.dashboard), label: 'Dashboard'),
-            NavigationDestination(icon: Icon(Icons.map), label: 'Profile'),
+            NavigationDestination(icon: Icon(Icons.map), label: 'Map'),
             NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
           ],
-          onDestinationSelected: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          }),
+          onDestinationSelected: onTapped),
     );
   }
 }

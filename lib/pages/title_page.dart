@@ -1,3 +1,4 @@
+import 'package:cibu/pages/kitchen/tab_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/donor_home_page.dart';
 import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
@@ -32,7 +33,7 @@ class TitlePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DonorHomePage()),
+                              builder: (context) => DonorHomePage()),
                         );
                       },
                       child: Text("Donor"),
@@ -42,8 +43,7 @@ class TitlePage extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => KitchenHomePage()),
+                          MaterialPageRoute(builder: (context) => KitchenHomePage()),
                         );
                       },
                       child: Text("Kitchen"),
