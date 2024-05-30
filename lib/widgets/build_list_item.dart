@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'request_detail_page.dart';
 import 'package:cibu/models/request_item.dart';
 
-Widget buildListItem(BuildContext context, RequestItem item) {
+Widget buildListItem(BuildContext context, RequestItem item, Widget Function(RequestItem) builder) {
     return ListTile(
       leading: Icon(Icons.person),
       title: Text("\"${item.title}\""),
@@ -11,7 +10,7 @@ Widget buildListItem(BuildContext context, RequestItem item) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RequestDetailPage(item: item),
+            builder: (context) => builder(item),
           ),
         );
       },

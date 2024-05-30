@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './donor/donor_home_page.dart';
-import './kitchen/kitchen_home_page.dart';
+import 'package:cibu/pages/donor/donor_home_page.dart';
+import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
 
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});

@@ -1,5 +1,6 @@
+import 'package:cibu/widgets/request_detail_page.dart';
 import 'package:flutter/material.dart';
-import 'new_request_page.dart';
+import 'package:cibu/pages/donor/new_request_page.dart';
 import 'package:cibu/widgets/build_list_item.dart';
 import 'package:cibu/models/request_item.dart';
 
@@ -65,10 +66,8 @@ class DonorDashboardState extends State<DonorDashboard> {
           },
         ),
       ),
-    );  
+    );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -90,10 +89,26 @@ class DonorDashboardState extends State<DonorDashboard> {
               child: ListView(
                 children: [
                   _buildSectionTitle("Waiting to load", waitingToLoad.length),
-                  ...waitingToLoad.map((item) => buildListItem(context, item)).toList(),
+                  ...waitingToLoad
+                      .map(
+                        (item) => buildListItem(
+                          context,
+                          item,
+                          (item) => RequestDetailPage(item: item),
+                        ),
+                      )
+                      .toList(),
                   SizedBox(height: 16),
                   _buildSectionTitle("Pending", pending.length),
-                  ...pending.map((item) => buildListItem(context, item)).toList(),
+                  ...pending
+                      .map(
+                        (item) => buildListItem(
+                          context,
+                          item,
+                          (item) => RequestDetailPage(item: item),
+                        ),
+                      )
+                      .toList(),
                 ],
               ),
             ),
@@ -104,8 +119,7 @@ class DonorDashboardState extends State<DonorDashboard> {
   }
 
   Widget _buildSectionTitle(String title, int count) {
-    return Text("$title ($count)", style: TextStyle(fontWeight: FontWeight.bold));
+    return Text("$title ($count)",
+        style: TextStyle(fontWeight: FontWeight.bold));
   }
-
 }
-

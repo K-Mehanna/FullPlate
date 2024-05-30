@@ -20,11 +20,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.bodyLarge!.copyWith(
-      color: theme.colorScheme.onSurface,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Profile"),
