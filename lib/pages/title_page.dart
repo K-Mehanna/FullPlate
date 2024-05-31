@@ -16,7 +16,7 @@ class TitlePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Welcome to Jason!", style: TextStyle(fontSize: 24)),
+                Text("Welcome to Cibu!", style: TextStyle(fontSize: 24)),
                 SizedBox(height: 20),
                 Text(
                   "I am a",
