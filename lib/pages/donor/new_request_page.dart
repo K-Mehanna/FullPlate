@@ -1,6 +1,5 @@
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/order_info.dart';
-import 'package:cibu/pages/donor/donor_dashboard_page.dart';
 import 'package:flutter/material.dart';
 
 class NewRequestPage extends StatefulWidget {
@@ -43,13 +42,6 @@ class NewRequestPageState extends State<NewRequestPage> {
     );
     ordersManager.addPendingOrder(newItem, null);
     Navigator.pop(context);
-    // Navigator.pop(context);
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => DonorDashboard(),
-    //   ),
-    // );
   }
 
   @override

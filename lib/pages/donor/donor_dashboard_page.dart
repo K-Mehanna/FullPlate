@@ -1,111 +1,3 @@
-// import 'package:cibu/models/order_info.dart';
-// import 'package:flutter/material.dart';
-// import 'package:cibu/pages/donor/new_request_page.dart';
-// import 'package:cibu/pages/donor/build_list_item.dart';
-// import 'package:cibu/database/orders_manager.dart';
-
-// class DonorDashboard extends StatefulWidget {
-//   DonorDashboard({super.key});
-
-//   @override
-//   DonorDashboardState createState() => DonorDashboardState();
-// }
-
-// class DonorDashboardState extends State<DonorDashboard> {
-//   final OrdersManager ordersManager = OrdersManager();
-
-//   List<OrderInfo> acceptedOrders = List.empty();
-//   List<OrderInfo> pendingOrders = List.empty();
-
-//   @override
-//   void initState() {
-//     super.initState();
-
-//     ordersManager
-//         .getOrders(OrderStatus.PENDING, false, 'znR7gs5otoK7r6BtP6zl', null)
-//         .then((value) {
-//       setState(() {
-//         pendingOrders = value;
-//         print('orders: $value');
-//       });
-//     });
-
-//     ordersManager
-//         .getOrders(OrderStatus.ACCEPTED, false, 'PkUIOxUHeaLexyI4uUE3', null)
-//         .then((value) {
-//       setState(() {
-//         acceptedOrders = value;
-//         print('accepted: $value');
-//       });
-//     });
-
-//     print(":)");
-//   }
-
-//   void _addNewRequest() {
-//     Navigator.push(
-//       context,
-//       MaterialPageRoute(
-//         builder: (context) => NewRequestPage(),
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Dashboard"),
-//       ),
-//       floatingActionButton: FloatingActionButton.extended(
-//         onPressed: _addNewRequest,
-//         label: Text("Add a new order"),
-//         icon: Icon(Icons.add),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Expanded(
-//               child: ListView(
-//                 children: [
-//                   _buildSectionTitle("Waiting to load", acceptedOrders.length),
-//                   ...acceptedOrders!
-//                       .map(
-//                         (item) => buildListItem(
-//                           context,
-//                           item,
-//                         ),
-//                       )
-//                       .toList(),
-//                   SizedBox(height: 16),
-//                   _buildSectionTitle("Pending", pendingOrders.length),
-//                   ...pendingOrders!
-//                       .map(
-//                         (item) => buildListItem(
-//                           context,
-//                           item,
-//                         ),
-//                       )
-//                       .toList(),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildSectionTitle(String title, int count) {
-//     return Text("$title ($count)",
-//         style: TextStyle(fontWeight: FontWeight.bold));
-//   }
-// }
-
-/////////////////////////// okay
-
 import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/models/order_info.dart';
@@ -113,8 +5,6 @@ import 'package:cibu/widgets/request_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/new_request_page.dart';
 import 'package:cibu/database/orders_manager.dart';
-import 'package:provider/provider.dart';
-import 'package:cibu/reload_notifier.dart';
 
 class DonorDashboard extends StatefulWidget {
   DonorDashboard({Key? key}) : super(key: key);
@@ -147,18 +37,6 @@ class _DonorDashboardState extends State<DonorDashboard> {
     );
   }
 
-  // void _addNewRequest(BuildContext context) {
-  //   final reloadNotifier = Provider.of<ReloadNotifier>(context);
-
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => NewRequestPage(),
-  //     ),
-  //   ).then((_) {
-  //     reloadNotifier.reload(); // Trigger a reload
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
