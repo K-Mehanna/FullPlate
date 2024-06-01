@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
-import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/order_info.dart';
 import 'package:cibu/pages/kitchen/donor_detail_page.dart';
 import 'package:flutter/material.dart';
@@ -20,20 +19,22 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   final OrdersManager ordersManager = OrdersManager();
   final DonorsManager donorsManager = DonorsManager();
   late GoogleMapController mapController;
-  late Future<Position> currentPositionFuture;
+  static LatLng currentPosition = LatLng(0.0, 0.0);
   late List<OrderInfo> orders = [];
   late Set<Marker> markers = {};
 
-  Future<Position> getCurrentLocation() async {
+  void getCurrentLocation(void Function(Position) callback) async {
     LocationPermission permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
 
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    print("The position is $position");
-    return position;
+    Future<Position> position =
+        Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+    position.then((newLocation) {
+      callback(newLocation);
+    }, onError: (e) => print("An error occured fetching location:\n$e"));
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -45,7 +46,15 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     super.initState();
     ordersManager.getOrdersCompletion(
         OrderStatus.PENDING, false, null, null, createMarkers);
-    currentPositionFuture = getCurrentLocation();
+    getCurrentLocation((newLocation) {
+      var newPosition = LatLng(newLocation.latitude, newLocation.longitude);
+      mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
+      setState(() {
+        print('previous: ${currentPosition.toString()}');
+        currentPosition = newPosition;
+        print('new: ${currentPosition.toString()}');
+      });
+    });
   }
 
   @override
@@ -55,29 +64,15 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         title: const Text('Available donors'),
         elevation: 2,
       ),
-      body: FutureBuilder<Position>(
-        future: currentPositionFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            Position position = snapshot.data!;
-            return GoogleMap(
-              myLocationButtonEnabled: true,
-              myLocationEnabled: true,
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(position.latitude, position.longitude),
-                zoom: 16.0,
-              ),
-              markers: markers,
-            );
-          } else {
-            return Center(child: Text('Unable to get location'));
-          }
-        },
+      body: GoogleMap(
+        myLocationButtonEnabled: true,
+        myLocationEnabled: true,
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: currentPosition,
+          zoom: 16.0,
+        ),
+        markers: markers,
       ),
     );
   }
