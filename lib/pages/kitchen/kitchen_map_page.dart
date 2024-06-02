@@ -32,9 +32,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     Future<Position> position =
         Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-    position.then((newLocation) {
-      callback(newLocation);
-    }, onError: (e) => print("An error occured fetching location:\n$e"));
+    position.then(callback, onError: (e) => print("An error occured fetching location:\n$e"));
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -43,6 +41,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
 
   @override
   void initState() {
+    print("\nKitchenMapPageState\n - initState()\n");
     super.initState();
     ordersManager.getOrdersCompletion(
         OrderStatus.PENDING, false, null, null, createMarkers);
@@ -78,31 +77,34 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   }
 
   void createMarkers(List<OrderInfo> orders) {
+    print("\nKitchenMapPageState\n - createMarkers()\n");
     setState(() {
-      for (var order in orders) {
-        donorsManager.getDonorCompletion(order.donorId, (donor) {
-          print(donor.address);
-          print(donor.name);
-          markers.add(
-            Marker(
-              markerId: MarkerId(order.orderId),
-              position: donor.location,
-              infoWindow: InfoWindow(
-                title: donor.name,
-                snippet: donor.address,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DonorDetailPage(order: order),
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        });
-      }
+      markers.clear();
     });
+
+    for (var order in orders) {
+      donorsManager.getDonorCompletion(order.donorId, (donor) {
+        setState(() { markers.add(
+          Marker(
+            markerId: MarkerId(order.orderId),
+            position: donor.location,
+            infoWindow: InfoWindow(
+              title: donor.name,
+              snippet: donor.address,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DonorDetailPage(order: order),
+                  ),
+                );
+              },
+            ),
+          ),
+        ); });
+
+        print("\n   markers.length: ${markers.length}");
+      });
+    }
   }
 }
