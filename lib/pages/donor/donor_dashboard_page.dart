@@ -16,16 +16,33 @@ class DonorDashboard extends StatefulWidget {
 class _DonorDashboardState extends State<DonorDashboard> {
   final OrdersManager ordersManager = OrdersManager();
   Map<String, KitchenInfo> kitchensInfo = {};
-  bool didGetKitchenInfo = false;
+  List<OrderInfo> acceptedOrders = [];
+  List<OrderInfo> pendingOrders = [];
 
-  Future<List<OrderInfo>> _getPendingOrders() {
-    return ordersManager.getOrders(
-        OrderStatus.PENDING, false, "sec0ABRO6ReQz1hxiKfJ", null);
-  }
+  final String donorId = "sec0ABRO6ReQz1hxiKfJ";
 
-  Future<List<OrderInfo>> _getAcceptedOrders() {
-    return ordersManager.getOrders(
-        OrderStatus.ACCEPTED, false, 'sec0ABRO6ReQz1hxiKfJ', null);
+  @override
+  void initState() {
+    super.initState();
+
+    ordersManager
+      .getOrders(OrderStatus.ACCEPTED, false, donorId, null)
+      .then((newAccepted) {
+        processKitchenInfo(newAccepted);
+        setState(() {
+          acceptedOrders.clear();
+          acceptedOrders.addAll(newAccepted);
+        });
+      });
+
+    ordersManager
+      .getOrders(OrderStatus.PENDING, false, donorId, null)
+      .then((newPending) {
+        setState(() {
+          pendingOrders.clear();
+          pendingOrders.addAll(newPending);
+        });
+      });
   }
 
   void _addNewRequest() {
@@ -36,7 +53,6 @@ class _DonorDashboardState extends State<DonorDashboard> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,51 +73,20 @@ class _DonorDashboardState extends State<DonorDashboard> {
             Expanded(
               child: ListView(
                 children: [
-                  FutureBuilder<List<OrderInfo>>(
-                    future: _getAcceptedOrders(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else {
-                        processKitchenInfo(snapshot.data ?? []);
-                        final acceptedOrders = snapshot.data ?? [];
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildSectionTitle(
-                                "Accepted", acceptedOrders.length),
-                            ...acceptedOrders
-                                .map((item) => buildListItem(item))
-                                .toList(),
-                            SizedBox(height: 16),
-                          ],
-                        );
-                      }
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle("Accepted Jobs", acceptedOrders.length),
+                      ...acceptedOrders.map(buildListItem)
+                    ]
                   ),
-                  FutureBuilder<List<OrderInfo>>(
-                    future: _getPendingOrders(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else {
-                        final pendingOrders = snapshot.data ?? [];
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildSectionTitle("Pending", pendingOrders.length),
-                            ...pendingOrders
-                                .map((item) => buildListItem(item))
-                                .toList(),
-                          ],
-                        );
-                      }
-                    },
-                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle("Pending Jobs", pendingOrders.length),
+                      ...pendingOrders.map(buildListItem)
+                    ]
+                  )
                 ],
               ),
             ),
@@ -112,28 +97,24 @@ class _DonorDashboardState extends State<DonorDashboard> {
   }
 
   void processKitchenInfo(List<OrderInfo> orders) {
-    if (didGetKitchenInfo) return;
-    didGetKitchenInfo = true;
     for (var order in orders) {
-      if (order.status != OrderStatus.ACCEPTED) continue;
+      assert(order.status == OrderStatus.ACCEPTED);
 
-      void makeListTile(KitchenInfo kitchenInfo) {
-        setState(() {
-          print("Kitchen name: ${kitchenInfo.name}");
-          kitchensInfo[order.kitchenId!] = kitchenInfo;
-        });
-      }
-
-      KitchensManager().getKitchenCompletion(
-          order.kitchenId!, (kitchen) => makeListTile(kitchen));
+      KitchensManager()
+        .getKitchenCompletion(order.kitchenId!, (kitchen) {
+          setState(() {
+            kitchensInfo[order.kitchenId!] = kitchen;
+          });
+        });    
     }
   }
 
   Widget buildListItem(OrderInfo order) {
+    var content = order.status == OrderStatus.ACCEPTED ? "..." : "";
     return ListTile(
       leading: Icon(Icons.person),
       title: Text(order.name),
-      trailing: Text(kitchensInfo[order.kitchenId]?.name ?? ""),
+      trailing: Text(kitchensInfo[order.kitchenId]?.name ?? content),
       onTap: () {
         Navigator.push(
           context,

@@ -14,26 +14,25 @@ class KitchenDashboardPage extends StatefulWidget {
 
 class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   final OrdersManager ordersManager = OrdersManager();
-  List<OrderInfo>? acceptedOrders;
-  Map<String, DonorInfo> donorsInfo = {};
-  bool didGetDonorsInfo = false;
 
-  Future<List<OrderInfo>> _getAcceptedOrders() {
-    return ordersManager.getOrders(
-        OrderStatus.ACCEPTED, false, 'sec0ABRO6ReQz1hxiKfJ', null);
-  }
+  Map<String, DonorInfo> donorsInfo = {};
+  List<OrderInfo> acceptedOrders = [];
+
+  final String kitchenId = "BgOtpuMuOZNa6IYWRJgb";
 
   @override
   void initState() {
     super.initState();
 
     ordersManager
-        .getOrders(OrderStatus.PENDING, false, 'znR7gs5otoK7r6BtP6zl', null)
-        .then((value) {
-      setState(() {
-        acceptedOrders = value;
+      .getOrders(OrderStatus.ACCEPTED, false, null, kitchenId)
+      .then((newAccepted) {
+        processDonorsInfo(newAccepted);
+        setState(() {
+          acceptedOrders.clear();
+          acceptedOrders.addAll(newAccepted);
+        });
       });
-    });
   }
 
   @override
@@ -50,31 +49,14 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
             Expanded(
               child: ListView(
                 children: [
-                  FutureBuilder(
-                    future: _getAcceptedOrders(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else {
-                        processDonorsInfo(snapshot.data ?? []);
-                        final acceptedOrders = snapshot.data ?? [];
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildSectionTitle(
-                                "Active Jobs", acceptedOrders.length),
-                            ...acceptedOrders
-                                .map((item) => buildListItem(item))
-                                .toList(),
-                            SizedBox(height: 16),
-                          ],
-                        );
-                      }
-                    },
-                  ),
-                ],
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle("Active Jobs", acceptedOrders.length),
+                      ...acceptedOrders.map(buildListItem)
+                    ]
+                  )
+                ]
               ),
             ),
           ],
@@ -84,26 +66,24 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   }
 
   void processDonorsInfo(List<OrderInfo> orders) {
-    if (didGetDonorsInfo) return;
-    didGetDonorsInfo = true;
     for (var order in orders) {
-      void makeListTile(DonorInfo donorInfo) {
-        setState(() {
-          print("Donor name: ${donorInfo.name}");
-          donorsInfo[order.donorId] = donorInfo;
-        });
-      }
+      assert(order.status == OrderStatus.ACCEPTED);
 
       DonorsManager()
-          .getDonorCompletion(order.donorId, (donor) => makeListTile(donor));
+        .getDonorCompletion(order.donorId, (donor) {
+          setState(() {
+            donorsInfo[order.donorId] = donor;
+          });
+        });
     }
   }
 
   Widget buildListItem(OrderInfo order) {
+    var content = order.status == OrderStatus.ACCEPTED ? "..." : "";
     return ListTile(
       leading: Icon(Icons.person),
       title: Text(order.name),
-      trailing: Text(donorsInfo[order.donorId]?.name ?? "..."),
+      trailing: Text(donorsInfo[order.donorId]?.name ?? content),
       onTap: () {
         Navigator.push(
           context,
