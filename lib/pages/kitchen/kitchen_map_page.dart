@@ -1,4 +1,4 @@
-import 'dart:async';
+// import 'dart:async';
 
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
@@ -9,51 +9,51 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class KitchenMapPage extends StatefulWidget {
-  KitchenMapPage({super.key});
+// class KitchenMapPage extends StatefulWidget {
+//   KitchenMapPage({super.key});
 
-  @override
-  State<KitchenMapPage> createState() => _KitchenMapPageState();
-}
+//   @override
+//   State<KitchenMapPage> createState() => _KitchenMapPageState();
+// }
 
-class _KitchenMapPageState extends State<KitchenMapPage> {
-  final OrdersManager ordersManager = OrdersManager();
-  final DonorsManager donorsManager = DonorsManager();
-  late GoogleMapController mapController;
-  static LatLng currentPosition = LatLng(0.0, 0.0);
-  late List<OrderInfo> orders = [];
-  late Set<Marker> markers = {};
+// class _KitchenMapPageState extends State<KitchenMapPage> {
+//   final OrdersManager ordersManager = OrdersManager();
+//   final DonorsManager donorsManager = DonorsManager();
+//   late GoogleMapController mapController;
+//   static LatLng currentPosition = LatLng(0.0, 0.0);
+//   late List<OrderInfo> orders = [];
+//   late Set<Marker> markers = {};
 
-  void getCurrentLocation(void Function(Position) callback) async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
+//   void getCurrentLocation(void Function(Position) callback) async {
+//     LocationPermission permission = await Geolocator.requestPermission();
+//     if (permission == LocationPermission.denied) {
+//       permission = await Geolocator.requestPermission();
+//     }
 
-    Future<Position> position =
-        Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+//     Future<Position> position =
+//         Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-    position.then(callback,
-        onError: (e) => print("An error occured fetching location:\n$e"));
-  }
+//     position.then(callback,
+//         onError: (e) => print("An error occured fetching location:\n$e"));
+//   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
+//   void _onMapCreated(GoogleMapController controller) {
+//     mapController = controller;
+//   }
 
-  @override
-  void initState() {
-    super.initState();
-    ordersManager.getOrdersCompletion(
-        OrderStatus.PENDING, false, null, null, createMarkers);
-    getCurrentLocation((newLocation) {
-      var newPosition = LatLng(newLocation.latitude, newLocation.longitude);
-      mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
-      setState(() {
-        currentPosition = newPosition;
-      });
-    });
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     ordersManager.getOrdersCompletion(
+//         OrderStatus.PENDING, false, null, null, createMarkers);
+//     getCurrentLocation((newLocation) {
+//       var newPosition = LatLng(newLocation.latitude, newLocation.longitude);
+//       mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
+//       setState(() {
+//         currentPosition = newPosition;
+//       });
+//     });
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -146,39 +146,39 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     );
   }
 
-  void createMarkers(List<OrderInfo> orderList) {
-    print("\nKitchenMapPageState - createMarkers()\n");
-    setState(() {
-      markers.clear();
-      orders = orderList;
-      print('orders: $orders');
-    });
+//   void createMarkers(List<OrderInfo> orderList) {
+//     print("\nKitchenMapPageState - createMarkers()\n");
+//     setState(() {
+//       markers.clear();
+//       orders = orderList;
+//       print('orders: $orders');
+//     });
 
-    for (var order in orderList) {
-      donorsManager.getDonorCompletion(order.donorId, (donor) {
-        setState(() {
-          markers.add(
-            Marker(
-              markerId: MarkerId(order.orderId),
-              position: donor.location,
-              infoWindow: InfoWindow(
-                title: donor.name,
-                snippet: donor.address,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DonorDetailPage(order: order),
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        });
+//     for (var order in orderList) {
+//       donorsManager.getDonorCompletion(order.donorId, (donor) {
+//         setState(() {
+//           markers.add(
+//             Marker(
+//               markerId: MarkerId(order.orderId),
+//               position: donor.location,
+//               infoWindow: InfoWindow(
+//                 title: donor.name,
+//                 snippet: donor.address,
+//                 onTap: () {
+//                   Navigator.push(
+//                     context,
+//                     MaterialPageRoute(
+//                       builder: (context) => DonorDetailPage(order: order),
+//                     ),
+//                   );
+//                 },
+//               ),
+//             ),
+//           );
+//         });
 
-        print("\n   markers.length: ${markers.length}");
-      });
-    }
-  }
-}
+//         print("\n   markers.length: ${markers.length}");
+//       });
+//     }
+//   }
+// }

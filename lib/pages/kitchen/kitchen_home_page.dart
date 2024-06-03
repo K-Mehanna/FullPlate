@@ -1,4 +1,3 @@
-import 'package:cibu/pages/kitchen/kitchen_map_page.dart';
 import 'package:cibu/pages/kitchen/kitchen_dashboard_page.dart';
 import 'package:cibu/pages/kitchen/kitchen_profile_page.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
 
   final List<Widget> _pages = [
     KitchenDashboardPage(),
-    KitchenMapPage(),
     KitchenProfilePage()
   ];
 

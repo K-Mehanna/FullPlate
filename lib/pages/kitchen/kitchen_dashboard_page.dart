@@ -1,5 +1,5 @@
 import 'package:cibu/database/orders_manager.dart';
-import 'package:cibu/models/order_info.dart';
+import 'package:cibu/models/job_info.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/widgets/request_detail_page.dart';
 import 'package:cibu/models/donor_info.dart';
@@ -16,7 +16,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   final OrdersManager ordersManager = OrdersManager();
 
   Map<String, DonorInfo> donorsInfo = {};
-  List<OrderInfo> acceptedOrders = [];
+  List<JobInfo> acceptedJobs = [];
 
   final String kitchenId = "BgOtpuMuOZNa6IYWRJgb";
 
@@ -25,11 +25,11 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
     super.initState();
 
     ordersManager
-      .setOrderListener(OrderStatus.ACCEPTED, false, null, kitchenId, (newAccepted) {
+      .setJobsListener(OrderStatus.ACCEPTED, null, kitchenId, (newAccepted) {
         processDonorsInfo(newAccepted);
         setState(() {
-          acceptedOrders.clear();
-          acceptedOrders.addAll(newAccepted);
+          acceptedJobs.clear();
+          acceptedJobs.addAll(newAccepted);
         });
       });
   }
@@ -51,8 +51,8 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionTitle("Active Jobs", acceptedOrders.length),
-                      ...acceptedOrders.map(buildListItem)
+                      _buildSectionTitle("Active Jobs", acceptedJobs.length),
+                      ...acceptedJobs.map(buildJobItem)
                     ]
                   )
                 ]
@@ -64,7 +64,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
     );
   }
 
-  void processDonorsInfo(List<OrderInfo> orders) {
+  void processDonorsInfo(List<JobInfo> orders) {
     for (var order in orders) {
       assert(order.status == OrderStatus.ACCEPTED);
 
@@ -77,12 +77,11 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
     }
   }
 
-  Widget buildListItem(OrderInfo order) {
-    var content = order.status == OrderStatus.ACCEPTED ? "..." : "";
+  Widget buildJobItem(JobInfo order) {
     return ListTile(
       leading: Icon(Icons.person),
-      title: Text(order.name),
-      trailing: Text(donorsInfo[order.donorId]?.name ?? content),
+      title: Text(donorsInfo[order.donorId]?.name ?? "..."),
+      trailing: Text("x${order.quantity}"),
       onTap: () {
         Navigator.push(
           context,
