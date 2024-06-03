@@ -1,8 +1,8 @@
-import 'package:cibu/models/order_info.dart';
+import 'package:cibu/models/job_info.dart';
 import 'package:flutter/material.dart';
 
 class RequestDetailPage extends StatelessWidget {
-  final OrderInfo item;
+  final JobInfo item;
 
   const RequestDetailPage({super.key, required this.item});
 
@@ -17,14 +17,13 @@ class RequestDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Title", "\"${item.name}\""),
+            _buildDetailRow("Title", "\"${item.donorId}\""),
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildDetailColumn("Quantity", item.quantity.toString()),
-                _buildDetailColumn("Category", item.category.value),
-                _buildDetailColumn("Size", item.size.value),
+                _buildDetailColumn("Category", item.kitchenId),
               ],
             ),
           ],

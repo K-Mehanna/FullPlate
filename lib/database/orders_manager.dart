@@ -1,48 +1,93 @@
+import 'package:cibu/models/offer_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cibu/models/order_info.dart';
+import 'package:cibu/models/job_info.dart';
 import 'dart:async';
 
 class OrdersManager {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  void addPendingOrder(OrderInfo order, void Function()? callback) {
-    assert(order.status == OrderStatus.PENDING);
+  void addOpenOffer(String donorId, OfferInfo offer) {
+    final openOffersRef = _db
+      .collection("donors")
+      .doc(donorId)
+      .collection("openOffers");
 
-    final offersRef = _db.collection("offers");
-
-    final offerRef = offersRef.add(order.toFirestore());
-
-    offerRef.then((offerSnapshot) {
-      final offerId = offerSnapshot.id;
-
-      offerSnapshot.update({"offerId": offerId}).then((updateSnap) {
-        if (callback != null) callback();
-      },
-          onError: (e) =>
-              print("OrdersManager\n - addPendingOrder - update offerId: $e"));
-    },
-        onError: (e) =>
-            print("OrdersManager\n - addPendingOrder - add offer: $e"));
+    openOffersRef.add(offer.toFirestore())
+      .then((a) {}, onError: (e) => print("\nOrdersManager\n - addOpenOffer"));
   }
 
-  void acceptOrder(
-      OrderInfo order, String kitchenId, void Function()? callback) {
-    assert(order.status == OrderStatus.PENDING);
+  void acceptOpenOffer(String donorId, String kitchenId, List<OfferInfo> openOffers, List<int> selectedQuantity) {
+    final openOffersRef = _db
+      .collection("donors")
+      .doc(donorId)
+      .collection("openOffers");
 
-    _db.collection("offers").doc(order.orderId).update({
-      "status": OrderStatus.ACCEPTED.value,
-      "timeAccepted": Timestamp.fromDate(DateTime.now()),
-      "kitchenId": kitchenId,
-    }).then((orderSnapshot) {
-      if (callback != null) callback();
-    }, onError: (e) => print("OrdersManager\n - acceptOrder"));
+    int i = 0;
+    for (OfferInfo offer in openOffers) {
+      final openOffer = openOffersRef.doc(offer.offerId);
+
+      final newQuantity = offer.quantity - selectedQuantity[i];
+      assert(newQuantity >= 0);
+
+      Future<void> outcome;
+      if (newQuantity > 0) {
+        outcome = openOffer.update({
+          "quantity": offer.quantity - selectedQuantity[0]
+        });
+      } else {
+        outcome = openOffer.delete();
+      }
+      
+      outcome.then((a) {
+        print("success for ${offer.name} (${offer.quantity} left)");
+      }, onError: (e) => print("\nOrdersManager\n - acceptOpenOffer\n - updating offer quantities"));
+      
+      offer.quantity = selectedQuantity[i];
+
+      i++;
+    }
+
+    JobInfo job = JobInfo(
+      timeAccepted: DateTime.now(), 
+      donorId: donorId, 
+      kitchenId: kitchenId, 
+      status: OrderStatus.ACCEPTED,
+      quantity: openOffers.map((offer) => offer.quantity).reduce((a, b) => a + b)
+    );
+
+    _db.collection("jobs").add(job.toFirestore())
+    .then((a) {}, onError: (e) => print("\nOrdersManager\n - acceptOpenOffer\n - adding job"));
   }
 
-  Query<Map<String, dynamic>> _buildOrdersQuery(OrderStatus status,
-      bool shouldLimit, String? donorId, String? kitchenId) {
-    final offersRef = _db.collection("offers");
+  void getOpenOffersCompletion(
+      String donorId,
+      void Function(List<OfferInfo>) callback) {
+    final query = _db
+      .collection("donors")
+      .doc(donorId)
+      .collection("openOffers");
 
-    var query = offersRef.where("status", isEqualTo: status.value);
+    _fetchOfferCallback(
+        query.orderBy("timeCreated", descending: true), callback);
+  }
+
+  void _fetchOfferCallback(Query<Map<String, dynamic>> query,
+      void Function(List<OfferInfo>) callback) {
+    query.get().then((querySnapshot) {
+      List<OfferInfo> offers = [];
+
+      for (var docSnapshot in querySnapshot.docs) {
+        offers.add(OfferInfo.fromFirestore(docSnapshot, null, docSnapshot.id));
+      }
+
+      callback(offers);
+    }, onError: (e) => print("OrdersManager\n - _fetchQueryCallback: $e"));
+  }
+
+  Query<Map<String, dynamic>> _buildJobsQuery(OrderStatus status, String? donorId, String? kitchenId) {
+    var query = _db
+      .collection("jobs")
+      .where("status", isEqualTo: status.value);
 
     if (donorId != null) {
       query = query.where("donorId", isEqualTo: donorId);
@@ -50,77 +95,60 @@ class OrdersManager {
     if (kitchenId != null) {
       query = query.where("kitchenId", isEqualTo: kitchenId);
     }
-    if (shouldLimit) {
-      query.limit(10);
-    }
 
     return query;
   }
 
-  Future<List<OrderInfo>> getOrders(OrderStatus status, bool shouldLimit,
-      String? donorId, String? kitchenId) {
-    var query = _buildOrdersQuery(status, shouldLimit, donorId, kitchenId);
+  void getJobsCompletion(OrderStatus status, String? donorId, String? kitchenId, void Function(List<JobInfo>) callback) {
+    var query = _buildJobsQuery(status, donorId, kitchenId);
 
-    return _fetchQuery(query.orderBy("timeCreated", descending: true));
+    _fetchJobsCallback(
+      query.orderBy("timeAccepted", descending: true), callback);
   }
 
-  void getOrdersCompletion(
-      OrderStatus status,
-      bool shouldLimit,
-      String? donorId,
-      String? kitchenId,
-      void Function(List<OrderInfo>) callback) {
-    var query = _buildOrdersQuery(status, shouldLimit, donorId, kitchenId);
-
-    _fetchQueryCallback(
-        query.orderBy("timeCreated", descending: true), callback);
-  }
-
-  void setOrderListener(
-      OrderStatus status,
-      bool shouldLimit,
-      String? donorId,
-      String? kitchenId,
-      void Function(List<OrderInfo>) callback) {
-    var query = _buildOrdersQuery(status, shouldLimit, donorId, kitchenId);
-
-    query.snapshots().listen((querySnapshot) {
-      List<OrderInfo> orders = [];
+  void _fetchJobsCallback(Query<Map<String, dynamic>> query,
+      void Function(List<JobInfo>) callback) {
+    query.get().then((querySnapshot) {
+      List<JobInfo> offers = [];
 
       for (var docSnapshot in querySnapshot.docs) {
-        orders.add(OrderInfo.fromFirestore(docSnapshot, null));
+        offers.add(JobInfo.fromFirestore(docSnapshot, null, docSnapshot.id));
       }
 
-      callback(orders);
+      callback(offers);
+    }, onError: (e) => print("OrdersManager\n - _fetchQueryCallback: $e"));
+  }
+
+  void setOpenOffersListener(
+      String donorId,
+      void Function(List<OfferInfo>) callback) {
+    final query = _db
+      .collection("donors")
+      .doc(donorId)
+      .collection("openOffers");
+
+    query.snapshots().listen((querySnapshot) {
+      List<OfferInfo> offers = [];
+
+      for (var docSnapshot in querySnapshot.docs) {
+        offers.add(OfferInfo.fromFirestore(docSnapshot, null, docSnapshot.id));
+      }
+
+      callback(offers);
     });
   }
 
-  Future<List<OrderInfo>> _fetchQuery(Query<Map<String, dynamic>> query) {
-    final completer = Completer<List<OrderInfo>>();
+  void setJobsListener(OrderStatus status, String? donorId, String? kitchenId, void Function(List<JobInfo>) callback) {
+    var query = _buildJobsQuery(status, donorId, kitchenId);
 
-    query.get().then((querySnapshot) {
-      List<OrderInfo> orders = [];
-
-      for (var docSnapshot in querySnapshot.docs) {
-        orders.add(OrderInfo.fromFirestore(docSnapshot, null));
-      }
-
-      completer.complete(orders);
-    }, onError: (e) => print("OrdersManager\n - _fetchQuery: $e"));
-
-    return completer.future;
-  }
-
-  void _fetchQueryCallback(Query<Map<String, dynamic>> query,
-      void Function(List<OrderInfo>) callback) {
-    query.get().then((querySnapshot) {
-      List<OrderInfo> orders = [];
+    query.snapshots().listen((querySnapshot) {
+      List<JobInfo> jobs = [];
 
       for (var docSnapshot in querySnapshot.docs) {
-        orders.add(OrderInfo.fromFirestore(docSnapshot, null));
+        jobs.add(JobInfo.fromFirestore(docSnapshot, null, docSnapshot.id));
       }
 
-      callback(orders);
-    }, onError: (e) => print("OrdersManager\n - _fetchQuery: $e"));
+      callback(jobs);
+    });
   }
 }

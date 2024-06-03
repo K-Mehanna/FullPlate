@@ -1,5 +1,6 @@
 import 'package:cibu/database/orders_manager.dart';
-import 'package:cibu/models/order_info.dart';
+import 'package:cibu/models/job_info.dart';
+import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 
 class NewRequestPage extends StatefulWidget {
@@ -14,7 +15,6 @@ class NewRequestPageState extends State<NewRequestPage> {
   final TextEditingController titleController = TextEditingController();
   int quantity = 1;
   OrderCategory selectedCategory = OrderCategory.BREAD;
-  OrderSize selectedSize = OrderSize.MEDIUM;
 
   void incrementQuantity() {
     setState(() {
@@ -31,16 +31,12 @@ class NewRequestPageState extends State<NewRequestPage> {
   }
 
   void submitRequest() {
-    final newItem = OrderInfo(
+    final newItem = OfferInfo(
       name: titleController.text,
       quantity: quantity,
-      category: selectedCategory,
-      size: selectedSize,
-      timeCreated: DateTime.now(),
-      donorId: "sec0ABRO6ReQz1hxiKfJ",
-      status: OrderStatus.PENDING,
+      category: selectedCategory
     );
-    ordersManager.addPendingOrder(newItem, null);
+    ordersManager.addOpenOffer("sec0ABRO6ReQz1hxiKfJ", newItem);
     Navigator.pop(context);
   }
 
@@ -97,20 +93,6 @@ class NewRequestPageState extends State<NewRequestPage> {
             ),
             SizedBox(height: 16),
             Text("Size"),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: OrderSize.values.map((size) {
-                return ChoiceChip(
-                  label: Text(size.value),
-                  selected: selectedSize == size,
-                  onSelected: (selected) {
-                    setState(() {
-                      selectedSize = size;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
             Spacer(),
             Align(
               alignment: Alignment.bottomCenter,

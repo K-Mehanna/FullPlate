@@ -1,15 +1,59 @@
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
-import 'package:cibu/models/order_info.dart';
+import 'package:cibu/models/job_info.dart';
+import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
 
-class DonorDetailPage extends StatelessWidget {
-  final OrderInfo order;
+class DonorDetailPage extends StatefulWidget {
+  final DonorInfo donorInfo;
+
+  DonorDetailPage({Key? key, required this.donorInfo}) : super(key: key);
+
+  @override
+  State<DonorDetailPage> createState() => _DonorDetailPageState();
+}
+
+class _DonorDetailPageState extends State<DonorDetailPage> {
+  List<OfferInfo> openOffers = [];
+
+  // final OfferInfo item1 = OfferInfo(
+  //     name: "name1",
+  //     quantity: 10,
+  //     category: OrderCategory.BREAD);
+
+  // final OfferInfo item2 = OfferInfo(
+  //     name: "name2",
+  //     quantity: 10,
+  //     category: OrderCategory.FRUIT_VEG);
+
+  // final OfferInfo item3 = OfferInfo(
+  //     name: "name3",
+  //     quantity: 10,
+  //     category: OrderCategory.READY_MEALS);
+
+  // late final List<OfferInfo> offers = [item1, item2, item3];
+
   final DonorsManager donorsManager = DonorsManager();
   final OrdersManager ordersManager = OrdersManager();
 
-  DonorDetailPage({Key? key, required this.order}) : super(key: key);
+  // Map to store the selected quantities for each order item
+  late final Map<String, ValueNotifier<int>> selectedQuantities;
+
+  @override
+  void initState() {
+    super.initState();
+
+    ordersManager.getOpenOffersCompletion(widget.donorInfo.donorId, (newOffers) {
+      setState(() {
+        openOffers.addAll(newOffers);
+
+        selectedQuantities = {
+          for (var order in openOffers) order.offerId: ValueNotifier<int>(0),
+        };
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +63,12 @@ class DonorDetailPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          ordersManager.acceptOrder(order, 'BgOtpuMuOZNa6IYWRJgb', null);
+          ordersManager.acceptOpenOffer(
+            widget.donorInfo.donorId, 
+            "BgOtpuMuOZNa6IYWRJgb", 
+            openOffers, 
+            openOffers.map((offer) => selectedQuantities[offer.offerId]!.value).toList());
+          
           Navigator.pop(context);
         },
         label: Text("Accept order"),
@@ -29,36 +78,32 @@ class DonorDetailPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<DonorInfo>(
-          future: donorsManager.getDonor(order.donorId),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              final donor = snapshot.data!;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow("Donor name", widget.donorInfo.name),
+            SizedBox(height: 16),
+            _buildDetailRow("Donor address", widget.donorInfo.address),
+            SizedBox(height: 16),
+            
+            Padding(
+              padding: const EdgeInsets.only(right: 40.0, left: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildDetailRow("Donor name", donor.name),
-                  SizedBox(height: 16),
-                  _buildDetailRow("Donor address", donor.address),
-                  SizedBox(height: 16),
-                  _buildDetailRow("Title", order.name),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildDetailColumn("Quantity", order.quantity.toString()),
-                      _buildDetailColumn("Category", order.category.value),
-                      _buildDetailColumn("Size", order.size.value),
-                    ],
-                  ),
+                  Text("Category",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("Quantity",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
-              );
-            }
-          },
+              ),
+            ),
+
+            SizedBox(height: 16),
+            Expanded(
+              child: _buildOfferItemSelection(openOffers)
+            ),
+          ],
         ),
       ),
     );
@@ -74,13 +119,55 @@ class DonorDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailColumn(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(value),
-      ],
+  // Widget _buildDetailColumn(String label, String value) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+  //       Text(value),
+  //     ],
+  //   );
+  // }
+
+  ListView _buildOfferItemSelection(List<OfferInfo> items) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final offer = items[index];
+        final selected = selectedQuantities[offer.name]!;
+
+        return ListTile(
+          title: Text(offer.category.value),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.remove),
+                onPressed: () {
+                  if (selected.value > 0) {
+                    selected.value--;
+                  }
+                },
+              ),
+              ValueListenableBuilder<int>(
+                valueListenable: selected,
+                builder: (context, value, _) {
+                  return Text(value.toString());
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  if (selected.value < offer.quantity) {
+                    selected.value++;
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -11,7 +11,7 @@ class DonorsManager {
       final donorsRef = _db.collection("donors");
 
       donorsRef.doc(donorId).get().then((querySnapshot) {
-        DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null);
+        DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null, querySnapshot.id);
         completer.complete(donor);
       }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
 
@@ -22,7 +22,7 @@ class DonorsManager {
       final donorsRef = _db.collection("donors");
 
       donorsRef.doc(donorId).get().then((querySnapshot) {
-        DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null);
+        DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null, querySnapshot.id);
         callback(donor);
       }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
     } 

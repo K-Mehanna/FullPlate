@@ -1,10 +1,12 @@
 import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/models/kitchen_info.dart';
-import 'package:cibu/models/order_info.dart';
+import 'package:cibu/models/job_info.dart';
+import 'package:cibu/models/offer_info.dart';
 import 'package:cibu/widgets/request_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/new_request_page.dart';
 import 'package:cibu/database/orders_manager.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DonorDashboard extends StatefulWidget {
   DonorDashboard({Key? key}) : super(key: key);
@@ -16,8 +18,8 @@ class DonorDashboard extends StatefulWidget {
 class _DonorDashboardState extends State<DonorDashboard> {
   final OrdersManager ordersManager = OrdersManager();
   Map<String, KitchenInfo> kitchensInfo = {};
-  List<OrderInfo> acceptedOrders = [];
-  List<OrderInfo> pendingOrders = [];
+  List<JobInfo> acceptedJobs = [];
+  List<OfferInfo> pendingOffers = [];
 
   final String donorId = "sec0ABRO6ReQz1hxiKfJ";
 
@@ -26,19 +28,19 @@ class _DonorDashboardState extends State<DonorDashboard> {
     super.initState();
 
     ordersManager
-      .setOrderListener(OrderStatus.ACCEPTED, false, donorId, null, (newAccepted) {
-        processKitchenInfo(newAccepted);
+      .setOpenOffersListener(donorId, (newPending) {
         setState(() {
-          acceptedOrders.clear();
-          acceptedOrders.addAll(newAccepted);
+          pendingOffers.clear();
+          pendingOffers.addAll(newPending);
         });
       });
 
     ordersManager
-      .setOrderListener(OrderStatus.PENDING, false, donorId, null, (newPending) {
+      .setJobsListener(OrderStatus.ACCEPTED, donorId, null, (newAccepted) {
+        processKitchenInfo(newAccepted);
         setState(() {
-          pendingOrders.clear();
-          pendingOrders.addAll(newPending);
+          acceptedJobs.clear();
+          acceptedJobs.addAll(newAccepted);
         });
       });
   }
@@ -74,15 +76,15 @@ class _DonorDashboardState extends State<DonorDashboard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionTitle("Accepted Jobs", acceptedOrders.length),
-                      ...acceptedOrders.map(buildListItem)
+                      _buildSectionTitle("Waiting for pickup", acceptedJobs.length),
+                      ...acceptedJobs.map(buildJobItem)
                     ]
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionTitle("Pending Jobs", pendingOrders.length),
-                      ...pendingOrders.map(buildListItem)
+                      _buildSectionTitle("Unassigned", pendingOffers.length),
+                      ...pendingOffers.map(buildOfferItem)
                     ]
                   )
                 ],
@@ -94,33 +96,51 @@ class _DonorDashboardState extends State<DonorDashboard> {
     );
   }
 
-  void processKitchenInfo(List<OrderInfo> orders) {
+  void processKitchenInfo(List<JobInfo> orders) {
     for (var order in orders) {
       assert(order.status == OrderStatus.ACCEPTED);
 
       KitchensManager()
-        .getKitchenCompletion(order.kitchenId!, (kitchen) {
+        .getKitchenCompletion(order.kitchenId, (kitchen) {
           setState(() {
-            kitchensInfo[order.kitchenId!] = kitchen;
+            kitchensInfo[order.kitchenId] = kitchen;
           });
         });    
     }
   }
 
-  Widget buildListItem(OrderInfo order) {
-    var content = order.status == OrderStatus.ACCEPTED ? "..." : "";
+  Widget buildJobItem(JobInfo job) {    
     return ListTile(
       leading: Icon(Icons.person),
-      title: Text(order.name),
-      trailing: Text(kitchensInfo[order.kitchenId]?.name ?? content),
+      title: Text(kitchensInfo[job.kitchenId]?.name ?? "..."),
+      trailing: Text("x${job.quantity}"),
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RequestDetailPage(item: order),
+            builder: (context) => RequestDetailPage(item: job),
           ),
         );
       },
+    );
+  }
+
+  Icon getIconForCategory(OrderCategory category) {
+    switch (category) {
+      case OrderCategory.BREAD:
+        return Icon(Icons.breakfast_dining_sharp);
+      case OrderCategory.FRUIT_VEG:
+        return Icon(Icons.apple);
+      case OrderCategory.READY_MEALS:
+        return Icon(Icons.set_meal_outlined);
+    }
+  }
+  
+  Widget buildOfferItem(OfferInfo offer) {
+    return ListTile(
+      leading: getIconForCategory(offer.category),
+      title: Text(offer.name),
+      trailing: Text("x${offer.quantity}")
     );
   }
 
