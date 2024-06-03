@@ -25,32 +25,8 @@ class _DonorDashboardState extends State<DonorDashboard> {
   void initState() {
     super.initState();
 
-    _refresh();
-
-    // ordersManager
-    //   .getOrders(OrderStatus.ACCEPTED, false, donorId, null)
-    //   .then((newAccepted) {
-    //     processKitchenInfo(newAccepted);
-    //     setState(() {
-    //       acceptedOrders.clear();
-    //       acceptedOrders.addAll(newAccepted);
-    //     });
-    //   });
-
-    // ordersManager
-    //   .getOrders(OrderStatus.PENDING, false, donorId, null)
-    //   .then((newPending) {
-    //     setState(() {
-    //       pendingOrders.clear();
-    //       pendingOrders.addAll(newPending);
-    //     });
-    //   });
-  }
-
-  void _refresh() {
     ordersManager
-      .getOrders(OrderStatus.ACCEPTED, false, donorId, null)
-      .then((newAccepted) {
+      .setOrderListener(OrderStatus.ACCEPTED, false, donorId, null, (newAccepted) {
         processKitchenInfo(newAccepted);
         setState(() {
           acceptedOrders.clear();
@@ -59,8 +35,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
       });
 
     ordersManager
-      .getOrders(OrderStatus.PENDING, false, donorId, null)
-      .then((newPending) {
+      .setOrderListener(OrderStatus.PENDING, false, donorId, null, (newPending) {
         setState(() {
           pendingOrders.clear();
           pendingOrders.addAll(newPending);
@@ -74,10 +49,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
       MaterialPageRoute(
         builder: (context) => NewRequestPage(),
       ),
-    ).then(
-      (value) => _refresh(),
     );
-
   }
 
   @override

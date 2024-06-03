@@ -1,6 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/donor_home_page.dart';
 import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
+import 'package:cibu/pages/auth/auth_gate.dart';
+
+enum UserType {
+  DONOR,
+  KITCHEN,
+}
+
+extension UserTypeExtension on UserType {
+  String get value {
+    switch (this) {
+      case UserType.DONOR:
+        return 'Donor';
+      case UserType.KITCHEN:
+        return 'Kitchen';
+    }
+  }
+
+  static UserType fromString(String type) {
+    switch (type) {
+      case 'Donor':
+        return UserType.DONOR;
+      case 'Kitchen':
+        return UserType.KITCHEN;
+      default:
+        throw ArgumentError('Invalid user type string: $type');
+    }
+  }
+}
 
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});
@@ -27,37 +55,41 @@ class TitlePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DonorHomePage()),
-                        );
-                      },
-                      child: Text("Donor"),
-                    ),
+                    UserButton(userType: UserType.DONOR),
                     SizedBox(width: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => KitchenHomePage()),
-                        );
-                      },
-                      child: Text("Kitchen"),
-                    ),
+                    UserButton(userType: UserType.KITCHEN),
                   ],
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                SizedBox(height: 20),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class UserButton extends StatelessWidget {
+  const UserButton({super.key, required this.userType});
+
+  final UserType userType;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => userType == UserType.DONOR
+                  ? DonorHomePage()
+                  : KitchenHomePage()
+              //AuthGate(userType: userType)
+              ),
+        );
+      },
+      child: Text(userType.value),
     );
   }
 }

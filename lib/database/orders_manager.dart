@@ -76,6 +76,25 @@ class OrdersManager {
         query.orderBy("timeCreated", descending: true), callback);
   }
 
+  void setOrderListener(
+      OrderStatus status,
+      bool shouldLimit,
+      String? donorId,
+      String? kitchenId,
+      void Function(List<OrderInfo>) callback) {
+    var query = _buildOrdersQuery(status, shouldLimit, donorId, kitchenId);
+
+    query.snapshots().listen((querySnapshot) {
+      List<OrderInfo> orders = [];
+
+      for (var docSnapshot in querySnapshot.docs) {
+        orders.add(OrderInfo.fromFirestore(docSnapshot, null));
+      }
+
+      callback(orders);
+    });
+  }
+
   Future<List<OrderInfo>> _fetchQuery(Query<Map<String, dynamic>> query) {
     final completer = Completer<List<OrderInfo>>();
 

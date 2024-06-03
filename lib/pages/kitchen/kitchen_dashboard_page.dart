@@ -25,8 +25,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
     super.initState();
 
     ordersManager
-      .getOrders(OrderStatus.ACCEPTED, false, null, kitchenId)
-      .then((newAccepted) {
+      .setOrderListener(OrderStatus.ACCEPTED, false, null, kitchenId, (newAccepted) {
         processDonorsInfo(newAccepted);
         setState(() {
           acceptedOrders.clear();
