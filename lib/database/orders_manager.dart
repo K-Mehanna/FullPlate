@@ -56,7 +56,25 @@ class OrdersManager {
     );
 
     _db.collection("jobs").add(job.toFirestore())
-    .then((a) {}, onError: (e) => print("\nOrdersManager\n - acceptOpenOffer\n - adding job"));
+    .then((docSnapshot) {
+      _addConstituentOffersToJob(docSnapshot.id, openOffers.where((offer) => offer.quantity > 0).toList());
+    }, onError: (e) => print("\nOrdersManager\n - acceptOpenOffer\n - adding job"));
+  }
+
+  void _addConstituentOffersToJob(String jobId, List<OfferInfo> offers) {
+    final offersRef = _db
+      .collection("jobs")
+      .doc(jobId)
+      .collection("constituentOffers");
+
+    for (OfferInfo offer in offers) {
+      offersRef
+        .doc(offer.offerId)
+        .set(offer.toFirestore())
+        .then((e) {
+          
+        }, onError: (e) => print("OrdersManager\n - addConstituentOffersToJob\n - error: $e"));
+    }
   }
 
   void getOpenOffersCompletion(
@@ -67,8 +85,7 @@ class OrdersManager {
       .doc(donorId)
       .collection("openOffers");
 
-    _fetchOfferCallback(
-        query.orderBy("timeCreated", descending: true), callback);
+    _fetchOfferCallback(query, callback);
   }
 
   void _fetchOfferCallback(Query<Map<String, dynamic>> query,
@@ -97,6 +114,24 @@ class OrdersManager {
     }
 
     return query;
+  }
+
+  void getConstituentOffersCompletion(String jobId, void Function(List<OfferInfo>) callback) {
+    final constituentOffersRef = _db
+      .collection("jobs")
+      .doc(jobId)
+      .collection("constituentOffers");
+
+    constituentOffersRef.get().then((querySnapshot) {
+      List<OfferInfo> offers = [];
+
+      for (var docSnapshot in querySnapshot.docs) {
+        OfferInfo offer = OfferInfo.fromFirestore(docSnapshot, null, docSnapshot.id);
+        offers.add(offer);
+      }
+
+      callback(offers);
+    }, onError: (e) => print("OrdersManager\n - getConstituentOffersCompletion: $e"));
   }
 
   void getJobsCompletion(OrderStatus status, String? donorId, String? kitchenId, void Function(List<JobInfo>) callback) {

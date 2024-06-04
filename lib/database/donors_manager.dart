@@ -5,6 +5,7 @@ import 'dart:async';
 class DonorsManager {
     final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+
     Future<DonorInfo> getDonor(String donorId) {
       final completer = Completer<DonorInfo>();
 
@@ -18,6 +19,21 @@ class DonorsManager {
       return completer.future;
     }
 
+    void getDonorsCompletion(void Function(List<DonorInfo>) callback) {
+      final donorsRef = _db.collection("donors");
+
+      donorsRef.get().then((querySnapshot) {
+        List<DonorInfo> donors = [];
+
+        for (var docSnapshot in querySnapshot.docs) {
+          DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null, docSnapshot.id);
+          donors.add(donor);
+        }
+        
+        callback(donors);
+      }, onError: (e) => print("DonorsManager\n - getDonors: $e"));
+    } 
+
     void getDonorCompletion(String donorId, void Function(DonorInfo) callback) {
       final donorsRef = _db.collection("donors");
 
@@ -25,20 +41,5 @@ class DonorsManager {
         DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null, querySnapshot.id);
         callback(donor);
       }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
-    } 
-
-    // Future<List<DonorInfo>> getDonors() { // idk if this works
-    //   final completer = Completer<List<DonorInfo>>();
-
-    //   final donorsRef = _db.collection("donors");
-
-    //   donorsRef.get().then((querySnapshot) {
-    //     List<DonorInfo> donorList = querySnapshot.docs
-    //     .map((doc) => DonorInfo.fromFirestore(doc, null))
-    //     .toList();
-    //     completer.complete(donorList);
-    //   }, onError: (e) => print("DonorsManager\n - getDonors: $e"));
-
-    //   return completer.future;
-    // }
+    }
 }

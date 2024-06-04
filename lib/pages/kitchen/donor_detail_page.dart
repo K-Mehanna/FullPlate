@@ -1,6 +1,5 @@
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
-import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
@@ -17,23 +16,6 @@ class DonorDetailPage extends StatefulWidget {
 class _DonorDetailPageState extends State<DonorDetailPage> {
   List<OfferInfo> openOffers = [];
 
-  // final OfferInfo item1 = OfferInfo(
-  //     name: "name1",
-  //     quantity: 10,
-  //     category: OrderCategory.BREAD);
-
-  // final OfferInfo item2 = OfferInfo(
-  //     name: "name2",
-  //     quantity: 10,
-  //     category: OrderCategory.FRUIT_VEG);
-
-  // final OfferInfo item3 = OfferInfo(
-  //     name: "name3",
-  //     quantity: 10,
-  //     category: OrderCategory.READY_MEALS);
-
-  // late final List<OfferInfo> offers = [item1, item2, item3];
-
   final DonorsManager donorsManager = DonorsManager();
   final OrdersManager ordersManager = OrdersManager();
 
@@ -44,7 +26,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
   void initState() {
     super.initState();
 
-    ordersManager.getOpenOffersCompletion(widget.donorInfo.donorId, (newOffers) {
+    ordersManager.getOpenOffersCompletion(widget.donorInfo.donorId,
+        (newOffers) {
       setState(() {
         openOffers.addAll(newOffers);
 
@@ -64,11 +47,13 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           ordersManager.acceptOpenOffer(
-            widget.donorInfo.donorId, 
-            "BgOtpuMuOZNa6IYWRJgb", 
-            openOffers, 
-            openOffers.map((offer) => selectedQuantities[offer.offerId]!.value).toList());
-          
+              widget.donorInfo.donorId,
+              "BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID
+              openOffers,
+              openOffers
+                  .map((offer) => selectedQuantities[offer.offerId]!.value)
+                  .toList());
+
           Navigator.pop(context);
         },
         label: Text("Accept order"),
@@ -85,24 +70,20 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
             SizedBox(height: 16),
             _buildDetailRow("Donor address", widget.donorInfo.address),
             SizedBox(height: 16),
-            
             Padding(
               padding: const EdgeInsets.only(right: 40.0, left: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Category",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   Text("Quantity",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
-
             SizedBox(height: 16),
-            Expanded(
-              child: _buildOfferItemSelection(openOffers)
-            ),
+            Expanded(child: _buildOfferItemSelection(openOffers)),
           ],
         ),
       ),
@@ -119,23 +100,13 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
     );
   }
 
-  // Widget _buildDetailColumn(String label, String value) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-  //       Text(value),
-  //     ],
-  //   );
-  // }
-
   ListView _buildOfferItemSelection(List<OfferInfo> items) {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: items.length,
       itemBuilder: (context, index) {
         final offer = items[index];
-        final selected = selectedQuantities[offer.name]!;
+        final selected = selectedQuantities[offer.offerId]!;
 
         return ListTile(
           title: Text(offer.category.value),

@@ -23,7 +23,7 @@ Widget buildListItem(BuildContext context, JobInfo order) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => RequestDetailPage(item: order),
+          builder: (context) => RequestDetailPage(job: order),
         ),
       );
     },

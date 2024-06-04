@@ -2,6 +2,7 @@ import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
+import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class RequestDetailPage extends StatefulWidget {
 }
 
 class _RequestDetailPageState extends State<RequestDetailPage> {
-  DonorInfo? donor; // should display donor
+  KitchenInfo? kitchen; // should display donor
   List<OfferInfo> constituentOffers = [];
 
   @override
@@ -24,7 +25,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
 
     DonorsManager().getDonorCompletion(widget.job.donorId, (donor) {
       setState(() {
-        this.donor = donor;
+        this.kitchen = kitchen;
       });
     });
 
@@ -47,7 +48,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow(
-                "Donor", donor?.name ?? "--"), //todo kitchen details
+                "Kitchen", kitchen?.name ?? "--"), //todo kitchen details
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

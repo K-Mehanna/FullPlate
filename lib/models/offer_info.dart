@@ -1,6 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 
 enum OrderCategory {
@@ -18,6 +20,17 @@ extension OrderCategoryExtension on OrderCategory {
         return "Bread";
       case OrderCategory.READY_MEALS:
         return "Ready Meals";
+    }
+  }
+
+  Icon get icon {
+    switch (this) {
+      case OrderCategory.BREAD:
+        return Icon(Icons.breakfast_dining_sharp);
+      case OrderCategory.FRUIT_VEG:
+        return Icon(Icons.apple);
+      case OrderCategory.READY_MEALS:
+        return Icon(Icons.set_meal_outlined);
     }
   }
 

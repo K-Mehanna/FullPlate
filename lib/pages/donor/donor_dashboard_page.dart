@@ -80,6 +80,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
                       ...acceptedJobs.map(buildJobItem)
                     ]
                   ),
+                  SizedBox(height: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -118,27 +119,16 @@ class _DonorDashboardState extends State<DonorDashboard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RequestDetailPage(item: job),
+            builder: (context) => RequestDetailPage(job: job),
           ),
         );
       },
     );
   }
-
-  Icon getIconForCategory(OrderCategory category) {
-    switch (category) {
-      case OrderCategory.BREAD:
-        return Icon(Icons.breakfast_dining_sharp);
-      case OrderCategory.FRUIT_VEG:
-        return Icon(Icons.apple);
-      case OrderCategory.READY_MEALS:
-        return Icon(Icons.set_meal_outlined);
-    }
-  }
   
   Widget buildOfferItem(OfferInfo offer) {
     return ListTile(
-      leading: getIconForCategory(offer.category),
+      leading: offer.category.icon,
       title: Text(offer.name),
       trailing: Text("x${offer.quantity}")
     );
