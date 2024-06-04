@@ -58,8 +58,7 @@ class JobInfo {
 
   factory JobInfo.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
-    SnapshotOptions? options,
-    String jobId
+    SnapshotOptions? options
   ) {
     final data = snapshot.data()!;
 
@@ -70,7 +69,7 @@ class JobInfo {
       kitchenId: data['kitchenId'],
       status: OrderStatusExtension.fromString(data['status']),
       quantity: data['quantity'],
-      jobId: jobId
+      jobId: snapshot.id
     );
 
     return job;

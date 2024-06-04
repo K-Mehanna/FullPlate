@@ -41,6 +41,18 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
       appBar: AppBar(
         title: Text("Viewing Job"),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Mark job as completed
+          
+          print('job ${widget.job.jobId} accepted');
+          Navigator.pop(context);
+        },
+        label: Text("Accept order"),
+        icon: Icon(
+          Icons.check,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

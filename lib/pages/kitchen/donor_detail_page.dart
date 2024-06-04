@@ -32,7 +32,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         openOffers.addAll(newOffers);
 
         selectedQuantities = {
-          for (var order in openOffers) order.offerId: ValueNotifier<int>(0),
+          for (var order in openOffers)
+            order.category.value: ValueNotifier<int>(0),
         };
       });
     });
@@ -51,10 +52,12 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
               "BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID
               openOffers,
               openOffers
-                  .map((offer) => selectedQuantities[offer.offerId]!.value)
-                  .toList());
-
-          Navigator.pop(context);
+                  .map((offer) =>
+                      selectedQuantities[offer.category.value]!.value)
+                  .toList(), () {
+            Navigator.pop(context);
+          });
+          print('FDSFDSSA');
         },
         label: Text("Accept order"),
         icon: Icon(
@@ -106,7 +109,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final offer = items[index];
-        final selected = selectedQuantities[offer.offerId]!;
+        final selected = selectedQuantities[offer.category.value]!;
 
         return ListTile(
           title: Text(offer.category.value),

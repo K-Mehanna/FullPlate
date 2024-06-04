@@ -6,12 +6,14 @@ class DonorInfo {
   final LatLng location;
   final String address;
   final String donorId;
+  final int quantity;
 
   DonorInfo({
     required this.name,
     required this.location,
     required this.address,
-    required this.donorId
+    required this.donorId,
+    required this.quantity
   });
 
   factory DonorInfo.fromFirestore(
@@ -26,7 +28,8 @@ class DonorInfo {
       name: data['name'],
       location: LatLng(geoPoint.latitude, geoPoint.longitude),
       address: data['address'],
-      donorId: donorId
+      donorId: donorId,
+      quantity: data['quantity']
     );
   }
 
@@ -35,6 +38,7 @@ class DonorInfo {
       "name": name,
       "location": GeoPoint(location.latitude, location.longitude),
       "address": address,
+      "quantity": quantity
     };
   }
 }

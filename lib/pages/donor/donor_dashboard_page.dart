@@ -27,22 +27,23 @@ class _DonorDashboardState extends State<DonorDashboard> {
   void initState() {
     super.initState();
 
-    ordersManager
-      .setOpenOffersListener(donorId, (newPending) {
-        setState(() {
-          pendingOffers.clear();
-          pendingOffers.addAll(newPending);
-        });
+    ordersManager.setOpenOffersListener(donorId, (newPending) {
+      if (!mounted) return;
+      setState(() {
+        pendingOffers.clear();
+        pendingOffers.addAll(newPending);
       });
+    });
 
-    ordersManager
-      .setJobsListener(OrderStatus.ACCEPTED, donorId, null, (newAccepted) {
-        processKitchenInfo(newAccepted);
-        setState(() {
-          acceptedJobs.clear();
-          acceptedJobs.addAll(newAccepted);
-        });
+    ordersManager.setJobsListener(OrderStatus.ACCEPTED, donorId, null,
+        (newAccepted) {
+      processKitchenInfo(newAccepted);
+      if (!mounted) return;
+      setState(() {
+        acceptedJobs.clear();
+        acceptedJobs.addAll(newAccepted);
       });
+    });
   }
 
   void _addNewRequest() {
@@ -74,20 +75,19 @@ class _DonorDashboardState extends State<DonorDashboard> {
               child: ListView(
                 children: [
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle("Waiting for pickup", acceptedJobs.length),
-                      ...acceptedJobs.map(buildJobItem)
-                    ]
-                  ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle(
+                            "Waiting for pickup", acceptedJobs.length),
+                        ...acceptedJobs.map(buildJobItem)
+                      ]),
                   SizedBox(height: 15),
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle("Unassigned", pendingOffers.length),
-                      ...pendingOffers.map(buildOfferItem)
-                    ]
-                  )
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle("Unassigned", pendingOffers.length),
+                        ...pendingOffers.map(buildOfferItem)
+                      ])
                 ],
               ),
             ),
@@ -101,16 +101,16 @@ class _DonorDashboardState extends State<DonorDashboard> {
     for (var order in orders) {
       assert(order.status == OrderStatus.ACCEPTED);
 
-      KitchensManager()
-        .getKitchenCompletion(order.kitchenId, (kitchen) {
-          setState(() {
-            kitchensInfo[order.kitchenId] = kitchen;
-          });
-        });    
+      KitchensManager().getKitchenCompletion(order.kitchenId, (kitchen) {
+        if (!mounted) return;
+        setState(() {
+          kitchensInfo[order.kitchenId] = kitchen;
+        });
+      });
     }
   }
 
-  Widget buildJobItem(JobInfo job) {    
+  Widget buildJobItem(JobInfo job) {
     return ListTile(
       leading: Icon(Icons.person),
       title: Text(kitchensInfo[job.kitchenId]?.name ?? "..."),
@@ -125,13 +125,12 @@ class _DonorDashboardState extends State<DonorDashboard> {
       },
     );
   }
-  
+
   Widget buildOfferItem(OfferInfo offer) {
     return ListTile(
-      leading: offer.category.icon,
-      title: Text(offer.name),
-      trailing: Text("x${offer.quantity}")
-    );
+        leading: offer.category.icon,
+        title: Text(offer.category.value),
+        trailing: Text("x${offer.quantity}"));
   }
 
   Widget _buildSectionTitle(String title, int count) {

@@ -3,6 +3,7 @@
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/donor_info.dart';
+import 'package:cibu/models/offer_info.dart';
 import 'package:cibu/pages/kitchen/donor_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,6 +24,8 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   static LatLng currentPosition = LatLng(0.0, 0.0);
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
+  OrderCategory? filters = OrderCategory.FRUIT_VEG;
+  String? sortBy = 'Sort By';
 
   void getCurrentLocation(void Function(Position) callback) async {
     LocationPermission permission = await Geolocator.requestPermission();
@@ -43,14 +46,17 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
 
   @override
   void initState() {
-    print('in here');
     super.initState();
+    print('in here');
 
     donorsManager.getDonorsCompletion(createMarkers);
 
     getCurrentLocation((newLocation) {
       var newPosition = LatLng(newLocation.latitude, newLocation.longitude);
       mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
+      if (!mounted) {
+        return;
+      }
       setState(() {
         currentPosition = newPosition;
       });
@@ -101,30 +107,80 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
             ),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Radius
-            Text('Radius: '),
-            Icon(Icons.radar),
-            Container(
-              width: 50,
-              child: TextField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                ),
-              ),
-            ),
-            SizedBox(width: 8),
-            // Category
-            Icon(Icons.fastfood),
-            SizedBox(width: 8),
-            // Sort by
-            Icon(Icons.sort),
-          ],
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Container(
+        //         child: Row(
+        //           children: [
+        //             Text('Radius'),
+        //             Padding(
+        //               padding: const EdgeInsets.all(4.0),
+        //               child: Icon(Icons.radar),
+        //             ),
+        //             Container(
+        //               width: 30,
+        //               height: 30,
+        //               child: TextField(
+        //                 keyboardType: TextInputType.number,
+        //                 decoration: InputDecoration(
+        //                   border: OutlineInputBorder(),
+        //                   contentPadding: EdgeInsets.symmetric(horizontal: 8),
+        //                 ),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //       Row(
+        //         children: [
+        //           Text('Category'),
+        //           SizedBox(width: 6),
+        //           DropdownButton(
+        //             value: filters,
+        //             items: OrderCategory.values.map((OrderCategory o) {
+        //               return DropdownMenuItem(
+        //                 value: o,
+        //                 child: o.icon, //Text(o.toString().split('.').last),
+        //               );
+        //             }).toList(),
+        //             onChanged: (OrderCategory? category) {
+        //               setState(() {
+        //                 filters = category!;
+        //               });
+        //             },
+        //           ),
+        //         ],
+        //       ),
+        //       Row(
+        //         children: [
+        //           DropdownButton(
+        //             value: sortBy,
+        //             items: ['Sort By', 'Distance', 'Recent'].map((String s) {
+        //               return DropdownMenuItem(
+        //                 value: s,
+        //                 enabled: s != 'Sort By',
+        //                 child: Text(
+        //                   s,
+        //                   style: s != 'Sort By'
+        //                       ? TextStyle(color: Colors.black)
+        //                       : TextStyle(color: Colors.grey),
+        //                 ), //Text(o.toString().split('.').last),
+        //               );
+        //             }).toList(),
+        //             onChanged: (String? s) {
+        //               setState(() {
+        //                 sortBy = s!;
+        //               });
+        //             },
+        //           ),
+        //         ],
+        //       ),
+        //     ],
+        //   ),
+        // ),
         Expanded(
           child: ListView.builder(
             controller: sc,
@@ -159,7 +215,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                       Expanded(
                         child: Align(
                           alignment: Alignment.centerRight,
-                          child: Text('Secondary text'),
+                          child: Text('x${donors[index].quantity}'),
                         ),
                       ),
                     ],

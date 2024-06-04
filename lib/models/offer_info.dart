@@ -2,24 +2,25 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
 
 enum OrderCategory {
   FRUIT_VEG,
   BREAD,
   READY_MEALS,
+  MISCELLANEOUS,
 }
 
 extension OrderCategoryExtension on OrderCategory {
   String get value {
     switch (this) {
-      case OrderCategory.FRUIT_VEG: 
+      case OrderCategory.FRUIT_VEG:
         return "Fruits & Veg";
       case OrderCategory.BREAD:
         return "Bread";
       case OrderCategory.READY_MEALS:
         return "Ready Meals";
+      case OrderCategory.MISCELLANEOUS:
+        return "Miscellaneous";
     }
   }
 
@@ -31,17 +32,21 @@ extension OrderCategoryExtension on OrderCategory {
         return Icon(Icons.apple);
       case OrderCategory.READY_MEALS:
         return Icon(Icons.set_meal_outlined);
+      case OrderCategory.MISCELLANEOUS:
+        return Icon(Icons.question_mark);
     }
   }
 
   String get code {
     switch (this) {
-      case OrderCategory.FRUIT_VEG: 
+      case OrderCategory.FRUIT_VEG:
         return "FRV";
       case OrderCategory.BREAD:
         return "BRD";
       case OrderCategory.READY_MEALS:
         return "MRE";
+      case OrderCategory.MISCELLANEOUS:
+        return "MIS";
     }
   }
 
@@ -53,6 +58,8 @@ extension OrderCategoryExtension on OrderCategory {
         return OrderCategory.BREAD;
       case "MRE":
         return OrderCategory.READY_MEALS;
+      case "MIS":
+        return OrderCategory.MISCELLANEOUS;
       default:
         throw ArgumentError('Invalid category code: $code');
     }
@@ -60,41 +67,29 @@ extension OrderCategoryExtension on OrderCategory {
 }
 
 class OfferInfo {
-  final String name;
   int quantity;
   int selectedQuantity = 0;
   final OrderCategory category;
-  String offerId;
 
-  OfferInfo(
-      {required this.name,
-      required this.quantity,
-      required this.category,
-      this.offerId = "unassigned"
-      });
+  OfferInfo({
+    required this.quantity,
+    required this.category,
+  });
 
   factory OfferInfo.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot,
-      SnapshotOptions? options,
-      String offerId) {
+      SnapshotOptions? options) {
     final data = snapshot.data()!;
 
     final order = OfferInfo(
-      name: data['title'],
       quantity: data['quantity'],
       category: OrderCategoryExtension.fromCode(data['category']),
-      offerId: offerId
     );
 
     return order;
   }
 
   Map<String, dynamic> toFirestore() {
-    return {
-      "title": name,
-      "quantity": quantity,
-      "category": category.code,
-      "offerId": offerId
-    };
+    return {"quantity": quantity, "category": category.code};
   }
 }
