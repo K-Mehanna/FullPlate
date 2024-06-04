@@ -1,4 +1,5 @@
 import 'package:cibu/database/donors_manager.dart';
+import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
@@ -23,7 +24,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   void initState() {
     super.initState();
 
-    DonorsManager().getDonorCompletion(widget.job.donorId, (donor) {
+    KitchensManager().getKitchenCompletion(widget.job.donorId, (donor) {
       setState(() {
         this.kitchen = kitchen;
       });

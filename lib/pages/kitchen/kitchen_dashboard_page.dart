@@ -77,16 +77,16 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
     }
   }
 
-  Widget buildJobItem(JobInfo order) {
+  Widget buildJobItem(JobInfo job) {
     return ListTile(
       leading: Icon(Icons.person),
-      title: Text(donorsInfo[order.donorId]?.name ?? "..."),
-      trailing: Text("x${order.quantity}"),
+      title: Text(donorsInfo[job.donorId]?.name ?? "..."),
+      trailing: Text("x${job.quantity}"),
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RequestDetailPage(item: order),
+            builder: (context) => RequestDetailPage(job: job),
           ),
         );
       },
