@@ -24,6 +24,9 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_svg: ^2.0.10+1
   sliding_up_panel: ^2.0.0+1
+  http: ^1.2.1
+  google_places_flutter: ^2.0.8
+  uuid: ^4.4.0
 
 dev_dependencies:
   flutter_test:
