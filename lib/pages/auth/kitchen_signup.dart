@@ -41,77 +41,90 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              // Text(
-              //   'Welcome to Cibu! Now for some extra details',
-              //   style: Theme.of(context).textTheme.displayMedium!,
-              // ),
-              // const SizedBox(height: 40),
-      
-              CustomTextField(
-                controller: nameController,
-                hintText: 'Organisation Name',
-                obscureText: false,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
-                  }
-                  return null;
-                },
-              ),
-      
-              const SizedBox(height: 25),
-              CustomTextField(
-                controller: addressController,
-                hintText: 'Address',
-                obscureText: false,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an address';
-                  }
-                  return null;
-                },
-                onTap: () async {
-                  // generate a new token here
-                  final sessionToken = Uuid().v4();
-      
-                  final Suggestion? result = await showSearch(
-                    context: context,
-                    delegate: AddressSearch(sessionToken),
-                  );
-      
-                  if (result != null) {
-                    final addressCoords = await PlaceApiProvider(sessionToken).getPlaceDetailFromId(result.placeId);
-                    setState(() {
-                      addressController.text = result.description;
-                      location = addressCoords;
-                    });
-                  }
-                }
-              ),
-      
-              const SizedBox(height: 25),
-            
-              CustomButton(
-                onTap: () { 
-                  if (formKey.currentState!.validate() && location != null) {
-                    updateDetailsToFirestore();
-                    Navigator.pushReplacement(
-                      context, 
-                      MaterialPageRoute(
-                        builder: (context) => KitchenHomePage()
-                      )
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Kitchen Page'),
+          automaticallyImplyLeading: false,
+        ),
+        body: Center(
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    'Thanks!\nWe still need a bit more info',
+                    style: Theme.of(context).textTheme.headlineMedium!,
+                  ),
+                ),
+                const SizedBox(height: 40),
+        
+                CustomTextField(
+                  controller: nameController,
+                  hintText: 'Organisation Name',
+                  obscureText: false,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a name';
+                    }
+                    return null;
+                  },
+                ),
+        
+                const SizedBox(height: 25),
+                CustomTextField(
+                  controller: addressController,
+                  hintText: 'Address',
+                  obscureText: false,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an address';
+                    }
+                    return null;
+                  },
+                  onTap: () async {
+                    // generate a new token here
+                    final sessionToken = Uuid().v4();
+        
+                    final Suggestion? result = await showSearch(
+                      context: context,
+                      delegate: AddressSearch(sessionToken),
                     );
+        
+                    if (result != null) {
+                      final addressCoords = await PlaceApiProvider(sessionToken).getPlaceDetailFromId(result.placeId);
+                      setState(() {
+                        addressController.text = result.description;
+                        location = addressCoords;
+                      });
+                    }
                   }
-                },
-                text: 'Next',
-              ),
-            ],
+                ),
+        
+                const SizedBox(height: 25),
+              
+                CustomButton(
+                  onTap: () { 
+                    if (formKey.currentState!.validate() && location != null) {
+                      updateDetailsToFirestore();
+                      Navigator.pushReplacement(
+                        context, 
+                        MaterialPageRoute(
+                          builder: (context) => KitchenHomePage()
+                        )
+                      );
+                    }
+                  },
+                  text: 'Next',
+                ),
+              ],
+            ),
           ),
         ),
       ),
