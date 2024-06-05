@@ -30,7 +30,7 @@ class KitchensManager {
 
   void addKitchen(KitchenInfo kitchenInfo) {
     _db
-      .collection("donors")
+      .collection("kitchens")
       .doc(kitchenInfo.kitchenId)
       .set(kitchenInfo.toFirestore())
       .then((a) {}, onError: (e) => print("Error: in addKitchen"));
