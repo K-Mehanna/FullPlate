@@ -12,8 +12,53 @@ class OrdersManager {
     _addOffer(baseDocumentRef, nestedOffersPath, offer);
   }
 
-  void acceptOpenOffer(String donorId, String kitchenId,
-      List<OfferInfo> openOffers, List<int> selectedQuantity, void Function() callback) {
+  void _addOffer(DocumentReference<Map<String, dynamic>> baseDocumentRef,
+      String nestedOffersPath, OfferInfo offer) {
+    final offerRef =
+        baseDocumentRef.collection(nestedOffersPath).doc(offer.category.code);
+
+    offerRef.get().then((docSnapshot) {
+      if (docSnapshot.exists) {
+        final int previousQuantity = docSnapshot.data()!["quantity"];
+
+        offerRef.update({"quantity": previousQuantity + offer.quantity});
+      } else {
+        offerRef.set(offer.toFirestore());
+      }
+    });
+
+    baseDocumentRef.get().then((docSnapshot) {
+      final previousQuantity = docSnapshot.data()!["quantity"];
+
+      baseDocumentRef.update({
+        "quantity": previousQuantity + offer.quantity
+      }).then((a) {},
+          onError: (e) => print(
+              "OrdersManager\n - addOpenOffer\n - update donor quantity $e"));
+    });
+  }
+
+  void setJobCompleted(JobInfo job, void Function() onCompletion) {
+    assert(job.status == OrderStatus.ACCEPTED);
+
+    _db
+        .collection("jobs")
+        .doc(job.jobId)
+        .update({"status": OrderStatus.COMPLETED.value})
+        .then(
+          (empty) {
+            onCompletion();
+          }, 
+          onError: (e) => print("OrdersManager\n - setJobCompleted: $e")
+        );
+  }
+
+  void acceptOpenOffer(
+      String donorId,
+      String kitchenId,
+      List<OfferInfo> openOffers,
+      List<int> selectedQuantity,
+      void Function() callback) {
     final openOffersRef =
         _db.collection("donors").doc(donorId).collection("openOffers");
 
@@ -38,8 +83,8 @@ class OrdersManager {
         _db.collection("jobs").add(job.toFirestore()).then((docSnapshot) {
           final baseDocumentRef = _db.collection("jobs").doc(docSnapshot.id);
 
-          _conductTransaction(
-              openOffers, openOffersRef, selectedQuantity, baseDocumentRef, callback);
+          _conductTransaction(donorId, openOffers, openOffersRef,
+              selectedQuantity, baseDocumentRef, callback);
         });
       } else {
         JobInfo previousJob =
@@ -49,14 +94,15 @@ class OrdersManager {
             {"quantity": previousJob.quantity + offerQuantity}).then((other) {
           final baseDocumentRef = _db.collection("jobs").doc(previousJob.jobId);
 
-          _conductTransaction(
-              openOffers, openOffersRef, selectedQuantity, baseDocumentRef, callback);
+          _conductTransaction(donorId, openOffers, openOffersRef,
+              selectedQuantity, baseDocumentRef, callback);
         });
       }
     });
   }
 
   void _conductTransaction(
+      String donorId,
       List<OfferInfo> openOffers,
       CollectionReference<Map<String, dynamic>> openOffersRef,
       List<int> selectedQuantity,
@@ -88,6 +134,11 @@ class OrdersManager {
 
       // WRITE
 
+      final donorRef = _db.collection("donors").doc(donorId);
+      transaction.update(donorRef, {
+        "quantity": openOffers.map((a) => a.quantity).reduce((a, b) => a + b)
+      });
+
       // old offers decrement quantity (delete / update)
       for (OfferInfo offer in openOffers) {
         final offerRef = openOffersRef.doc(offer.category.code);
@@ -114,32 +165,6 @@ class OrdersManager {
     }).then((e) {
       callback();
     }, onError: (e) => print("transaction failure: $e"));
-  }
-
-  void _addOffer(DocumentReference<Map<String, dynamic>> baseDocumentRef,
-      String nestedOffersPath, OfferInfo offer) {
-    final offerRef =
-        baseDocumentRef.collection(nestedOffersPath).doc(offer.category.code);
-
-    offerRef.get().then((docSnapshot) {
-      if (docSnapshot.exists) {
-        final int previousQuantity = docSnapshot.data()!["quantity"];
-
-        offerRef.update({"quantity": previousQuantity + offer.quantity});
-      } else {
-        offerRef.set(offer.toFirestore());
-      }
-    });
-
-    baseDocumentRef.get().then((docSnapshot) {
-      final previousQuantity = docSnapshot.data()!["quantity"];
-
-      baseDocumentRef.update({
-        "quantity": previousQuantity + offer.quantity
-      }).then((a) {},
-          onError: (e) => print(
-              "OrdersManager\n - addOpenOffer\n - update donor quantity $e"));
-    });
   }
 
   void getOpenOffersCompletion(

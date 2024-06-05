@@ -27,7 +27,10 @@ class DonorsManager {
 
         for (var docSnapshot in querySnapshot.docs) {
           DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null, docSnapshot.id);
-          donors.add(donor);
+          
+          if (donor.quantity > 0) {
+            donors.add(donor);
+          }
         }
         
         callback(donors);

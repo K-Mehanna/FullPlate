@@ -65,6 +65,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
       assert(order.status == OrderStatus.ACCEPTED);
 
       DonorsManager().getDonorCompletion(order.donorId, (donor) {
+        if (!mounted) return;
         setState(() {
           donorsInfo[order.donorId] = donor;
         });

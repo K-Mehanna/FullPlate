@@ -21,7 +21,8 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   final OrdersManager ordersManager = OrdersManager();
   final DonorsManager donorsManager = DonorsManager();
   late GoogleMapController mapController;
-  static LatLng currentPosition = LatLng(51.5072, 0.1276);
+  static LatLng currentPosition =
+      LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;
@@ -53,10 +54,10 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
 
     getCurrentLocation((newLocation) {
       var newPosition = LatLng(newLocation.latitude, newLocation.longitude);
-      mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
       if (!mounted) {
         return;
       }
+      mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
       setState(() {
         currentPosition = newPosition;
       });
