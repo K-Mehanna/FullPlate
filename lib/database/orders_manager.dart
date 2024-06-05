@@ -44,7 +44,10 @@ class OrdersManager {
     _db
         .collection("jobs")
         .doc(job.jobId)
-        .update({"status": OrderStatus.COMPLETED.value})
+        .update({
+          "status": OrderStatus.COMPLETED.value,
+          "timeCompleted": Timestamp.fromDate(DateTime.now())
+        })
         .then(
           (empty) {
             onCompletion();
