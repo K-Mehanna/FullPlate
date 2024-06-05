@@ -18,6 +18,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   Map<String, DonorInfo> donorsInfo = {};
   List<JobInfo> acceptedJobs = [];
 
+  //auth.currentUser!.uid
   final String kitchenId = "BgOtpuMuOZNa6IYWRJgb";
 
   @override

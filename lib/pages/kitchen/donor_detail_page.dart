@@ -48,7 +48,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         onPressed: () {
           ordersManager.acceptOpenOffer(
               widget.donorInfo.donorId,
-              "BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID
+              //auth.currentUser!.uid
+              "BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID // 
               openOffers,
               openOffers
                   .map((offer) => selectedQuantities[offer.offerId]!.value)
