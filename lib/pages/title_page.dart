@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cibu/pages/auth/auth_gate.dart';
 import 'package:cibu/pages/donor/donor_home_page.dart';
 import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
 import 'package:cibu/enums/user_type.dart';
@@ -57,10 +56,11 @@ class UserButton extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AuthGate(userType: userType)
-              // userType == UserType.DONOR
-              //     ? DonorHomePage()
-              //     : KitchenHomePage()
+              builder: (context) => 
+              userType == UserType.DONOR
+                  ? DonorHomePage()
+                  : KitchenHomePage()
+              //AuthGate(userType: userType)
           ),
         );
       },

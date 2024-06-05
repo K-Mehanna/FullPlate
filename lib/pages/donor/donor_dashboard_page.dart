@@ -3,6 +3,7 @@ import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cibu/widgets/request_detail_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/new_request_page.dart';
 import 'package:cibu/database/orders_manager.dart';
@@ -20,7 +21,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
   List<JobInfo> acceptedJobs = [];
   List<OfferInfo> pendingOffers = [];
 
-  final String donorId = "sec0ABRO6ReQz1hxiKfJ";
+  final String donorId = FirebaseAuth.instance.currentUser?.uid ?? "sec0ABRO6ReQz1hxiKfJ";
 
   @override
   void initState() {

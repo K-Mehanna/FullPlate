@@ -52,7 +52,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
             });
           },
           label: Text(
-            "Mark as complete",
+            "I've collected this order",
             style: TextStyle(color: Colors.white),
           ),
           icon: Icon(

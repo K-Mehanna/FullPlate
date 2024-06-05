@@ -11,7 +11,6 @@ import 'package:uuid/uuid.dart';
 import 'package:cibu/pages/auth/address_autocomplete/address_search.dart';
 import 'package:cibu/pages/auth/address_autocomplete/address_service.dart';
 
-
 class DonorSignupPage extends StatefulWidget {
   const DonorSignupPage({super.key});
 
@@ -21,7 +20,7 @@ class DonorSignupPage extends StatefulWidget {
 
 class _DonorSignupPageState extends State<DonorSignupPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  
+
   final nameController = TextEditingController();
   final addressController = TextEditingController();
   final DonorsManager donorsManager = DonorsManager();
@@ -33,7 +32,8 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
       name: nameController.text,
       location: location!,
       address: addressController.text,
-      donorId: FirebaseAuth.instance.currentUser!.uid
+      donorId: FirebaseAuth.instance.currentUser!.uid,
+      quantity: 0,
     );
 
     donorsManager.addDonor(donorInfo);
@@ -63,10 +63,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                     style: Theme.of(context).textTheme.headlineMedium!,
                   ),
                 ),
-                                
                 const SizedBox(height: 40),
-
-        
                 CustomTextField(
                   controller: nameController,
                   hintText: 'Organisation Name',
@@ -78,49 +75,45 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                     return null;
                   },
                 ),
-        
                 const SizedBox(height: 25),
                 CustomTextField(
-                  controller: addressController,
-                  hintText: 'Address',
-                  obscureText: false,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an address';
-                    }
-                    return null;
-                  },
-                  onTap: () async {
-                    // generate a new token here
-                    final sessionToken = Uuid().v4();
-        
-                    final Suggestion? result = await showSearch(
-                      context: context,
-                      delegate: AddressSearch(sessionToken),
-                    );
-        
-                    if (result != null) {
-                      final addressCoords = await PlaceApiProvider(sessionToken).getPlaceDetailFromId(result.placeId);
-                      setState(() {
-                        addressController.text = result.description;
-                        location = addressCoords;
-                      });
-                    }
-                  }
-                ),
-        
+                    controller: addressController,
+                    hintText: 'Address',
+                    obscureText: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter an address';
+                      }
+                      return null;
+                    },
+                    onTap: () async {
+                      // generate a new token here
+                      final sessionToken = Uuid().v4();
+
+                      final Suggestion? result = await showSearch(
+                        context: context,
+                        delegate: AddressSearch(sessionToken),
+                      );
+
+                      if (result != null) {
+                        final addressCoords =
+                            await PlaceApiProvider(sessionToken)
+                                .getPlaceDetailFromId(result.placeId);
+                        setState(() {
+                          addressController.text = result.description;
+                          location = addressCoords;
+                        });
+                      }
+                    }),
                 const SizedBox(height: 25),
-              
                 CustomButton(
-                  onTap: () { 
+                  onTap: () {
                     if (formKey.currentState!.validate() && location != null) {
                       updateDetailsToFirestore();
                       Navigator.pushReplacement(
-                        context, 
-                        MaterialPageRoute(
-                          builder: (context) => DonorHomePage()
-                        )
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DonorHomePage()));
                     }
                   },
                   text: 'Next',

@@ -1,6 +1,7 @@
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/offer_info.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:flutter/services.dart'; // Add this import
@@ -56,8 +57,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         onPressed: () {
           ordersManager.acceptOpenOffer(
               widget.donorInfo.donorId,
-              //auth.currentUser!.uid
-              "BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID // 
+              //"BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID //
+              FirebaseAuth.instance.currentUser?.uid ?? "BgOtpuMuOZNa6IYWRJgb",
               openOffers,
               openOffers
                   .map((offer) =>

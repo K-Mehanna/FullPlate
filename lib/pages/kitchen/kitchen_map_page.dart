@@ -98,7 +98,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   Widget _ordersScrollingList(ScrollController sc) {
     return Column(
       children: [
-        Icon(Icons.drag_handle),
+        Icon(Icons.keyboard_arrow_up),
         Padding(
           padding: const EdgeInsets.only(bottom: 15.0),
           child: Text(

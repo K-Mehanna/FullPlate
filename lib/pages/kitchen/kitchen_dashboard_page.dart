@@ -1,5 +1,6 @@
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/job_info.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/widgets/request_detail_page.dart';
 import 'package:cibu/models/donor_info.dart';
@@ -18,8 +19,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   Map<String, DonorInfo> donorsInfo = {};
   List<JobInfo> acceptedJobs = [];
 
-  //auth.currentUser!.uid
-  final String kitchenId = "BgOtpuMuOZNa6IYWRJgb";
+  final String kitchenId = FirebaseAuth.instance.currentUser?.uid ?? "BgOtpuMuOZNa6IYWRJgb";
 
   @override
   void initState() {
