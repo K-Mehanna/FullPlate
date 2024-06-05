@@ -5,11 +5,13 @@ class KitchenInfo {
   final String name;
   final LatLng location;
   final String address;
+  final String kitchenId;
 
   KitchenInfo({
     required this.name,
     required this.location,
     required this.address,
+    required this.kitchenId
   });
 
   factory KitchenInfo.fromFirestore(
@@ -23,6 +25,7 @@ class KitchenInfo {
       name: data['name'],
       location: LatLng(geoPoint.latitude, geoPoint.longitude),
       address: data['address'],
+      kitchenId: snapshot.id
     );
   }
 

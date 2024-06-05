@@ -45,4 +45,12 @@ class DonorsManager {
         callback(donor);
       }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
     }
+
+    void addDonor(DonorInfo donorInfo) {
+      _db
+        .collection("donors")
+        .doc(donorInfo.donorId)
+        .set(donorInfo.toFirestore())
+        .then((a) {}, onError: (e) => print("Error: in addDonor"));
+    }
 }
