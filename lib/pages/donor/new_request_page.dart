@@ -1,5 +1,4 @@
 import 'package:cibu/database/orders_manager.dart';
-import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +11,6 @@ class NewRequestPage extends StatefulWidget {
 
 class NewRequestPageState extends State<NewRequestPage> {
   final OrdersManager ordersManager = OrdersManager();
-  final TextEditingController titleController = TextEditingController();
   int quantity = 1;
   OrderCategory selectedCategory = OrderCategory.BREAD;
 
@@ -31,11 +29,7 @@ class NewRequestPageState extends State<NewRequestPage> {
   }
 
   void submitRequest() {
-    final newItem = OfferInfo(
-      name: titleController.text,
-      quantity: quantity,
-      category: selectedCategory
-    );
+    final newItem = OfferInfo(quantity: quantity, category: selectedCategory);
     ordersManager.addOpenOffer("sec0ABRO6ReQz1hxiKfJ", newItem);
     Navigator.pop(context);
   }
@@ -51,11 +45,6 @@ class NewRequestPageState extends State<NewRequestPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(labelText: "Title"),
-            ),
-            SizedBox(height: 16),
             DropdownButtonFormField<OrderCategory>(
               value: selectedCategory,
               items: OrderCategory.values.map((category) {
@@ -92,7 +81,6 @@ class NewRequestPageState extends State<NewRequestPage> {
               ],
             ),
             SizedBox(height: 16),
-            Text("Size"),
             Spacer(),
             Align(
               alignment: Alignment.bottomCenter,

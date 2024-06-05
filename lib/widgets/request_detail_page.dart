@@ -41,6 +41,29 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
       appBar: AppBar(
         title: Text("Viewing Job"),
       ),
+      floatingActionButton: Align(
+        alignment: Alignment.bottomCenter,
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            // Mark job as completed
+            print('job ${widget.job.jobId} accepted');
+            OrdersManager().setJobCompleted(widget.job, () {
+              Navigator.pop(context);
+            });
+          },
+          label: Text(
+            "Mark as complete",
+            style: TextStyle(color: Colors.white),
+          ),
+          icon: Icon(
+            Icons.check,
+            color: Colors.white,
+          ),
+          backgroundColor: const Color.fromARGB(255, 43, 200, 64),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

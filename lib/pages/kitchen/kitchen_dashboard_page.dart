@@ -25,14 +25,15 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   void initState() {
     super.initState();
 
-    ordersManager
-      .setJobsListener(OrderStatus.ACCEPTED, null, kitchenId, (newAccepted) {
-        processDonorsInfo(newAccepted);
-        setState(() {
-          acceptedJobs.clear();
-          acceptedJobs.addAll(newAccepted);
-        });
+    ordersManager.setJobsListener(OrderStatus.ACCEPTED, null, kitchenId,
+        (newAccepted) {
+      processDonorsInfo(newAccepted);
+      if (!mounted) return;
+      setState(() {
+        acceptedJobs.clear();
+        acceptedJobs.addAll(newAccepted);
       });
+    });
   }
 
   @override
@@ -47,17 +48,12 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: ListView(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle("Active Jobs", acceptedJobs.length),
-                      ...acceptedJobs.map(buildJobItem)
-                    ]
-                  )
-                ]
-              ),
+              child: ListView(children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  _buildSectionTitle("Active Jobs", acceptedJobs.length),
+                  ...acceptedJobs.map(buildJobItem)
+                ])
+              ]),
             ),
           ],
         ),
@@ -69,12 +65,12 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
     for (var order in orders) {
       assert(order.status == OrderStatus.ACCEPTED);
 
-      DonorsManager()
-        .getDonorCompletion(order.donorId, (donor) {
-          setState(() {
-            donorsInfo[order.donorId] = donor;
-          });
+      DonorsManager().getDonorCompletion(order.donorId, (donor) {
+        if (!mounted) return;
+        setState(() {
+          donorsInfo[order.donorId] = donor;
         });
+      });
     }
   }
 

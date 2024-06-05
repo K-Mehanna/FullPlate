@@ -3,6 +3,7 @@ import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
+import 'package:flutter/services.dart'; // Add this import
 
 class DonorDetailPage extends StatefulWidget {
   final DonorInfo donorInfo;
@@ -19,8 +20,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
   final DonorsManager donorsManager = DonorsManager();
   final OrdersManager ordersManager = OrdersManager();
 
-  // Map to store the selected quantities for each order item
   late final Map<String, ValueNotifier<int>> selectedQuantities;
+  late final Map<String, TextEditingController> controllers;
 
   @override
   void initState() {
@@ -32,7 +33,14 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         openOffers.addAll(newOffers);
 
         selectedQuantities = {
-          for (var order in openOffers) order.offerId: ValueNotifier<int>(0),
+          for (var offer in openOffers)
+            offer.category.value: ValueNotifier<int>(offer.quantity),
+        };
+
+        controllers = {
+          for (var offer in openOffers)
+            offer.category.value:
+                TextEditingController(text: offer.quantity.toString()),
         };
       });
     });
@@ -52,10 +60,11 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
               "BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID // 
               openOffers,
               openOffers
-                  .map((offer) => selectedQuantities[offer.offerId]!.value)
-                  .toList());
-
-          Navigator.pop(context);
+                  .map((offer) =>
+                      selectedQuantities[offer.category.value]!.value)
+                  .toList(), () {
+            Navigator.pop(context);
+          });
         },
         label: Text("Accept order"),
         icon: Icon(
@@ -107,35 +116,77 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final offer = items[index];
-        final selected = selectedQuantities[offer.offerId]!;
+        var selected = selectedQuantities[offer.category.value]!;
+        var controller = controllers[offer.category.value]!;
 
         return ListTile(
           title: Text(offer.category.value),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                icon: Icon(Icons.remove),
-                onPressed: () {
-                  if (selected.value > 0) {
-                    selected.value--;
-                  }
+              ValueListenableBuilder<int>(
+                valueListenable: selected,
+                builder: (context, value, _) {
+                  return IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: (value > 0)
+                        ? () {
+                            selected.value--;
+                            controller.text = selected.value.toString();
+                          }
+                        : null,
+                  );
                 },
+              ),
+              SizedBox(
+                width: 25, // Adjust width as necessary
+                child: TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                  onChanged: (value) {
+                    int? intValue = int.tryParse(value);
+                    if (intValue != null &&
+                        intValue >= 0 &&
+                        intValue <= offer.quantity) {
+                      selected.value = intValue;
+                    } else if (intValue != null && intValue > offer.quantity) {
+                      controller.text = offer.quantity.toString();
+                    } else if (intValue != null && intValue < offer.quantity) {
+                      controller.text = "0";
+                    } else if (intValue != null) {
+                      controller.text = selected.value.toString();
+                    }
+                  },
+                  onSubmitted: (value) {
+                    int? intValue = int.tryParse(value);
+                    if (intValue != null &&
+                        intValue >= 0 &&
+                        intValue <= offer.quantity) {
+                      selected.value = intValue;
+                    } else {
+                      controller.text =
+                          selected.value.toString(); // Reset to valid value
+                    }
+                  },
+                ),
               ),
               ValueListenableBuilder<int>(
                 valueListenable: selected,
                 builder: (context, value, _) {
-                  return Text(value.toString());
+                  return IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: (value < offer.quantity)
+                        ? () {
+                            selected.value++;
+                            controller.text = selected.value.toString();
+                          }
+                        : null,
+                  );
                 },
-              ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  if (selected.value < offer.quantity) {
-                    selected.value++;
-                  }
-                },
-              ),
+              )
             ],
           ),
         );
