@@ -5,7 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 enum OrderStatus {
   PENDING,
   ACCEPTED,
-  COMPLETED
+  COMPLETED,
+  CANCELLED
 }
 
 extension OrderStatusExtension on OrderStatus {
@@ -17,6 +18,8 @@ extension OrderStatusExtension on OrderStatus {
         return 'ACCEPTED';
       case OrderStatus.COMPLETED:
         return 'COMPLETED';
+      case OrderStatus.CANCELLED:
+        return 'CANCELLED';
     }
   }
 
@@ -28,6 +31,8 @@ extension OrderStatusExtension on OrderStatus {
         return OrderStatus.ACCEPTED;
       case 'COMPLETED':
         return OrderStatus.COMPLETED;
+      case 'CANCELLED':
+        return OrderStatus.CANCELLED;
       default:
         throw ArgumentError('Invalid status string: $status');
     }

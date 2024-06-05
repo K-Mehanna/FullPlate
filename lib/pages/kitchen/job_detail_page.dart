@@ -1,30 +1,30 @@
-import 'package:cibu/database/kitchens_manager.dart';
+import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
+import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
-import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 
-class RequestDetailPage extends StatefulWidget {
+class JobDetailPage extends StatefulWidget {
   final JobInfo job;
 
-  const RequestDetailPage({super.key, required this.job});
+  const JobDetailPage({super.key, required this.job});
 
   @override
-  State<RequestDetailPage> createState() => _RequestDetailPageState();
+  State<JobDetailPage> createState() => _JobDetailPageState();
 }
 
-class _RequestDetailPageState extends State<RequestDetailPage> {
-  KitchenInfo? kitchen; // should display donor
+class _JobDetailPageState extends State<JobDetailPage> {
+  DonorInfo? donor; // should display donor
   List<OfferInfo> constituentOffers = [];
 
   @override
   void initState() {
     super.initState();
 
-    KitchensManager().getKitchenCompletion(widget.job.kitchenId, (kitchen) {
+    DonorsManager().getDonorCompletion(widget.job.donorId, (donor) {
       setState(() {
-        this.kitchen = kitchen;
+        this.donor = donor;
       });
     });
 
@@ -46,7 +46,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Kitchen", kitchen?.name ?? "--"), //todo kitchen details
+            _buildDetailRow(
+                "Donor", donor?.name ?? "--"), 
+            _buildDetailRow("Address", donor?.address ?? "--"),
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

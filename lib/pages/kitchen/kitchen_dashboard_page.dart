@@ -1,10 +1,11 @@
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/job_info.dart';
+import 'package:cibu/pages/kitchen/job_detail_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cibu/widgets/request_detail_page.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/database/donors_manager.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class KitchenDashboardPage extends StatefulWidget {
   KitchenDashboardPage({super.key});
@@ -19,7 +20,8 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   Map<String, DonorInfo> donorsInfo = {};
   List<JobInfo> acceptedJobs = [];
 
-  final String kitchenId = FirebaseAuth.instance.currentUser?.uid ?? "BgOtpuMuOZNa6IYWRJgb";
+  final String kitchenId =
+      "vArN1MQqQfXSTTbgSP6MT5nzLz42"; //FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -83,7 +85,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RequestDetailPage(job: job),
+            builder: (context) => JobDetailPage(job: job),
           ),
         );
       },

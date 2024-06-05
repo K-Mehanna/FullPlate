@@ -39,14 +39,14 @@ class PlaceApiProvider {
         return result['predictions']
             .map<Suggestion>((p) => Suggestion(p['place_id'], p['description']))
             .toList();
-      }
-      if (result['status'] == 'ZERO_RESULTS') {
+      } else if (result['status'] == 'ZERO_RESULTS') {
         return [];
       }
-      throw Exception(result['error_message']);
-    } else {
-      throw Exception('Failed to fetch suggestion');
     }
+    
+    //throw Exception('Failed to fetch suggestion');
+    print("Error: failed to fetch suggestions");
+    return [];
   }
   
   

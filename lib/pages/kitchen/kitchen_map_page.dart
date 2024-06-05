@@ -1,5 +1,8 @@
 // import 'dart:async';
 
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/donor_info.dart';
@@ -9,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'dart:ui' as ui;
 
 class KitchenMapPage extends StatefulWidget {
   KitchenMapPage({super.key});
@@ -20,6 +24,7 @@ class KitchenMapPage extends StatefulWidget {
 class _KitchenMapPageState extends State<KitchenMapPage> {
   final OrdersManager ordersManager = OrdersManager();
   final DonorsManager donorsManager = DonorsManager();
+  late LocationPermission permission = LocationPermission.denied;
   late GoogleMapController mapController;
   static LatLng currentPosition =
       LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
@@ -29,9 +34,21 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   String? sortBy = 'Sort By';
 
   void getCurrentLocation(void Function(Position) callback) async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+    print('original: ${this.permission}');
+    if (permission != LocationPermission.whileInUse &&
+        permission != LocationPermission.always) {
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      print('new permission: $permission');
+
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        this.permission = permission;
+      });
     }
 
     Future<Position> position =
@@ -73,6 +90,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
       ),
       body: SlidingUpPanel(
         color: Colors.blueGrey.shade50,
+        snapPoint: 0.5,
         minHeight: 65.0,
         maxHeight: 550.0,
         parallaxEnabled: true,
@@ -84,10 +102,14 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         body: GoogleMap(
           myLocationButtonEnabled: true,
           myLocationEnabled: true,
+          mapType: MapType.terrain,
           onMapCreated: _onMapCreated,
+          padding: EdgeInsets.only(
+            bottom: 250,
+          ),
           initialCameraPosition: CameraPosition(
             target: currentPosition,
-            zoom: 16.0,
+            zoom: 15.0,
           ),
           markers: markers,
         ),
@@ -108,80 +130,80 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
             ),
           ),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //     children: [
-        //       Container(
-        //         child: Row(
-        //           children: [
-        //             Text('Radius'),
-        //             Padding(
-        //               padding: const EdgeInsets.all(4.0),
-        //               child: Icon(Icons.radar),
-        //             ),
-        //             Container(
-        //               width: 30,
-        //               height: 30,
-        //               child: TextField(
-        //                 keyboardType: TextInputType.number,
-        //                 decoration: InputDecoration(
-        //                   border: OutlineInputBorder(),
-        //                   contentPadding: EdgeInsets.symmetric(horizontal: 8),
-        //                 ),
-        //               ),
-        //             ),
-        //           ],
-        //         ),
-        //       ),
-        //       Row(
-        //         children: [
-        //           Text('Category'),
-        //           SizedBox(width: 6),
-        //           DropdownButton(
-        //             value: filters,
-        //             items: OrderCategory.values.map((OrderCategory o) {
-        //               return DropdownMenuItem(
-        //                 value: o,
-        //                 child: o.icon, //Text(o.toString().split('.').last),
-        //               );
-        //             }).toList(),
-        //             onChanged: (OrderCategory? category) {
-        //               setState(() {
-        //                 filters = category!;
-        //               });
-        //             },
-        //           ),
-        //         ],
-        //       ),
-        //       Row(
-        //         children: [
-        //           DropdownButton(
-        //             value: sortBy,
-        //             items: ['Sort By', 'Distance', 'Recent'].map((String s) {
-        //               return DropdownMenuItem(
-        //                 value: s,
-        //                 enabled: s != 'Sort By',
-        //                 child: Text(
-        //                   s,
-        //                   style: s != 'Sort By'
-        //                       ? TextStyle(color: Colors.black)
-        //                       : TextStyle(color: Colors.grey),
-        //                 ), //Text(o.toString().split('.').last),
-        //               );
-        //             }).toList(),
-        //             onChanged: (String? s) {
-        //               setState(() {
-        //                 sortBy = s!;
-        //               });
-        //             },
-        //           ),
-        //         ],
-        //       ),
-        //     ],
-        //   ),
-        // ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                child: Row(
+                  children: [
+                    Text('Radius'),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Icon(Icons.radar),
+                    ),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  Text('Category'),
+                  SizedBox(width: 6),
+                  DropdownButton(
+                    value: filters,
+                    items: OrderCategory.values.map((OrderCategory o) {
+                      return DropdownMenuItem(
+                        value: o,
+                        child: o.icon, //Text(o.toString().split('.').last),
+                      );
+                    }).toList(),
+                    onChanged: (OrderCategory? category) {
+                      setState(() {
+                        filters = category!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  DropdownButton(
+                    value: sortBy,
+                    items: ['Sort By', 'Distance', 'Recent'].map((String s) {
+                      return DropdownMenuItem(
+                        value: s,
+                        enabled: s != 'Sort By',
+                        child: Text(
+                          s,
+                          style: s != 'Sort By'
+                              ? TextStyle(color: Colors.black)
+                              : TextStyle(color: Colors.grey),
+                        ), //Text(o.toString().split('.').last),
+                      );
+                    }).toList(),
+                    onChanged: (String? s) {
+                      setState(() {
+                        sortBy = s!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
         Expanded(
           child: ListView.builder(
             controller: sc,
@@ -238,10 +260,14 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
       print('donors: $donors');
     });
 
+    // BitmapDescriptor.asset(
+    //         ImageConfiguration(size: Size(10, 10)), 'assets/store_logo.png')
+    //     .then((image) {
     for (var donor in donorList) {
       setState(() {
         markers.add(
           Marker(
+            //icon: image,
             markerId: MarkerId(donor.donorId),
             position: donor.location,
             infoWindow: InfoWindow(
@@ -259,8 +285,34 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
           ),
         );
       });
-
-      print("\n   markers.length: ${markers.length}");
     }
   }
+  //);
 }
+
+  // Future<BitmapDescriptor> iconDataToBitmapDescriptorSync(IconData iconData, {double size = 100}) async {
+  //   final PictureRecorder recorder = PictureRecorder();
+  //   final Canvas canvas = Canvas(recorder);
+
+  //   final TextPainter textPainter = TextPainter(
+  //     textDirection: TextDirection.ltr,
+  //   );
+  //   textPainter.text = TextSpan(
+  //     text: String.fromCharCode(iconData.codePoint),
+  //     style: TextStyle(
+  //       color: Colors.black, // Change the color as needed
+  //       fontSize: size,
+  //       fontFamily: iconData.fontFamily,
+  //     ),
+  //   );
+
+  //   textPainter.layout();
+  //   textPainter.paint(canvas, Offset(0, 0));
+
+  //   final ui.Image image = recorder.endRecording().toImage(size.toInt(), size.toInt());
+
+  //   final ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  //   final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+  //   return BitmapDescriptor.fromBytes(pngBytes);
+  // }

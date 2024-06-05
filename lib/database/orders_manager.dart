@@ -5,55 +5,80 @@ import 'package:cibu/models/job_info.dart';
 class OrdersManager {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  void addOpenOffer(String donorId, OfferInfo offer) {
+  void addOpenOffer(
+      String donorId, OfferInfo offer, void Function() onCompletion) {
+    addOpenOffers(donorId, [offer], onCompletion);
+  }
+
+  void addOpenOffers(
+      String donorId, List<OfferInfo> offers, void Function() onCompletion) {
     final baseDocumentRef = _db.collection("donors").doc(donorId);
     const nestedOffersPath = "openOffers";
 
-    _addOffer(baseDocumentRef, nestedOffersPath, offer);
+    _addOffers(baseDocumentRef, nestedOffersPath, offers, onCompletion);
   }
 
-  void _addOffer(DocumentReference<Map<String, dynamic>> baseDocumentRef,
-      String nestedOffersPath, OfferInfo offer) {
-    final offerRef =
-        baseDocumentRef.collection(nestedOffersPath).doc(offer.category.code);
+  void _addOffers(
+      DocumentReference<Map<String, dynamic>> baseDocumentRef,
+      String nestedOffersPath,
+      List<OfferInfo> offers,
+      void Function() onCompletion) {
+    
+    _db.runTransaction((transaction) async {
+      for (var offer in offers) {
+        final offerRef = baseDocumentRef
+            .collection(nestedOffersPath)
+            .doc(offer.category.code);
 
-    offerRef.get().then((docSnapshot) {
-      if (docSnapshot.exists) {
-        final int previousQuantity = docSnapshot.data()!["quantity"];
+        var previousOffer = await transaction.get(offerRef);
 
-        offerRef.update({"quantity": previousQuantity + offer.quantity});
-      } else {
-        offerRef.set(offer.toFirestore());
+        if (previousOffer.exists) {
+          offer.quantity += previousOffer.get("quantity") as int;
+        }
       }
-    });
 
-    baseDocumentRef.get().then((docSnapshot) {
-      final previousQuantity = docSnapshot.data()!["quantity"];
+      for (var offer in offers) {
+        final offerRef = baseDocumentRef
+            .collection(nestedOffersPath)
+            .doc(offer.category.code);
 
-      baseDocumentRef.update({
-        "quantity": previousQuantity + offer.quantity
-      }).then((a) {},
-          onError: (e) => print(
-              "OrdersManager\n - addOpenOffer\n - update donor quantity $e"));
-    });
+        transaction.set(offerRef, offer.toFirestore());
+      }
+
+      transaction.update(baseDocumentRef, {
+        "quantity": offers.map((a) => a.quantity).reduce((a, b) => a + b)
+      });
+    }).then((e) {
+      onCompletion();
+    }, onError: (e) => print("OrdersManager\n - _addOrders: $e"));
   }
 
-  void setJobCompleted(JobInfo job, void Function() onCompletion) {
+  void cancelJob(JobInfo job, void Function() onCompletion) {
     assert(job.status == OrderStatus.ACCEPTED);
 
     _db
         .collection("jobs")
         .doc(job.jobId)
-        .update({
-          "status": OrderStatus.COMPLETED.value,
-          "timeCompleted": Timestamp.fromDate(DateTime.now())
-        })
-        .then(
-          (empty) {
-            onCompletion();
-          }, 
-          onError: (e) => print("OrdersManager\n - setJobCompleted: $e")
-        );
+        .update({"status": OrderStatus.CANCELLED.value}).then((empty) {
+      getConstituentOffersCompletion(job.jobId, (constituentOffers) {
+        final baseDocumentRef = _db.collection("donors").doc(job.donorId);
+
+        const nestedOffersPath = "openOffers";
+
+        _addOffers(baseDocumentRef, nestedOffersPath, constituentOffers, onCompletion);
+      });
+    }, onError: (e) => print("OrdersManager\n - cancelJob: $e"));
+  }
+
+  void setJobCompleted(JobInfo job, void Function() onCompletion) {
+    assert(job.status == OrderStatus.ACCEPTED);
+
+    _db.collection("jobs").doc(job.jobId).update({
+      "status": OrderStatus.COMPLETED.value,
+      "timeCompleted": Timestamp.fromDate(DateTime.now())
+    }).then((empty) {
+      onCompletion();
+    }, onError: (e) => print("OrdersManager\n - setJobCompleted: $e"));
   }
 
   void acceptOpenOffer(

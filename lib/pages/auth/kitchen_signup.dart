@@ -11,7 +11,6 @@ import 'package:uuid/uuid.dart';
 import 'package:cibu/pages/auth/address_autocomplete/address_search.dart';
 import 'package:cibu/pages/auth/address_autocomplete/address_service.dart';
 
-
 class KitchenSignupPage extends StatefulWidget {
   const KitchenSignupPage({super.key});
 
@@ -21,7 +20,7 @@ class KitchenSignupPage extends StatefulWidget {
 
 class _KitchenSignupPageState extends State<KitchenSignupPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  
+
   final nameController = TextEditingController();
   final addressController = TextEditingController();
   final KitchensManager kitchensManager = KitchensManager();
@@ -33,7 +32,8 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
       name: nameController.text,
       location: location!,
       address: addressController.text,
-      kitchenId: FirebaseAuth.instance.currentUser!.uid
+      kitchenId:
+          "vArN1MQqQfXSTTbgSP6MT5nzLz42", //FirebaseAuth.instance.currentUser!.uid
     );
 
     kitchensManager.addKitchen(kitchenInfo);
@@ -64,7 +64,6 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-        
                 CustomTextField(
                   controller: nameController,
                   hintText: 'Organisation Name',
@@ -76,49 +75,45 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
                     return null;
                   },
                 ),
-        
                 const SizedBox(height: 25),
                 CustomTextField(
-                  controller: addressController,
-                  hintText: 'Address',
-                  obscureText: false,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an address';
-                    }
-                    return null;
-                  },
-                  onTap: () async {
-                    // generate a new token here
-                    final sessionToken = Uuid().v4();
-        
-                    final Suggestion? result = await showSearch(
-                      context: context,
-                      delegate: AddressSearch(sessionToken),
-                    );
-        
-                    if (result != null) {
-                      final addressCoords = await PlaceApiProvider(sessionToken).getPlaceDetailFromId(result.placeId);
-                      setState(() {
-                        addressController.text = result.description;
-                        location = addressCoords;
-                      });
-                    }
-                  }
-                ),
-        
+                    controller: addressController,
+                    hintText: 'Address',
+                    obscureText: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter an address';
+                      }
+                      return null;
+                    },
+                    onTap: () async {
+                      // generate a new token here
+                      final sessionToken = Uuid().v4();
+
+                      final Suggestion? result = await showSearch(
+                        context: context,
+                        delegate: AddressSearch(sessionToken),
+                      );
+
+                      if (result != null && result.placeId.isNotEmpty) {
+                        final addressCoords =
+                            await PlaceApiProvider(sessionToken)
+                                .getPlaceDetailFromId(result.placeId);
+                        setState(() {
+                          addressController.text = result.description;
+                          location = addressCoords;
+                        });
+                      }
+                    }),
                 const SizedBox(height: 25),
-              
                 CustomButton(
-                  onTap: () { 
+                  onTap: () {
                     if (formKey.currentState!.validate() && location != null) {
                       updateDetailsToFirestore();
                       Navigator.pushReplacement(
-                        context, 
-                        MaterialPageRoute(
-                          builder: (context) => KitchenHomePage()
-                        )
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => KitchenHomePage()));
                     }
                   },
                   text: 'Next',

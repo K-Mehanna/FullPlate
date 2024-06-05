@@ -7,12 +7,11 @@ class KitchenInfo {
   final String address;
   final String kitchenId;
 
-  KitchenInfo({
-    required this.name,
-    required this.location,
-    required this.address,
-    required this.kitchenId
-  });
+  KitchenInfo(
+      {required this.name,
+      required this.location,
+      required this.address,
+      required this.kitchenId});
 
   factory KitchenInfo.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -22,11 +21,10 @@ class KitchenInfo {
     final GeoPoint geoPoint = data['location'];
 
     return KitchenInfo(
-      name: data['name'],
-      location: LatLng(geoPoint.latitude, geoPoint.longitude),
-      address: data['address'],
-      kitchenId: snapshot.id
-    );
+        name: data['name'],
+        location: LatLng(geoPoint.latitude, geoPoint.longitude),
+        address: data['address'],
+        kitchenId: snapshot.id);
   }
 
   Map<String, dynamic> toFirestore() {

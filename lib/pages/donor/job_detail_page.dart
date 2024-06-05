@@ -1,21 +1,24 @@
 import 'package:cibu/database/donors_manager.dart';
+import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
+import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 
-class RequestDetailPage extends StatefulWidget {
+class JobDetailPage extends StatefulWidget {
   final JobInfo job;
 
-  const RequestDetailPage({super.key, required this.job});
+  const JobDetailPage({super.key, required this.job});
 
   @override
-  State<RequestDetailPage> createState() => _RequestDetailPageState();
+  State<JobDetailPage> createState() => _JobDetailPageState();
 }
 
-class _RequestDetailPageState extends State<RequestDetailPage> {
+class _JobDetailPageState extends State<JobDetailPage> {
   DonorInfo? donor; // should display donor
+  KitchenInfo? kitchen; // should display kitchen
   List<OfferInfo> constituentOffers = [];
 
   @override
@@ -23,12 +26,27 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     super.initState();
 
     DonorsManager().getDonorCompletion(widget.job.donorId, (donor) {
+      if (!mounted) {
+        return; // to avoid calling setState after dispose (if the widget is disposed
+      }
       setState(() {
         this.donor = donor;
       });
     });
 
+    KitchensManager().getKitchenCompletion(widget.job.kitchenId, (kitchen) {
+      if (!mounted) {
+        return; // to avoid calling setState after dispose (if the widget is disposed
+      }
+      setState(() {
+        this.kitchen = kitchen;
+      });
+    });
+
     OrdersManager().getConstituentOffersCompletion(widget.job.jobId, (offers) {
+      if (!mounted) {
+        return; // to avoid calling setState after dispose (if the widget is disposed
+      }
       setState(() {
         constituentOffers = offers;
       });
@@ -43,25 +61,40 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
       ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            // Mark job as completed
-            print('job ${widget.job.jobId} accepted');
-            OrdersManager().setJobCompleted(widget.job, () {
-              Navigator.pop(context);
-            });
-          },
-          label: Text(
-            "I've collected this order",
-            style: TextStyle(color: Colors.white),
-          ),
-          icon: Icon(
-            Icons.check,
-            color: Colors.white,
-          ),
-          backgroundColor: const Color.fromARGB(255, 43, 200, 64),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton.extended(
+              heroTag: "job-complete",
+              onPressed: () {
+                OrdersManager().setJobCompleted(widget.job, () {
+                  Navigator.pop(context);
+                });
+              },
+              icon: Icon(Icons.check, color: Colors.white),
+              label:
+                  Text("Job Complete", style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.green,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            SizedBox(width: 30),
+            FloatingActionButton.extended(
+              heroTag: "job-cancel",
+              onPressed: () {
+                OrdersManager().cancelJob(widget.job, () {
+                  Navigator.pop(context);
+                });
+              },
+              icon: Icon(Icons.cancel, color: Colors.white),
+              label: Text("Cancel Job", style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+          ],
         ),
       ),
       body: Padding(
@@ -70,7 +103,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow(
-                "Donor", donor?.name ?? "--"), //todo kitchen details
+                "Kitchen", kitchen?.name ?? "--"), //todo kitchen details
+            _buildDetailRow("Address", kitchen?.address ?? "--"),
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

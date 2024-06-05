@@ -4,7 +4,6 @@ import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
 import 'package:cibu/enums/user_type.dart';
 import 'package:cibu/pages/auth/auth_gate.dart';
 
-
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});
 
@@ -58,11 +57,11 @@ class UserButton extends StatelessWidget {
           context,
           MaterialPageRoute(
               builder: (context) => 
-              // userType == UserType.DONOR
-              //     ? DonorHomePage()
-              //     : KitchenHomePage()
-              AuthGate(userType: userType)
-          ),
+              userType == UserType.DONOR
+                  ? DonorHomePage()
+                  : KitchenHomePage()
+              //AuthGate(userType: userType)
+              ),
         );
       },
       child: Text(userType.value),

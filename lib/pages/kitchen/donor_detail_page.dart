@@ -57,8 +57,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         onPressed: () {
           ordersManager.acceptOpenOffer(
               widget.donorInfo.donorId,
-              //"BgOtpuMuOZNa6IYWRJgb", // TODO: Replace with the actual kitchen ID //
-              FirebaseAuth.instance.currentUser?.uid ?? "BgOtpuMuOZNa6IYWRJgb",
+              "vArN1MQqQfXSTTbgSP6MT5nzLz42",
+              //FirebaseAuth.instance.currentUser!.uid,
               openOffers,
               openOffers
                   .map((offer) =>

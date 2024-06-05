@@ -32,7 +32,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
       name: nameController.text,
       location: location!,
       address: addressController.text,
-      donorId: FirebaseAuth.instance.currentUser!.uid,
+      donorId: "HAO9gLWbTaT7z16pBoLGz019iSC3", //FirebaseAuth.instance.currentUser!.uid,
       quantity: 0,
     );
 
@@ -95,7 +95,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                         delegate: AddressSearch(sessionToken),
                       );
 
-                      if (result != null) {
+                      if (result != null && result.placeId.isNotEmpty) {
                         final addressCoords =
                             await PlaceApiProvider(sessionToken)
                                 .getPlaceDetailFromId(result.placeId);
