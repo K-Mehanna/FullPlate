@@ -1,4 +1,5 @@
 import 'package:cibu/pages/title_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class DonorProfilePage extends StatefulWidget {
@@ -10,12 +11,20 @@ class DonorProfilePage extends StatefulWidget {
 
 class _DonorProfilePageState extends State<DonorProfilePage> {
   void _signOut() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TitlePage()
-      ),
-    );  
+    FirebaseAuth.instance.signOut().then((value) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TitlePage()
+        ),
+      );
+    });
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => TitlePage()
+    //   ),
+    // );  
   }
 
   @override
