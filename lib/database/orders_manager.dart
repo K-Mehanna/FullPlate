@@ -1,8 +1,6 @@
-import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cibu/models/job_info.dart';
-import 'dart:async';
 
 class OrdersManager {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

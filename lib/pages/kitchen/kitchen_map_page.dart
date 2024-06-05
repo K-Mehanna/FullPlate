@@ -21,7 +21,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   final OrdersManager ordersManager = OrdersManager();
   final DonorsManager donorsManager = DonorsManager();
   late GoogleMapController mapController;
-  static LatLng currentPosition = LatLng(0.0, 0.0);
+  static LatLng currentPosition = LatLng(51.5072, 0.1276);
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;
