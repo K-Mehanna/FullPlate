@@ -19,8 +19,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   // text editing controllers
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   bool isSignUp = false;
 
@@ -57,10 +59,14 @@ class _LoginPageState extends State<LoginPage> {
       // pop the loading circle
       Navigator.pop(context);
       // WRONG EMAIL
-      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+      if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') {
         // show error to user
         invalidMessage('Invalid Login Credentials');
+      } else {
+        // show error to user
+        invalidMessage('Error: ${e.code}');
       }
+      print("Error: ${e.code}");
     }
   }
 
@@ -75,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
 
-    // try sign in
+    // try sign up
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
@@ -100,7 +106,11 @@ class _LoginPageState extends State<LoginPage> {
       } else if (e.code == 'email-already-in-use') {
         // show error to user
         invalidMessage('Email already in use');
+      } else {
+        // show error to user
+        invalidMessage('Error: ${e.code}');
       }
+      print("Error: ${e.code}");
     }
   }
 
@@ -125,54 +135,100 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.userType.value} Page'),
+      ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomTextField(
-              controller: emailController,
-              hintText: 'Email',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: passwordController,
-              hintText: 'Password',
-              obscureText: true,
-            ),
-            const SizedBox(height: 25),
-            CustomButton(
-              onTap: isSignUp ? signUserUp : signUserIn,
-              text: isSignUp ? 'Sign Up' : 'Sign In',
-            ),
-            const SizedBox(height: 50),
-
-            // not a member? register now
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  !isSignUp ? 'Not a member?' : 'Already have an account?',
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-                const SizedBox(width: 4),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isSignUp = !isSignUp;
-                    });
-                  },
-                  child: Text(
-                    !isSignUp ? 'Register now' : 'Log In',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                isSignUp ? 'Sign Up' : 'Sign In',
+                style: Theme.of(context).textTheme.displayMedium!,
+              ),
+              const SizedBox(height: 40),
+          
+              CustomTextField(
+                controller: emailController,
+                hintText: 'Email',
+                obscureText: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an email';
+                  }
+                  return null;
+                },
+              ),
+          
+              const SizedBox(height: 10),
+          
+              CustomTextField(
+                controller: passwordController,
+                hintText: 'Password',
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a password';
+                  }
+                  return null;
+                },
+              ),
+          
+              if (isSignUp) const SizedBox(height: 10),
+              if (isSignUp) CustomTextField(
+                controller: confirmPasswordController,
+                hintText: 'Confirm Password',
+                obscureText: true,
+                validator: (value) {
+                  if (value != passwordController.text) {
+                    return 'Passwords do not match';
+                  }
+                  return null;
+                },
+              ),
+          
+              const SizedBox(height: 25),
+          
+              CustomButton(
+                onTap: () { 
+                  if (formKey.currentState!.validate()) {
+                    isSignUp ? signUserUp() : signUserIn();
+                  }
+                },
+                text: isSignUp ? 'Sign Up' : 'Sign In',
+              ),
+          
+              const SizedBox(height: 50),
+          
+              // not a member? register now
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    !isSignUp ? 'Not a member?' : 'Already have an account?',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isSignUp = !isSignUp;
+                      });
+                    },
+                    child: Text(
+                      !isSignUp ? 'Register now' : 'Log In',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
