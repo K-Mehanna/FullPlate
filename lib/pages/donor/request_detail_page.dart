@@ -46,8 +46,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow(
-                "Kitchen", kitchen?.name ?? "--"), //todo kitchen details
+            _buildDetailRow("Kitchen", kitchen?.name ?? "--"), //todo kitchen details
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

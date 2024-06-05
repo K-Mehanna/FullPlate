@@ -62,9 +62,8 @@ class PlaceApiProvider {
         final lng = location['lng'];
         return LatLng(lat, lng);
       }
-      throw Exception(result['error_message']);
-    } else {
-      throw Exception('Failed to fetch suggestion');
     }
+    
+    throw Exception('Failed to fetch suggestion');
   }
 }
