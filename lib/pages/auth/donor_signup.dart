@@ -27,12 +27,14 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
 
   LatLng? location;
 
+  final _auth = FirebaseAuth.instance;
+
   void updateDetailsToFirestore() {
     DonorInfo donorInfo = DonorInfo(
       name: nameController.text,
       location: location!,
       address: addressController.text,
-      donorId: "HAO9gLWbTaT7z16pBoLGz019iSC3", //FirebaseAuth.instance.currentUser!.uid,
+      donorId: _auth.currentUser!.uid, //"HAO9gLWbTaT7z16pBoLGz019iSC3", //FirebaseAuth.instance.currentUser!.uid,
       quantity: 0,
     );
 

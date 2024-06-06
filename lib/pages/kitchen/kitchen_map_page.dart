@@ -1,4 +1,3 @@
-// import 'dart:async';
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/donor_info.dart';
@@ -22,8 +21,8 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   final OrdersManager ordersManager = OrdersManager();
   final DonorsManager donorsManager = DonorsManager();
   late GoogleMapController mapController;
-  static LatLng currentPosition =
-      LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
+
+  static LatLng currentPosition = LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;

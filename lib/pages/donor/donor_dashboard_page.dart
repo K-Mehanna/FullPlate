@@ -20,12 +20,16 @@ class _DonorDashboardState extends State<DonorDashboard> {
   List<JobInfo> acceptedJobs = [];
   List<OfferInfo> pendingOffers = [];
 
-  final String donorId =
-      "HAO9gLWbTaT7z16pBoLGz019iSC3"; //FirebaseAuth.instance.currentUser!.uid;
+  final _auth = FirebaseAuth.instance;
+
+  late final String donorId;
+      //"HAO9gLWbTaT7z16pBoLGz019iSC3"; //FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
     super.initState();
+
+    donorId = _auth.currentUser!.uid;
 
     ordersManager.setOpenOffersListener(donorId, (newPending) {
       print(newPending.length);

@@ -19,12 +19,15 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   Map<String, DonorInfo> donorsInfo = {};
   List<JobInfo> acceptedJobs = [];
 
-  final String kitchenId =
-      "vArN1MQqQfXSTTbgSP6MT5nzLz42"; //FirebaseAuth.instance.currentUser!.uid;
+  final _auth = FirebaseAuth.instance;
+
+  late final String kitchenId; //= "vArN1MQqQfXSTTbgSP6MT5nzLz42"; //FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
     super.initState();
+
+    kitchenId = _auth.currentUser!.uid;
 
     ordersManager.setJobsListener(OrderStatus.ACCEPTED, null, kitchenId,
         (newAccepted) {

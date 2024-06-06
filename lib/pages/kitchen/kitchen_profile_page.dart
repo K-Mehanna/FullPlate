@@ -57,6 +57,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
         MaterialPageRoute(builder: (context) => const TitlePage()),
       );
     });
+
   }
 
   void _navigateToHistoryPage() {
