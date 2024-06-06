@@ -11,7 +11,6 @@ class AuthGate extends StatelessWidget {
 
   Future<UserType> getUserType(String userId) async {
     // Assuming 'users' is the collection name in Firestore
-    print(userId);
     try {
       DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
         .collection('users')

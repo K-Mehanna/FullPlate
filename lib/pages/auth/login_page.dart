@@ -20,22 +20,32 @@ class _LoginPageState extends State<LoginPage> {
 
   final _auth = FirebaseAuth.instance;
 
-  void signUserIn(BuildContext context) {
-    _auth
-      .signInWithEmailAndPassword(
+  Future<void> signUserIn(BuildContext context) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
-      )
-      .then((userCredential) => {}, onError: (e) => {
+      );
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
         if (e.code == 'invalid-email') {
-          CustomAlertDialog(context, 'Invalid email'),
+          CustomAlertDialog(context, 'Invalid email');
         } else if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') {
-          CustomAlertDialog(context, 'Incorrect login credentials'),
+          CustomAlertDialog(context, 'Incorrect login credentials');
         } else {
-          CustomAlertDialog(context, 'Error: ${e.code}'),
-        },
-        print("Error: ${e.code}"),
-      });
+          CustomAlertDialog(context, 'Error: ${e.code}');
+        }
+      }
+      print("Error: ${e.code}");
+    }
+    //  _auth
+    //   .signInWithEmailAndPassword(
+    //     email: emailController.text,
+    //     password: passwordController.text,
+    //   )
+    //   .then((userCredential) => {}, onError: (e) => {
+
+    //   });
   }
 
   // wrong email message popup
@@ -94,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 25),
 
                   CustomButton(
-                    onTap: () {
+                    onTap: () async {
                       if (formKey.currentState!.validate()) {
                         signUserIn(context);
                       }

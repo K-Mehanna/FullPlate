@@ -27,35 +27,75 @@ class _SignUpPageState extends State<SignUpPage> {
   final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
-  void signUserUp(BuildContext context) {
-    _auth
-      .createUserWithEmailAndPassword(
+  Future<void> signUserUp(BuildContext context) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
-      )
-      .then((_) => _db.collection('users').doc(_auth.currentUser!.uid).set({
+      );
+
+      try {
+        await _db.collection('users').doc(_auth.currentUser!.uid).set({
           'email': emailController.text,
           'userType': userType.value,
-        }), onError: (e) => {
-          if (e.code == 'invalid-email') {
-            CustomAlertDialog(context, 'Invalid email'),
-          } else if (e.code == 'email-already-in-use') {
-            CustomAlertDialog(context, 'Email already in use'),
-          } else if (e.code == 'weak-password') {
-            CustomAlertDialog(context, 'Password is too weak'),
-          } else {
-            CustomAlertDialog(context, 'Error: ${e.code}'),
-          },
-          print("Error: ${e.code}"),
+        }).then((_) {
+           Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => userType == UserType.DONOR
+                ? DonorSignupPage()
+                : KitchenSignupPage(),
+            ),
+          );
+        });
+      } catch (e) {
+        print("User Sign Up");
+      }
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        if (e.code == 'invalid-email') {
+          CustomAlertDialog(context, 'Invalid email');
+        } else if (e.code == 'email-already-in-use') {
+          CustomAlertDialog(context, 'Email already in use');
+        } else if (e.code == 'weak-password') {
+          CustomAlertDialog(context, 'Password is too weak');
+        } else {
+          CustomAlertDialog(context, 'Error: ${e.code}');
         }
-      ).then((_) => Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => userType == UserType.DONOR
-              ? DonorSignupPage()
-              : KitchenSignupPage(),
-          ),
-      ));
+      }
+      print("Error: ${e.code}");
+    }
+
+
+
+    // _auth
+    //   .createUserWithEmailAndPassword(
+    //     email: emailController.text,
+    //     password: passwordController.text,
+    //   )
+      // .then((_) => _db.collection('users').doc(_auth.currentUser!.uid).set({
+      //     'email': emailController.text,
+      //     'userType': userType.value,
+      //   }), onError: (e) => {
+          // if (e.code == 'invalid-email') {
+          //   CustomAlertDialog(context, 'Invalid email'),
+          // } else if (e.code == 'email-already-in-use') {
+          //   CustomAlertDialog(context, 'Email already in use'),
+          // } else if (e.code == 'weak-password') {
+          //   CustomAlertDialog(context, 'Password is too weak'),
+          // } else {
+          //   CustomAlertDialog(context, 'Error: ${e.code}'),
+          // },
+          // print("Error: ${e.code}"),
+        // }
+    //   ).then((_) => Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(
+    //         builder: (context) => userType == UserType.DONOR
+    //           ? DonorSignupPage()
+    //           : KitchenSignupPage(),
+    //       ),
+    //   ));
   }
 
   // wrong email message popup
@@ -159,7 +199,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 25),
 
                   CustomButton(
-                    onTap: () {
+                    onTap: () async {
                       if (formKey.currentState!.validate()) {
                         signUserUp(context);
                       }
