@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:filter_list/filter_list.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class KitchenMapPage extends StatefulWidget {
   KitchenMapPage({super.key});
@@ -26,20 +27,11 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;
-  String? sortBy = 'Sort By';
-  List<OrderCategory> selectedCategoryList = [];
+  List<String> sortParams = ['Distance', 'Quantity', 'Recent'];
+  String? sortParam;
+  List<OrderCategory> selectedCategoryList = OrderCategory.values;
 
   void getCurrentLocation(void Function(Position) callback) async {
-    // LocationPermission permission = await Geolocator.requestPermission();
-    // if (permission == LocationPermission.denied) {
-    //   permission = await Geolocator.requestPermission();
-    // }
-
-    // Future<Position> position =
-    //     Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-
-    // position.then(callback,
-    //     onError: (e) => print("An error occured fetching location:\n$e"));
     _determineCurrentPosition().then(callback,
         onError: (e) => print("An error occured fetching location:\n$e"));
   }
@@ -51,9 +43,6 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
 
@@ -61,10 +50,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
+        // According to Android guidelines
         // your App should show an explanatory UI now.
         return Future.error('Location permissions are denied');
       }
@@ -76,8 +62,6 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition();
   }
 
@@ -118,7 +102,6 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         snapPoint: 0.5,
         minHeight: 65.0,
         maxHeight: 550.0,
-        parallaxEnabled: true,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -155,6 +138,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
       onApplyButtonClick: (list) {
         setState(() {
           selectedCategoryList = List.from(list!);
+          donorsManager.getFilteredOfferDonorsCompletion(
+              createMarkers, selectedCategoryList);
+          print('selectedCategoryList: $selectedCategoryList');
         });
         Navigator.pop(context);
         // Redraw list
@@ -178,77 +164,75 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(
-                child: Row(
-                  children: [
-                    Text('Radius'),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Icon(Icons.radar),
-                    ),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               Row(
-                children: [
-                  Text('Category'),
-                  SizedBox(width: 6),
-                  DropdownButton(
-                    value: filters,
-                    items: OrderCategory.values.map((OrderCategory o) {
-                      return DropdownMenuItem(
-                        value: o,
-                        child: o.icon, //Text(o.toString().split('.').last),
-                      );
-                    }).toList(),
-                    onChanged: (OrderCategory? category) {
-                      setState(() {
-                        filters = category!;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TextButton.icon(
                     onPressed: openFilterDialog,
                     label: Text('Filters'),
                     icon: Icon(Icons.filter_alt),
                   ),
-                  // DropdownButton(
-                  //   value: sortBy,
-                  //   items: ['Sort By', 'Distance', 'Recent'].map((String s) {
-                  //     return DropdownMenuItem(
-                  //       value: s,
-                  //       enabled: s != 'Sort By',
-                  //       child: Text(
-                  //         s,
-                  //         style: s != 'Sort By'
-                  //             ? TextStyle(color: Colors.black)
-                  //             : TextStyle(color: Colors.grey),
-                  //       ),
-                  //     );
-                  //   }).toList(),
-                  //   onChanged: (String? s) {
-                  //     setState(() {
-                  //       sortBy = s!;
-                  //     });
-                  //   },
-                  // ),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      isExpanded: false,
+                      hint: Row(
+                        children: [
+                          Icon(Icons.sort),
+                          SizedBox(width: 10),
+                          Text(
+                            'Sort by',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).hintColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      items: sortParams
+                          .map(
+                            (String item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      value: sortParam,
+                      onChanged: (String? value) {
+                        setState(() {
+                          sortParam = value;
+                          donorsManager.getFilteredOfferDonorsCompletion(
+                              createMarkers, selectedCategoryList);
+                        });
+                      },
+                      buttonStyleData: ButtonStyleData(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        height: 40,
+                        width: 140,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Colors.black26,
+                          ),
+                        ),
+                      ),
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        openInterval: const Interval(0.1, 0.25),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -302,17 +286,34 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     );
   }
 
+  double _distanceBetween(LatLng point1, LatLng point2) {
+    return Geolocator.distanceBetween(
+      point1.latitude,
+      point1.longitude,
+      point2.latitude,
+      point2.longitude,
+    );
+  }
+
   void createMarkers(List<DonorInfo> donorList) {
+    print('donors: $donorList');
     print("\nKitchenMapPageState - createMarkers()\n");
     setState(() {
       markers.clear();
+
+      if (sortParam == 'Distance') {
+        donorList.sort((a, b) => _distanceBetween(a.location, currentPosition)
+            .compareTo(_distanceBetween(b.location, currentPosition)));
+      } else if (sortParam == 'Quantity') {
+        donorList.sort((a, b) => b.quantity.compareTo(a.quantity));
+      } else if (sortParam == 'Recent') {
+        //donorList.sort((a, b) => a..compareTo(b.createdAt));
+      }
+
       donors = donorList;
       print('donors: $donors');
     });
 
-    // BitmapDescriptor.asset(
-    //         ImageConfiguration(size: Size(10, 10)), 'assets/store_logo.png')
-    //     .then((image) {
     for (var donor in donorList) {
       setState(() {
         markers.add(
