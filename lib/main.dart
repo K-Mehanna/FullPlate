@@ -14,15 +14,19 @@ void main() async {
 
   // run this command:
   // firebase emulators:start --import ./emulators_data --export-on-exit
-  if (kDebugMode) {
-    try {
-      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    } catch (e) {
-      // ignore: avoid_print
-      print(e);
-    }
-  }
+  // if (kDebugMode) {
+  //   try {
+  //     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+  //     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  //     print('Connected to emulator');
+  //   } catch (e) {
+  //     // ignore: avoid_print
+  //     print(e);
+  //     print('Error on connecting to emulator');
+  //   }
+  // } else {
+  //   print('Emulator disabled');
+  // }
 
   runApp(MyApp());
 }
