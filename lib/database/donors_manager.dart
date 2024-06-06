@@ -3,54 +3,54 @@ import 'package:cibu/models/donor_info.dart';
 import 'dart:async';
 
 class DonorsManager {
-    final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  Future<DonorInfo> getDonor(String donorId) {
+    final completer = Completer<DonorInfo>();
 
-    Future<DonorInfo> getDonor(String donorId) {
-      final completer = Completer<DonorInfo>();
+    final donorsRef = _db.collection("donors");
 
-      final donorsRef = _db.collection("donors");
+    donorsRef.doc(donorId).get().then((querySnapshot) {
+      DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null);
+      completer.complete(donor);
+    }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
 
-      donorsRef.doc(donorId).get().then((querySnapshot) {
-        DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null, querySnapshot.id);
-        completer.complete(donor);
-      }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
+    return completer.future;
+  }
 
-      return completer.future;
-    }
+  void getOfferDonorsCompletion(void Function(List<DonorInfo>) callback) {
+    final donorsRef = _db
+      .collection("donors")
+      .where("quantity", isGreaterThan: 0);
 
-    void getDonorsCompletion(void Function(List<DonorInfo>) callback) {
-      final donorsRef = _db.collection("donors");
+    donorsRef.get().then((querySnapshot) {
+      List<DonorInfo> donors = [];
 
-      donorsRef.get().then((querySnapshot) {
-        List<DonorInfo> donors = [];
+      for (var docSnapshot in querySnapshot.docs) {
+        DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
 
-        for (var docSnapshot in querySnapshot.docs) {
-          DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null, docSnapshot.id);
-          
-          if (donor.quantity > 0) {
-            donors.add(donor);
-          }
-        }
-        
-        callback(donors);
-      }, onError: (e) => print("DonorsManager\n - getDonors: $e"));
-    } 
+        assert(donor.quantity > 0);
+        donors.add(donor);
+      }
 
-    void getDonorCompletion(String donorId, void Function(DonorInfo) callback) {
-      final donorsRef = _db.collection("donors");
+      callback(donors);
+    }, onError: (e) => print("DonorsManager\n - getDonors: $e"));
+  }
 
-      donorsRef.doc(donorId).get().then((querySnapshot) {
-        DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null, querySnapshot.id);
-        callback(donor);
-      }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
-    }
+  void getDonorCompletion(String donorId, void Function(DonorInfo) callback) {
+    final donorsRef = _db.collection("donors");
 
-    void addDonor(DonorInfo donorInfo) {
-      _db
+    donorsRef.doc(donorId).get().then((querySnapshot) {
+      DonorInfo donor = DonorInfo.fromFirestore(querySnapshot, null);
+      callback(donor);
+    }, onError: (e) => print("DonorsManager\n - getDonor: $e"));
+  }
+
+  void addDonor(DonorInfo donorInfo) {
+    _db
         .collection("donors")
         .doc(donorInfo.donorId)
         .set(donorInfo.toFirestore())
         .then((a) {}, onError: (e) => print("Error: in addDonor"));
-    }
+  }
 }

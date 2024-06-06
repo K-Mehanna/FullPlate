@@ -1,149 +1,5 @@
-// import 'package:cibu/database/orders_manager.dart';
-// import 'package:cibu/models/offer_info.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-
-// class NewRequestPage extends StatefulWidget {
-//   const NewRequestPage({super.key});
-
-//   @override
-//   NewRequestPageState createState() => NewRequestPageState();
-// }
-
-// class NewRequestPageState extends State<NewRequestPage> {
-//   final OrdersManager ordersManager = OrdersManager();
-//   final ValueNotifier<int> quantityNotifier = ValueNotifier<int>(1);
-
-//   OrderCategory selectedCategory = OrderCategory.BREAD;
-//   final TextEditingController quantityController =
-//       TextEditingController(text: '1');
-
-//   @override
-//   void dispose() {
-//     quantityNotifier.dispose();
-//     quantityController.dispose();
-//     super.dispose();
-//   }
-
-//   void incrementQuantity() {
-//     quantityNotifier.value++;
-//     quantityController.text = quantityNotifier.value.toString();
-//   }
-
-//   void decrementQuantity() {
-//     if (quantityNotifier.value > 1) {
-//       quantityNotifier.value--;
-//       quantityController.text = quantityNotifier.value.toString();
-//     }
-//   }
-
-//   void submitRequest() {
-//     final newItem =
-//         OfferInfo(quantity: quantityNotifier.value, category: selectedCategory);
-//     ordersManager.addOpenOffer(FirebaseAuth.instance.currentUser!.uid,
-//         newItem); //"sec0ABRO6ReQz1hxiKfJ"
-//     Navigator.pop(context);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Add new item"),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             DropdownButtonFormField<OrderCategory>(
-//               value: selectedCategory,
-//               items: OrderCategory.values.map((category) {
-//                 return DropdownMenuItem(
-//                   value: category,
-//                   child: Text(category.value),
-//                 );
-//               }).toList(),
-//               onChanged: (value) {
-//                 setState(() {
-//                   selectedCategory = value!;
-//                 });
-//               },
-//               decoration: InputDecoration(labelText: "Category"),
-//             ),
-//             SizedBox(height: 16),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text("Quantity"),
-//                 Row(
-//                   children: [
-//                     ValueListenableBuilder<int>(
-//                       valueListenable: quantityNotifier,
-//                       builder: (context, value, _) {
-//                         return IconButton(
-//                           icon: Icon(Icons.remove),
-//                           onPressed: (value > 1) ? decrementQuantity : null,
-//                         );
-//                       },
-//                     ),
-//                     SizedBox(
-//                       width: 25,
-//                       child: TextField(
-//                         controller: quantityController,
-//                         keyboardType: TextInputType.number,
-//                         inputFormatters: <TextInputFormatter>[
-//                           FilteringTextInputFormatter.digitsOnly
-//                         ],
-//                         onChanged: (value) {
-//                           int? intValue = int.tryParse(value);
-//                           if (intValue != null &&
-//                               intValue >= 1 &&
-//                               intValue <= 99) {
-//                             quantityNotifier.value = intValue;
-//                           } else if (intValue != null && intValue > 99) {
-//                             quantityNotifier.value = 99;
-//                             quantityController.text = "99";
-//                           } else {
-//                             quantityController.text =
-//                                 quantityNotifier.value.toString();
-//                           }
-//                         },
-//                       ),
-//                     ),
-//                     ValueListenableBuilder<int>(
-//                       valueListenable: quantityNotifier,
-//                       builder: (context, value, _) {
-//                         return IconButton(
-//                           icon: Icon(Icons.add),
-//                           onPressed: (value < 99) ? incrementQuantity : null,
-//                         );
-//                       },
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//             SizedBox(height: 16),
-//             Spacer(),
-//             Align(
-//               alignment: Alignment.bottomCenter,
-//               child: ElevatedButton.icon(
-//                 onPressed: submitRequest,
-//                 icon: Icon(Icons.check),
-//                 label: Text("Done"),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/offer_info.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -173,12 +29,10 @@ class NewRequestPageState extends State<NewRequestPage> {
   }
 
   void removeOrder(int index) {
-    if (index != 0) {
-      setState(() {
-        orders[index].dispose();
-        orders.removeAt(index);
-      });
-    }
+    setState(() {
+      orders[index].dispose();
+      orders.removeAt(index);
+    });
   }
 
   OrderCategory getFirstAvailableCategory() {
@@ -259,11 +113,16 @@ class NewRequestPageState extends State<NewRequestPage> {
                               });
                             },
                           ),
-                          if (index != 0)
+                          if (orders.length != 1)
                             IconButton(
                               icon: Icon(Icons.close),
                               onPressed: () => removeOrder(index),
-                            ),
+                            )
+                          else
+                            (IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: null,
+                            ))
                         ],
                       ),
                       Row(
@@ -291,24 +150,31 @@ class NewRequestPageState extends State<NewRequestPage> {
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
                                   ],
-                                  onChanged: (value) {
+                                  onSubmitted: (value) {
                                     int? intValue = int.tryParse(value);
-                                    if (intValue != null &&
-                                        intValue >= 1 &&
-                                        intValue <= 99) {
-                                      orders[index].quantityNotifier.value =
-                                          intValue;
-                                    } else if (intValue != null &&
-                                        intValue > 99) {
-                                      orders[index].quantityNotifier.value = 99;
-                                      orders[index].quantityController.text =
-                                          "99";
-                                    } else {
+                                    if (intValue != null) {
+                                      orders[index].quantityNotifier.value = 
+                                        limitedValue(1, 99, intValue);
+                                      orders[index].quantityController.text = 
+                                        limitedValue(1, 99, intValue)
+                                          .toString();
+                                    }
+                                    else {
                                       orders[index].quantityController.text =
                                           orders[index]
                                               .quantityNotifier
                                               .value
                                               .toString();
+                                    }
+                                  },
+                                  onChanged: (value) {
+                                    int? intValue = int.tryParse(value);
+                                    if (intValue != null) {
+                                      orders[index].quantityNotifier.value = 
+                                        limitedValue(1, 99, intValue);
+                                      orders[index].quantityController.text = 
+                                        limitedValue(1, 99, intValue)
+                                          .toString();
                                     }
                                   },
                                 ),
@@ -351,6 +217,17 @@ class NewRequestPageState extends State<NewRequestPage> {
         ),
       ),
     );
+  }
+}
+
+int limitedValue(int lower, int upper, int value) {
+  if (value >= lower &&
+    value <= upper) {
+    return value;
+  } else if (value > upper) {
+    return upper;
+  } else {
+    return lower;
   }
 }
 

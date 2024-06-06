@@ -1,3 +1,4 @@
+import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cibu/models/job_info.dart';
@@ -8,6 +9,29 @@ class OrdersManager {
   void addOpenOffer(
       String donorId, OfferInfo offer, void Function() onCompletion) {
     addOpenOffers(donorId, [offer], onCompletion);
+  }
+
+  void removeOpenOffer(String donorId, OfferInfo offer, void Function() onCompletion) {
+    final donorRef = _db
+      .collection("donors")
+      .doc(donorId);
+
+    final offerRef = donorRef
+      .collection("openOffers")
+      .doc(offer.category.code);
+
+    offerRef.delete().then((res) {
+      donorRef.get().then((docSnapshot) {
+        DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
+        
+        donorRef.update({
+          "quantity": donor.quantity - offer.quantity
+        }).then((e) {
+          onCompletion();
+        }, onError: (e) => print("OrdersManager\n - removeOpenOffer: update donor $e"));
+      });
+      onCompletion();
+    }, onError: (e) => print("OrdersManager\n - removeOpenOffer: $e"));
   }
 
   void addOpenOffers(
@@ -203,6 +227,7 @@ class OrdersManager {
     _fetchOfferCallback(query, callback);
   }
 
+
   void _fetchOfferCallback(Query<Map<String, dynamic>> query,
       void Function(List<OfferInfo>) callback) {
     query.get().then((querySnapshot) {
@@ -215,6 +240,7 @@ class OrdersManager {
       callback(offers);
     }, onError: (e) => print("OrdersManager\n - _fetchQueryCallback: $e"));
   }
+
 
   Query<Map<String, dynamic>> _buildJobsQuery(
       OrderStatus status, String? donorId, String? kitchenId) {

@@ -155,9 +155,9 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                       selected.value = intValue;
                     } else if (intValue != null && intValue > offer.quantity) {
                       controller.text = offer.quantity.toString();
-                    } else if (intValue != null && intValue < offer.quantity) {
+                    } else if (intValue != null && intValue < 0) {
                       controller.text = "0";
-                    } else if (intValue != null) {
+                    } else if (intValue == null) {
                       controller.text = selected.value.toString();
                     }
                   },

@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/database/donors_manager.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 class KitchenDashboardPage extends StatefulWidget {
   KitchenDashboardPage({super.key});

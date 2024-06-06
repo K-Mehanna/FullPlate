@@ -5,7 +5,7 @@ import 'dart:async';
 class KitchensManager {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<KitchenInfo> getKitchen(String kitchenId) {
+  Future<KitchenInfo> getKitchen(String kitchenId, Null Function(dynamic kitchen) param1) {
     final completer = Completer<KitchenInfo>();
 
     final kitchensRef = _db.collection("kitchens");

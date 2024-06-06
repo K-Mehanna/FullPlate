@@ -17,8 +17,7 @@ class DonorInfo {
 
   factory DonorInfo.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot,
-      SnapshotOptions? options,
-      String donorId) {
+      SnapshotOptions? options) {
     final data = snapshot.data()!;
     final GeoPoint geoPoint = data['location'];
 
@@ -26,7 +25,7 @@ class DonorInfo {
         name: data['name'],
         location: LatLng(geoPoint.latitude, geoPoint.longitude),
         address: data['address'],
-        donorId: donorId,
+        donorId: snapshot.id,
         quantity: data['quantity']);
   }
 

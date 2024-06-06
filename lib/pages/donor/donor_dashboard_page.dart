@@ -3,11 +3,9 @@ import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cibu/pages/donor/job_detail_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/new_request_page.dart';
 import 'package:cibu/database/orders_manager.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 class DonorDashboard extends StatefulWidget {
   DonorDashboard({Key? key}) : super(key: key);
@@ -129,59 +127,97 @@ class _DonorDashboardState extends State<DonorDashboard> {
   }
 
   Widget buildOfferItem(OfferInfo offer) {
-    // Slidable stuff
-    return ListTile(
-        leading: offer.category.icon,
-        title: Text(offer.category.value),
-        trailing: Text("x${offer.quantity}"));
+    // return ListTile(
+    //     leading: offer.category.icon,
+    //     title: Text(offer.category.value),
+    //     trailing: Text("x${offer.quantity}"));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            offer.category.icon,
+            SizedBox(width: 8),
+            Text(offer.category.value, style: TextStyle(fontSize: 18)),
+          ],
+        ),
+        Row(
+          children: [
+            Text(
+              "x${offer.quantity}",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.close,
+                size: 20,
+                color: Colors.grey.shade600,
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text(
+                      "Remove item",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    content: Text(
+                      "Are you sure you want to remove this item?",
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                    actions: [
+                      Container(
+                        //color: Colors.red,
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: Colors.blueGrey.shade50,
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            "Cancel",
+                            //style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            ordersManager.removeOpenOffer(
+                                donorId, offer, () {});
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            "Remove",
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
   }
-
-  // Slidable(
-  //             // Specify a key if the Slidable is dismissible.
-  //             key: const ValueKey(0),
-
-  //             // The start action pane is the one at the left or the top side.
-  //             startActionPane: ActionPane(
-  //               // A motion is a widget used to control how the pane animates.
-  //               motion: const DrawerMotion(),
-
-  //               // A pane can dismiss the Slidable.
-  //               dismissible: DismissiblePane(onDismissed: () {}),
-
-  //               // All actions are defined in the children parameter.
-  //               children: [
-  //                 // A SlidableAction can have an icon and/or a label.
-  //                 SlidableAction(
-  //                   onPressed: (a) {},
-  //                   backgroundColor: Color(0xFFFE4A49),
-  //                   foregroundColor: Colors.white,
-  //                   icon: Icons.delete,
-  //                   label: 'Delete',
-  //                 ),
-  //               ],
-  //             ),
-
-  //             // The end action pane is the one at the right or the bottom side.
-  //             endActionPane: ActionPane(
-  //               motion: DrawerMotion(),
-  //               children: [
-  //                 SlidableAction(
-  //                   onPressed: (a) {},
-  //                   backgroundColor: Color(0xFFFE4A49),
-  //                   foregroundColor: Colors.white,
-  //                   icon: Icons.delete,
-  //                   label: 'Delete',
-  //                 ),
-  //               ],
-  //             ),
-
-  //             // The child of the Slidable is what the user sees when the
-  //             // component is not dragged.
-  //             child: const ListTile(
-  //               title: Text('Slide me'),
-  //               tileColor: Colors.grey,
-  //             ),
-  //           ),
 
   Widget _buildSectionTitle(String title, int count) {
     return Text("$title ($count)",
