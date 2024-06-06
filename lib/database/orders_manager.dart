@@ -14,22 +14,34 @@ class OrdersManager {
   void removeOpenOffer(
       String donorId, OfferInfo offer, void Function() onCompletion) {
     final donorRef = _db.collection("donors").doc(donorId);
-
-    final offerRef = donorRef
-      .collection("openOffers")
-      .doc(offer.offerId);
+    final offersRef = donorRef.collection("openOffers");
+    final offerRef = offersRef.doc(offer.offerId);
 
     offerRef.delete().then((res) {
       donorRef.get().then((docSnapshot) {
         DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
 
-        donorRef.update({"quantity": donor.quantity - offer.quantity}).then(
-            (e) {
-          onCompletion();
-        },
-            onError: (e) =>
-                print("OrdersManager\n - removeOpenOffer: update donor $e"));
-      });
+        donorRef
+          .update({
+            "quantity": donor.quantity - offer.quantity
+          })
+          .then((e) {
+            offersRef
+              .where("category", isEqualTo: offer.category.code)
+              .count()
+              .get()
+              .then((res) {
+                if (res.count == 0) {
+                  donorRef
+                    .update({
+                      "offerSummary": FieldValue.arrayRemove([offer.category.code])
+                    })
+                    .then((res) {
+                      onCompletion();
+                    }, onError: (e) => print("iehfoiewhf :(((())))"));
+                }
+              });
+          }, onError: (e) => print("OrdersManager\n - removeOpenOffer: update donor $e"));});
       onCompletion();
     }, onError: (e) => print("OrdersManager\n - removeOpenOffer: $e"));
   }
@@ -49,15 +61,19 @@ class OrdersManager {
       String nestedOffersPath,
       List<OfferInfo> offers,
       void Function() onCompletion) {
-
     List<String> orders = offers
-      .map((offer) => offer.category).toSet().toList()
-      .map((category) => category.code).toList();
+        .map((offer) => offer.category)
+        .toSet()
+        .toList()
+        .map((category) => category.code)
+        .toList();
 
     _db.runTransaction((transaction) async {
-      transaction.update(baseDocumentRef, {
-        "offerSummary": FieldValue.arrayUnion(orders)
-      });
+      final baseDoc = await transaction.get(baseDocumentRef);
+      int previousQuantity = baseDoc.get("quantity");
+
+      transaction.update(
+          baseDocumentRef, {"offerSummary": FieldValue.arrayUnion(orders)});
 
       for (var offer in offers) {
         final offerRef = baseDocumentRef
@@ -67,8 +83,10 @@ class OrdersManager {
         transaction.set(offerRef, offer.toFirestore());
       }
 
-      transaction.update(baseDocumentRef,
-          {"quantity": offers.map((a) => a.quantity).reduce((a, b) => a + b)});
+      transaction.update(baseDocumentRef, {
+        "quantity": previousQuantity +
+            offers.map((a) => a.quantity).reduce((a, b) => a + b)
+      });
     }).then((e) {
       onCompletion();
     }, onError: (e) => print("OrdersManager\n - _addOrders: $e"));
@@ -149,19 +167,11 @@ class OrdersManager {
         JobInfo previousJob =
             JobInfo.fromFirestore(querySnapshot.docs[0], null);
 
-        _db
-          .collection("jobs")
-          .doc(previousJob.jobId)
-          .update({
-            "quantity": previousJob.quantity + offerQuantity,
-            "offerSummary": FieldValue.arrayUnion(
-              offerSummary
-                .toList()
-                .map((category) => category.code)
-                .toList()
-            )
-          })
-          .then((other) {
+        _db.collection("jobs").doc(previousJob.jobId).update({
+          "quantity": previousJob.quantity + offerQuantity,
+          "offerSummary": FieldValue.arrayUnion(
+              offerSummary.toList().map((category) => category.code).toList())
+        }).then((other) {
           final baseDocumentRef = _db.collection("jobs").doc(previousJob.jobId);
 
           _conductTransaction(donorId, openOffers, openOffersRef,
@@ -178,27 +188,24 @@ class OrdersManager {
       List<int> selectedQuantity,
       DocumentReference<Map<String, dynamic>> baseJobRef,
       void Function() callback) {
-    
     for (int i = 0; i < selectedQuantity.length; i++) {
       openOffers[i].quantity -= selectedQuantity[i];
       assert(openOffers[i].quantity >= 0);
     }
 
     _db.runTransaction((transaction) async {
-      final donorRef = _db
-        .collection("donors")
-        .doc(donorId);
+      final donorRef = _db.collection("donors").doc(donorId);
 
       // WRITE
 
       for (var category in OrderCategory.values) {
-        List<OfferInfo> reducedOffers = openOffers
-          .where((offer) => offer.category == category).toList();
+        List<OfferInfo> reducedOffers =
+            openOffers.where((offer) => offer.category == category).toList();
         if (reducedOffers.isEmpty) continue;
 
         int newQuantity = reducedOffers
-          .map((offer) => offer.quantity)
-          .reduce((a, b) => a + b);
+            .map((offer) => offer.quantity)
+            .reduce((a, b) => a + b);
 
         if (newQuantity == 0) {
           transaction.update(donorRef, {
@@ -206,7 +213,7 @@ class OrdersManager {
           });
         }
       }
-      
+
       transaction.update(donorRef, {
         "quantity": openOffers.map((a) => a.quantity).reduce((a, b) => a + b)
       });
