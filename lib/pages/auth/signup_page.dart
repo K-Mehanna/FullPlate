@@ -33,19 +33,10 @@ class _SignUpPageState extends State<SignUpPage> {
         email: emailController.text,
         password: passwordController.text,
       )
-      .then((_) => {
-        _db.collection('users').doc(_auth.currentUser!.uid).set({
+      .then((_) => _db.collection('users').doc(_auth.currentUser!.uid).set({
           'email': emailController.text,
           'userType': userType.value,
-        }),
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => userType == UserType.DONOR
-              ? DonorSignupPage()
-              : KitchenSignupPage(),
-          ),
-        )}, onError: (e) => {
+        }), onError: (e) => {
           if (e.code == 'invalid-email') {
             CustomAlertDialog(context, 'Invalid email'),
           } else if (e.code == 'email-already-in-use') {
@@ -57,7 +48,14 @@ class _SignUpPageState extends State<SignUpPage> {
           },
           print("Error: ${e.code}"),
         }
-      );
+      ).then((_) => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => userType == UserType.DONOR
+              ? DonorSignupPage()
+              : KitchenSignupPage(),
+          ),
+      ));
   }
 
   // wrong email message popup
