@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       .then((userCredential) => {}, onError: (e) => {
         if (e.code == 'invalid-email') {
           CustomAlertDialog(context, 'Invalid email'),
-        } else if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        } else if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') {
           CustomAlertDialog(context, 'Incorrect login credentials'),
         } else {
           CustomAlertDialog(context, 'Error: ${e.code}'),
