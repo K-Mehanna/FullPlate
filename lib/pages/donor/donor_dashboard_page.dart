@@ -173,12 +173,13 @@ class _DonorDashboardState extends State<DonorDashboard> {
                     actions: [
                       Container(
                         //color: Colors.red,
-                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        //padding: EdgeInsets.symmetric(horizontal: 5),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
                           color: Colors.blueGrey.shade50,
                         ),
                         child: TextButton(
+                          style: ButtonStyle(padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 20))),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -189,7 +190,6 @@ class _DonorDashboardState extends State<DonorDashboard> {
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
                         decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(30),
@@ -200,6 +200,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
                                 donorId, offer, () {});
                             Navigator.of(context).pop();
                           },
+                          style: ButtonStyle(padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 20))),
                           child: Text(
                             "Remove",
                             style: TextStyle(
