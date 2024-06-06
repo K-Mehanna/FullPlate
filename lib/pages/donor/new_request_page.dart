@@ -1,149 +1,5 @@
-// import 'package:cibu/database/orders_manager.dart';
-// import 'package:cibu/models/offer_info.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-
-// class NewRequestPage extends StatefulWidget {
-//   const NewRequestPage({super.key});
-
-//   @override
-//   NewRequestPageState createState() => NewRequestPageState();
-// }
-
-// class NewRequestPageState extends State<NewRequestPage> {
-//   final OrdersManager ordersManager = OrdersManager();
-//   final ValueNotifier<int> quantityNotifier = ValueNotifier<int>(1);
-
-//   OrderCategory selectedCategory = OrderCategory.BREAD;
-//   final TextEditingController quantityController =
-//       TextEditingController(text: '1');
-
-//   @override
-//   void dispose() {
-//     quantityNotifier.dispose();
-//     quantityController.dispose();
-//     super.dispose();
-//   }
-
-//   void incrementQuantity() {
-//     quantityNotifier.value++;
-//     quantityController.text = quantityNotifier.value.toString();
-//   }
-
-//   void decrementQuantity() {
-//     if (quantityNotifier.value > 1) {
-//       quantityNotifier.value--;
-//       quantityController.text = quantityNotifier.value.toString();
-//     }
-//   }
-
-//   void submitRequest() {
-//     final newItem =
-//         OfferInfo(quantity: quantityNotifier.value, category: selectedCategory);
-//     ordersManager.addOpenOffer(_auth.currentUser!.uid,
-//         newItem); //"sec0ABRO6ReQz1hxiKfJ"
-//     Navigator.pop(context);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Add new item"),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             DropdownButtonFormField<OrderCategory>(
-//               value: selectedCategory,
-//               items: OrderCategory.values.map((category) {
-//                 return DropdownMenuItem(
-//                   value: category,
-//                   child: Text(category.value),
-//                 );
-//               }).toList(),
-//               onChanged: (value) {
-//                 setState(() {
-//                   selectedCategory = value!;
-//                 });
-//               },
-//               decoration: InputDecoration(labelText: "Category"),
-//             ),
-//             SizedBox(height: 16),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text("Quantity"),
-//                 Row(
-//                   children: [
-//                     ValueListenableBuilder<int>(
-//                       valueListenable: quantityNotifier,
-//                       builder: (context, value, _) {
-//                         return IconButton(
-//                           icon: Icon(Icons.remove),
-//                           onPressed: (value > 1) ? decrementQuantity : null,
-//                         );
-//                       },
-//                     ),
-//                     SizedBox(
-//                       width: 25,
-//                       child: TextField(
-//                         controller: quantityController,
-//                         keyboardType: TextInputType.number,
-//                         inputFormatters: <TextInputFormatter>[
-//                           FilteringTextInputFormatter.digitsOnly
-//                         ],
-//                         onChanged: (value) {
-//                           int? intValue = int.tryParse(value);
-//                           if (intValue != null &&
-//                               intValue >= 1 &&
-//                               intValue <= 99) {
-//                             quantityNotifier.value = intValue;
-//                           } else if (intValue != null && intValue > 99) {
-//                             quantityNotifier.value = 99;
-//                             quantityController.text = "99";
-//                           } else {
-//                             quantityController.text =
-//                                 quantityNotifier.value.toString();
-//                           }
-//                         },
-//                       ),
-//                     ),
-//                     ValueListenableBuilder<int>(
-//                       valueListenable: quantityNotifier,
-//                       builder: (context, value, _) {
-//                         return IconButton(
-//                           icon: Icon(Icons.add),
-//                           onPressed: (value < 99) ? incrementQuantity : null,
-//                         );
-//                       },
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//             SizedBox(height: 16),
-//             Spacer(),
-//             Align(
-//               alignment: Alignment.bottomCenter,
-//               child: ElevatedButton.icon(
-//                 onPressed: submitRequest,
-//                 icon: Icon(Icons.check),
-//                 label: Text("Done"),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/offer_info.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -174,42 +30,27 @@ class NewRequestPageState extends State<NewRequestPage> {
   }
 
   void removeOrder(int index) {
-    if (index != 0) {
-      setState(() {
-        orders[index].dispose();
-        orders.removeAt(index);
-      });
-    }
+    setState(() {
+      orders[index].dispose();
+      orders.removeAt(index);
+    });
   }
 
   OrderCategory getFirstAvailableCategory() {
-    for (var category in OrderCategory.values) {
-      if (!categoryAlreadySelected(category)) {
-        return category;
-      }
-    }
     return OrderCategory.BREAD; // Fallback in case all categories are selected
   }
 
-  bool categoryAlreadySelected(OrderCategory category) {
-    for (var order in orders) {
-      if (order.selectedCategory == category) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   bool isCategoryAvailable() {
-    return OrderCategory.values
-        .any((category) => !categoryAlreadySelected(category));
+    return true;
   }
 
   void submitRequest() {
     List<OfferInfo> offers = [];
     for (var order in orders) {
       final newItem = OfferInfo(
+          offerId: "unassigned",
           quantity: order.quantityNotifier.value,
+          expiryDate: order.expiryDate,
           category: order.selectedCategory);
 
       if (newItem.quantity > 0) offers.add(newItem);
@@ -221,6 +62,31 @@ class NewRequestPageState extends State<NewRequestPage> {
     // ordersManager.addOpenOffers("HAO9gLWbTaT7z16pBoLGz019iSC3", offers, () {
     //   Navigator.pop(context);
     // });
+  }
+
+  void _showDatePicker(OrderItem order) {
+    showDatePicker(
+      context: context, 
+      initialDate: order.expiryDate,
+      firstDate: DateTime.now(), 
+      lastDate: DateTime.now().add(Duration(days: 30))
+    ).then((date) {
+      if (date != null) {
+        setState(() {
+          order.expiryDate = date;
+        });
+      }
+    });
+  }
+
+  Color getButtonColors(Set<WidgetState> state) {
+    if (state.contains(WidgetState.hovered)) {
+      return Colors.blueGrey.withOpacity(0.9);
+    } else if (state.contains(WidgetState.focused) || state.contains(WidgetState.pressed)) {
+      return Colors.blueGrey.withOpacity(0.8);
+    } else {
+      return Colors.blueGrey;
+    }
   }
 
   @override
@@ -245,9 +111,6 @@ class NewRequestPageState extends State<NewRequestPage> {
                           DropdownButton<OrderCategory>(
                             value: orders[index].selectedCategory,
                             items: OrderCategory.values
-                                .where((category) =>
-                                    !categoryAlreadySelected(category) ||
-                                    category == orders[index].selectedCategory)
                                 .map((category) {
                               return DropdownMenuItem(
                                 value: category,
@@ -260,74 +123,111 @@ class NewRequestPageState extends State<NewRequestPage> {
                               });
                             },
                           ),
-                          if (index != 0)
+                          if (orders.length != 1)
                             IconButton(
                               icon: Icon(Icons.close),
                               onPressed: () => removeOrder(index),
-                            ),
+                            )
+                          else
+                            (IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: null,
+                            ))
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Quantity"),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ValueListenableBuilder<int>(
-                                valueListenable: orders[index].quantityNotifier,
-                                builder: (context, value, _) {
-                                  return IconButton(
-                                    icon: Icon(Icons.remove),
-                                    onPressed: (value > 1)
-                                        ? orders[index].decrementQuantity
-                                        : null,
-                                  );
-                                },
-                              ),
-                              SizedBox(
-                                width: 25,
-                                child: TextField(
-                                  controller: orders[index].quantityController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  onChanged: (value) {
-                                    int? intValue = int.tryParse(value);
-                                    if (intValue != null &&
-                                        intValue >= 1 &&
-                                        intValue <= 99) {
-                                      orders[index].quantityNotifier.value =
-                                          intValue;
-                                    } else if (intValue != null &&
-                                        intValue > 99) {
-                                      orders[index].quantityNotifier.value = 99;
-                                      orders[index].quantityController.text =
-                                          "99";
-                                    } else {
-                                      orders[index].quantityController.text =
-                                          orders[index]
-                                              .quantityNotifier
-                                              .value
+                              Text("Quantity", style: TextStyle(fontWeight: FontWeight.bold),),
+                              Row(
+                                children: [
+                                  ValueListenableBuilder<int>(
+                                    valueListenable: orders[index].quantityNotifier,
+                                    builder: (context, value, _) {
+                                      return IconButton(
+                                        icon: Icon(Icons.remove),
+                                        onPressed: (value > 1)
+                                            ? orders[index].decrementQuantity
+                                            : null,
+                                      );
+                                    },
+                                  ),
+                                  SizedBox(
+                                    width: 25,
+                                    child: TextField(
+                                      controller: orders[index].quantityController,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: <TextInputFormatter>[
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      onSubmitted: (value) {
+                                        int? intValue = int.tryParse(value);
+                                        if (intValue != null) {
+                                          orders[index].quantityNotifier.value = 
+                                            limitedValue(1, 99, intValue);
+                                          orders[index].quantityController.text = 
+                                            limitedValue(1, 99, intValue)
                                               .toString();
-                                    }
-                                  },
-                                ),
-                              ),
-                              ValueListenableBuilder<int>(
-                                valueListenable: orders[index].quantityNotifier,
-                                builder: (context, value, _) {
-                                  return IconButton(
-                                    icon: Icon(Icons.add),
-                                    onPressed: (value < 99)
-                                        ? orders[index].incrementQuantity
-                                        : null,
-                                  );
-                                },
+                                        }
+                                        else {
+                                          orders[index].quantityController.text =
+                                              orders[index]
+                                                  .quantityNotifier
+                                                  .value
+                                                  .toString();
+                                        }
+                                      },
+                                      onChanged: (value) {
+                                        int? intValue = int.tryParse(value);
+                                        if (intValue != null) {
+                                          orders[index].quantityNotifier.value = 
+                                            limitedValue(1, 99, intValue);
+                                          orders[index].quantityController.text = 
+                                            limitedValue(1, 99, intValue)
+                                              .toString();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  ValueListenableBuilder<int>(
+                                    valueListenable: orders[index].quantityNotifier,
+                                    builder: (context, value, _) {
+                                      return IconButton(
+                                        icon: Icon(Icons.add),
+                                        onPressed: (value < 99)
+                                            ? orders[index].incrementQuantity
+                                            : null,
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Expiry", style: TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(width: 10),
+                              TextButton.icon(
+                                icon: Icon(Icons.hourglass_bottom_rounded, color: Colors.white,),
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateColor.resolveWith(getButtonColors)
+                                ),
+                                onPressed: () {
+                                  _showDatePicker(orders[index]);
+                                }, 
+                                label: Text(
+                                  orders[index].getExpiryDescription(),
+                                  style: TextStyle(color: Colors.white)
+                                )
+                              )
+                            ],
+                          ),
+                        ]
                       ),
                     ],
                   );
@@ -355,14 +255,26 @@ class NewRequestPageState extends State<NewRequestPage> {
   }
 }
 
+int limitedValue(int lower, int upper, int value) {
+  if (value >= lower &&
+    value <= upper) {
+    return value;
+  } else if (value > upper) {
+    return upper;
+  } else {
+    return lower;
+  }
+}
+
 class OrderItem {
   final ValueNotifier<int> quantityNotifier = ValueNotifier<int>(1);
   OrderCategory selectedCategory;
-  final TextEditingController quantityController =
-      TextEditingController(text: '1');
+  DateTime expiryDate = DateTime.now().add(Duration(days: 7));
+  final TextEditingController quantityController;
 
   OrderItem({OrderCategory? defaultCategory})
-      : selectedCategory = defaultCategory ?? OrderCategory.BREAD;
+      : selectedCategory = defaultCategory ?? OrderCategory.BREAD,
+        quantityController = TextEditingController(text: '1');
 
   void incrementQuantity() {
     quantityNotifier.value++;
@@ -379,5 +291,11 @@ class OrderItem {
   void dispose() {
     quantityNotifier.dispose();
     quantityController.dispose();
+  }
+  
+  String getExpiryDescription() {
+    int days = expiryDate.difference(DateTime.now().subtract(Duration(days: 1))).inDays;
+
+    return "$days day${days > 1 ? "s" : ""}";
   }
 }

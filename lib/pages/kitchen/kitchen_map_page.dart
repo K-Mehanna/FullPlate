@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:filter_list/filter_list.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class KitchenMapPage extends StatefulWidget {
   KitchenMapPage({super.key});
@@ -18,38 +20,48 @@ class KitchenMapPage extends StatefulWidget {
 class _KitchenMapPageState extends State<KitchenMapPage> {
   final OrdersManager ordersManager = OrdersManager();
   final DonorsManager donorsManager = DonorsManager();
-  late LocationPermission permission = LocationPermission.denied;
   late GoogleMapController mapController;
 
   static LatLng currentPosition = LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;
-  String? sortBy = 'Sort By';
+  List<String> sortParams = ['Distance', 'Quantity', 'Recent'];
+  String? sortParam;
+  List<OrderCategory> selectedCategoryList = OrderCategory.values;
 
   void getCurrentLocation(void Function(Position) callback) async {
-    print('original: $permission');
-    if (permission != LocationPermission.whileInUse &&
-        permission != LocationPermission.always) {
-      LocationPermission permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      print('new permission: $permission');
+    _determineCurrentPosition().then(callback,
+        onError: (e) => print("An error occured fetching location:\n$e"));
+  }
 
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        this.permission = permission;
-      });
+  Future<Position> _determineCurrentPosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
     }
 
-    Future<Position> position =
-        Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
 
-    position.then(callback,
-        onError: (e) => print("An error occured fetching location:\n$e"));
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -61,14 +73,16 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     super.initState();
     print('in here');
 
-    donorsManager.getDonorsCompletion(createMarkers);
+    donorsManager.getOfferDonorsCompletion(createMarkers);
 
     getCurrentLocation((newLocation) {
       var newPosition = LatLng(newLocation.latitude, newLocation.longitude);
       if (!mounted) {
         return;
       }
+
       mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
+
       setState(() {
         currentPosition = newPosition;
       });
@@ -87,7 +101,6 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         snapPoint: 0.5,
         minHeight: 65.0,
         maxHeight: 550.0,
-        parallaxEnabled: true,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -103,11 +116,34 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
           ),
           initialCameraPosition: CameraPosition(
             target: currentPosition,
-            zoom: 15.0,
+            zoom: 15.5,
           ),
           markers: markers,
         ),
       ),
+    );
+  }
+
+  void openFilterDialog() async {
+    await FilterListDialog.display<OrderCategory>(
+      context,
+      listData: OrderCategory.values,
+      selectedListData: selectedCategoryList,
+      choiceChipLabel: (category) => category!.value,
+      validateSelectedItem: (list, val) => list!.contains(val),
+      onItemSearch: (category, query) {
+        return category.value.toLowerCase().contains(query.toLowerCase());
+      },
+      onApplyButtonClick: (list) {
+        setState(() {
+          selectedCategoryList = List.from(list!);
+          donorsManager.getFilteredOfferDonorsCompletion(
+              createMarkers, selectedCategoryList);
+          print('selectedCategoryList: $selectedCategoryList');
+        });
+        Navigator.pop(context);
+        // Redraw list
+      },
     );
   }
 
@@ -127,69 +163,74 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text('Radius'),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Icon(Icons.radar),
+                  TextButton.icon(
+                    onPressed: openFilterDialog,
+                    label: Text('Filters'),
+                    icon: Icon(Icons.filter_alt),
                   ),
-                  SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      isExpanded: false,
+                      hint: Row(
+                        children: [
+                          Icon(Icons.sort),
+                          SizedBox(width: 10),
+                          Text(
+                            'Sort by',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).hintColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      items: sortParams
+                          .map(
+                            (String item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      value: sortParam,
+                      onChanged: (String? value) {
+                        setState(() {
+                          sortParam = value;
+                          donorsManager.getFilteredOfferDonorsCompletion(
+                              createMarkers, selectedCategoryList);
+                        });
+                      },
+                      buttonStyleData: ButtonStyleData(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        height: 40,
+                        width: 140,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Colors.black26,
+                          ),
+                        ),
+                      ),
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        openInterval: const Interval(0.1, 0.25),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('Category'),
-                  SizedBox(width: 6),
-                  DropdownButton(
-                    value: filters,
-                    items: OrderCategory.values.map((OrderCategory o) {
-                      return DropdownMenuItem(
-                        value: o,
-                        child: o.icon, //Text(o.toString().split('.').last),
-                      );
-                    }).toList(),
-                    onChanged: (OrderCategory? category) {
-                      setState(() {
-                        filters = category!;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  DropdownButton(
-                    value: sortBy,
-                    items: ['Sort By', 'Distance', 'Recent'].map((String s) {
-                      return DropdownMenuItem(
-                        value: s,
-                        enabled: s != 'Sort By',
-                        child: Text(
-                          s,
-                          style: s != 'Sort By'
-                              ? TextStyle(color: Colors.black)
-                              : TextStyle(color: Colors.grey),
-                        ), //Text(o.toString().split('.').last),
-                      );
-                    }).toList(),
-                    onChanged: (String? s) {
-                      setState(() {
-                        sortBy = s!;
-                      });
-                    },
                   ),
                 ],
               ),
@@ -244,17 +285,34 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     );
   }
 
+  double _distanceBetween(LatLng point1, LatLng point2) {
+    return Geolocator.distanceBetween(
+      point1.latitude,
+      point1.longitude,
+      point2.latitude,
+      point2.longitude,
+    );
+  }
+
   void createMarkers(List<DonorInfo> donorList) {
+    print('donors: $donorList');
     print("\nKitchenMapPageState - createMarkers()\n");
     setState(() {
       markers.clear();
+
+      if (sortParam == 'Distance') {
+        donorList.sort((a, b) => _distanceBetween(a.location, currentPosition)
+            .compareTo(_distanceBetween(b.location, currentPosition)));
+      } else if (sortParam == 'Quantity') {
+        donorList.sort((a, b) => b.quantity.compareTo(a.quantity));
+      } else if (sortParam == 'Recent') {
+        //donorList.sort((a, b) => a..compareTo(b.createdAt));
+      }
+
       donors = donorList;
       print('donors: $donors');
     });
 
-    // BitmapDescriptor.asset(
-    //         ImageConfiguration(size: Size(10, 10)), 'assets/store_logo.png')
-    //     .then((image) {
     for (var donor in donorList) {
       setState(() {
         markers.add(
@@ -282,29 +340,29 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   //);
 }
 
-  // Future<BitmapDescriptor> iconDataToBitmapDescriptorSync(IconData iconData, {double size = 100}) async {
-  //   final PictureRecorder recorder = PictureRecorder();
-  //   final Canvas canvas = Canvas(recorder);
+// Future<BitmapDescriptor> iconDataToBitmapDescriptorSync(IconData iconData, {double size = 100}) async {
+//   final PictureRecorder recorder = PictureRecorder();
+//   final Canvas canvas = Canvas(recorder);
 
-  //   final TextPainter textPainter = TextPainter(
-  //     textDirection: TextDirection.ltr,
-  //   );
-  //   textPainter.text = TextSpan(
-  //     text: String.fromCharCode(iconData.codePoint),
-  //     style: TextStyle(
-  //       color: Colors.black, // Change the color as needed
-  //       fontSize: size,
-  //       fontFamily: iconData.fontFamily,
-  //     ),
-  //   );
+//   final TextPainter textPainter = TextPainter(
+//     textDirection: TextDirection.ltr,
+//   );
+//   textPainter.text = TextSpan(
+//     text: String.fromCharCode(iconData.codePoint),
+//     style: TextStyle(
+//       color: Colors.black, // Change the color as needed
+//       fontSize: size,
+//       fontFamily: iconData.fontFamily,
+//     ),
+//   );
 
-  //   textPainter.layout();
-  //   textPainter.paint(canvas, Offset(0, 0));
+//   textPainter.layout();
+//   textPainter.paint(canvas, Offset(0, 0));
 
-  //   final ui.Image image = recorder.endRecording().toImage(size.toInt(), size.toInt());
+//   final ui.Image image = recorder.endRecording().toImage(size.toInt(), size.toInt());
 
-  //   final ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-  //   final Uint8List pngBytes = byteData.buffer.asUint8List();
+//   final ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+//   final Uint8List pngBytes = byteData.buffer.asUint8List();
 
-  //   return BitmapDescriptor.fromBytes(pngBytes);
-  // }
+//   return BitmapDescriptor.fromBytes(pngBytes);
+// }

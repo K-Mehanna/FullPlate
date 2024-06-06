@@ -37,12 +37,12 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
 
         selectedQuantities = {
           for (var offer in openOffers)
-            offer.category.value: ValueNotifier<int>(offer.quantity),
+            offer.offerId: ValueNotifier<int>(offer.quantity),
         };
 
         controllers = {
           for (var offer in openOffers)
-            offer.category.value:
+            offer.offerId:
                 TextEditingController(text: offer.quantity.toString()),
         };
       });
@@ -64,7 +64,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
               openOffers,
               openOffers
                   .map((offer) =>
-                      selectedQuantities[offer.category.value]!.value)
+                      selectedQuantities[offer.offerId]!.value)
                   .toList(), () {
             Navigator.pop(context);
           });
@@ -119,8 +119,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final offer = items[index];
-        var selected = selectedQuantities[offer.category.value]!;
-        var controller = controllers[offer.category.value]!;
+        var selected = selectedQuantities[offer.offerId]!;
+        var controller = controllers[offer.offerId]!;
 
         return ListTile(
           title: Text(offer.category.value),
@@ -157,17 +157,13 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                       selected.value = intValue;
                     } else if (intValue != null && intValue > offer.quantity) {
                       controller.text = offer.quantity.toString();
-                    } else if (intValue != null && intValue < offer.quantity) {
+                    } else if (intValue != null && intValue < 0) {
                       controller.text = "0";
-                    } else if (intValue != null) {
-                      controller.text = selected.value.toString();
                     }
                   },
                   onSubmitted: (value) {
                     int? intValue = int.tryParse(value);
-                    if (intValue != null &&
-                        intValue >= 0 &&
-                        intValue <= offer.quantity) {
+                    if (intValue != null) {
                       selected.value = intValue;
                     } else {
                       controller.text =

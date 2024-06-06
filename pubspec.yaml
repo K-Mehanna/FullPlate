@@ -27,7 +27,8 @@ dependencies:
   http: ^1.2.1
   google_places_flutter: ^2.0.8
   uuid: ^4.4.0
-  flutter_slidable: ^3.1.0
+  filter_list: ^1.0.3
+  dropdown_button2: ^2.3.9
 
 dev_dependencies:
   flutter_test:

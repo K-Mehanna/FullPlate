@@ -1,3 +1,4 @@
+import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cibu/models/job_info.dart';
@@ -10,10 +11,47 @@ class OrdersManager {
     addOpenOffers(donorId, [offer], onCompletion);
   }
 
+  void removeOpenOffer(
+      String donorId, OfferInfo offer, void Function() onCompletion) {
+    final donorRef = _db.collection("donors").doc(donorId);
+    final offersRef = donorRef.collection("openOffers");
+    final offerRef = offersRef.doc(offer.offerId);
+
+    offerRef.delete().then((res) {
+      donorRef.get().then((docSnapshot) {
+        DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
+
+        donorRef
+          .update({
+            "quantity": donor.quantity - offer.quantity
+          })
+          .then((e) {
+            offersRef
+              .where("category", isEqualTo: offer.category.code)
+              .count()
+              .get()
+              .then((res) {
+                if (res.count == 0) {
+                  donorRef
+                    .update({
+                      "offerSummary": FieldValue.arrayRemove([offer.category.code])
+                    })
+                    .then((res) {
+                      onCompletion();
+                    }, onError: (e) => print("iehfoiewhf :(((())))"));
+                }
+              });
+          }, onError: (e) => print("OrdersManager\n - removeOpenOffer: update donor $e"));});
+      onCompletion();
+    }, onError: (e) => print("OrdersManager\n - removeOpenOffer: $e"));
+  }
+
   void addOpenOffers(
       String donorId, List<OfferInfo> offers, void Function() onCompletion) {
     final baseDocumentRef = _db.collection("donors").doc(donorId);
     const nestedOffersPath = "openOffers";
+
+    print("potato");
 
     _addOffers(baseDocumentRef, nestedOffersPath, offers, onCompletion);
   }
@@ -23,30 +61,31 @@ class OrdersManager {
       String nestedOffersPath,
       List<OfferInfo> offers,
       void Function() onCompletion) {
-    
+    List<String> orders = offers
+        .map((offer) => offer.category)
+        .toSet()
+        .toList()
+        .map((category) => category.code)
+        .toList();
+
     _db.runTransaction((transaction) async {
-      for (var offer in offers) {
-        final offerRef = baseDocumentRef
-            .collection(nestedOffersPath)
-            .doc(offer.category.code);
+      final baseDoc = await transaction.get(baseDocumentRef);
+      int previousQuantity = baseDoc.get("quantity");
 
-        var previousOffer = await transaction.get(offerRef);
-
-        if (previousOffer.exists) {
-          offer.quantity += previousOffer.get("quantity") as int;
-        }
-      }
+      transaction.update(
+          baseDocumentRef, {"offerSummary": FieldValue.arrayUnion(orders)});
 
       for (var offer in offers) {
         final offerRef = baseDocumentRef
             .collection(nestedOffersPath)
-            .doc(offer.category.code);
+            .doc(offer.offerId == "unassigned" ? null : offer.offerId);
 
         transaction.set(offerRef, offer.toFirestore());
       }
 
       transaction.update(baseDocumentRef, {
-        "quantity": offers.map((a) => a.quantity).reduce((a, b) => a + b)
+        "quantity": previousQuantity +
+            offers.map((a) => a.quantity).reduce((a, b) => a + b)
       });
     }).then((e) {
       onCompletion();
@@ -65,7 +104,8 @@ class OrdersManager {
 
         const nestedOffersPath = "openOffers";
 
-        _addOffers(baseDocumentRef, nestedOffersPath, constituentOffers, onCompletion);
+        _addOffers(
+            baseDocumentRef, nestedOffersPath, constituentOffers, onCompletion);
       });
     }, onError: (e) => print("OrdersManager\n - cancelJob: $e"));
   }
@@ -98,6 +138,14 @@ class OrdersManager {
         .where("kitchenId", isEqualTo: kitchenId)
         .where("status", isEqualTo: OrderStatus.ACCEPTED.value);
 
+    Set<OrderCategory> offerSummary = {};
+
+    for (int i = 0; i < openOffers.length; i++) {
+      if (selectedQuantity[i] > 0) {
+        offerSummary.add(openOffers[i].category);
+      }
+    }
+
     existingJobQuery.get().then((querySnapshot) {
       if (querySnapshot.docs.isEmpty) {
         // make new job
@@ -106,6 +154,7 @@ class OrdersManager {
             donorId: donorId,
             kitchenId: kitchenId,
             status: OrderStatus.ACCEPTED,
+            offerSummary: offerSummary.toList(),
             quantity: offerQuantity);
 
         _db.collection("jobs").add(job.toFirestore()).then((docSnapshot) {
@@ -118,8 +167,11 @@ class OrdersManager {
         JobInfo previousJob =
             JobInfo.fromFirestore(querySnapshot.docs[0], null);
 
-        _db.collection("jobs").doc(previousJob.jobId).update(
-            {"quantity": previousJob.quantity + offerQuantity}).then((other) {
+        _db.collection("jobs").doc(previousJob.jobId).update({
+          "quantity": previousJob.quantity + offerQuantity,
+          "offerSummary": FieldValue.arrayUnion(
+              offerSummary.toList().map((category) => category.code).toList())
+        }).then((other) {
           final baseDocumentRef = _db.collection("jobs").doc(previousJob.jobId);
 
           _conductTransaction(donorId, openOffers, openOffersRef,
@@ -142,34 +194,33 @@ class OrdersManager {
     }
 
     _db.runTransaction((transaction) async {
-      // READ
-
-      List<int> previousQuantity = [];
-
-      for (OfferInfo offer in openOffers) {
-        final newOfferRef =
-            baseJobRef.collection("constituentOffers").doc(offer.category.code);
-
-        DocumentSnapshot snapshot = await transaction.get(newOfferRef);
-
-        if (snapshot.exists) {
-          int q = snapshot.get("quantity");
-          previousQuantity.add(q);
-        } else {
-          previousQuantity.add(0);
-        }
-      }
+      final donorRef = _db.collection("donors").doc(donorId);
 
       // WRITE
 
-      final donorRef = _db.collection("donors").doc(donorId);
+      for (var category in OrderCategory.values) {
+        List<OfferInfo> reducedOffers =
+            openOffers.where((offer) => offer.category == category).toList();
+        if (reducedOffers.isEmpty) continue;
+
+        int newQuantity = reducedOffers
+            .map((offer) => offer.quantity)
+            .reduce((a, b) => a + b);
+
+        if (newQuantity == 0) {
+          transaction.update(donorRef, {
+            "offerSummary": FieldValue.arrayRemove([category.code])
+          });
+        }
+      }
+
       transaction.update(donorRef, {
         "quantity": openOffers.map((a) => a.quantity).reduce((a, b) => a + b)
       });
 
       // old offers decrement quantity (delete / update)
       for (OfferInfo offer in openOffers) {
-        final offerRef = openOffersRef.doc(offer.category.code);
+        final offerRef = openOffersRef.doc(offer.offerId);
 
         if (offer.quantity > 0) {
           transaction.update(offerRef, {"quantity": offer.quantity});
@@ -180,15 +231,18 @@ class OrdersManager {
 
       // new offers increment quantity (add / update)
       for (int i = 0; i < openOffers.length; i++) {
+        if (selectedQuantity[i] == 0) continue;
+
         OfferInfo offer = openOffers[i];
 
+        assert(offer.offerId != "unassigned");
         final newOfferRef =
-            baseJobRef.collection("constituentOffers").doc(offer.category.code);
+            baseJobRef.collection("constituentOffers").doc(offer.offerId);
 
-        transaction.set(newOfferRef, {
-          "quantity": previousQuantity[i] + selectedQuantity[i],
-          "category": offer.category.code
-        });
+        Map<String, dynamic> offerData = offer.toFirestore();
+        offerData["quantity"] = selectedQuantity[i];
+
+        transaction.set(newOfferRef, offerData);
       }
     }).then((e) {
       callback();
