@@ -1,0 +1,15 @@
+X change gesture detector to inkwell
+X add title to sign up/login done
+- change text form to text form field
+- add confirm password
+- remove custom widgets and integrate directly to auth
+- sign up form for donor
+- sign up form for kitchen
+
+
+5th June TODO
+X Focus off the text entry when †apped away
+X Bottom overflow on sign up on smaller devices (due to keyboard popup)
+X Address causes not responding when clicked off
+X add text entry into donor quantity
+- Able to remove first order for multiple orders in python

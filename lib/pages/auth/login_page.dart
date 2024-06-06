@@ -1,5 +1,7 @@
 import 'package:cibu/pages/auth/donor_signup.dart';
 import 'package:cibu/pages/auth/kitchen_signup.dart';
+import 'package:cibu/pages/donor/donor_home_page.dart';
+import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
 import 'package:cibu/widgets/custom_alert_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,9 +11,10 @@ import 'package:cibu/widgets/custom_button.dart';
 import 'package:cibu/enums/user_type.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({super.key, required this.userType});
+  LoginPage({super.key, required this.userType, this.isLoggedIn = false});
 
   final UserType userType;
+  final bool isLoggedIn;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -27,6 +30,44 @@ class _LoginPageState extends State<LoginPage> {
   final _auth = FirebaseAuth.instance;
 
   bool isSignUp = false;
+
+  void initState() {
+    super.initState();
+
+    if (widget.isLoggedIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        verifyLoggedInUser(context);
+      });
+    }
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   verifyLoggedInUser(context);
+    // });
+  }
+
+  void verifyLoggedInUser(BuildContext context) {
+    if (widget.isLoggedIn) {
+      userExists(
+        widget.userType == UserType.DONOR ? 'donors' : 'kitchens',
+        _auth.currentUser!.uid
+      ).then((exists) {
+        if (exists) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => widget.userType == UserType.DONOR
+                ? DonorHomePage()
+                : KitchenHomePage(),
+            ),
+          );
+        } else {
+          CustomAlertDialog(context, 'User not found. Check that you are registered as a ${widget.userType.value}');
+          print("Error: User not found in database. Currently in ${widget.userType.value}");
+          _auth.signOut();
+        }
+      });
+    }
+  }
+
 
   Future<bool> userExists(String dbName, String userId) async {
     print("A user just signed in!");

@@ -1,4 +1,4 @@
-import 'package:cibu/pages/title_page.dart';
+import 'package:cibu/pages/auth/auth2/title_page2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +15,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TitlePage()
+          builder: (context) => TitlePage2()
         ),
       );
     });
