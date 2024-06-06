@@ -36,33 +36,20 @@ class NewRequestPageState extends State<NewRequestPage> {
   }
 
   OrderCategory getFirstAvailableCategory() {
-    for (var category in OrderCategory.values) {
-      if (!categoryAlreadySelected(category)) {
-        return category;
-      }
-    }
     return OrderCategory.BREAD; // Fallback in case all categories are selected
   }
 
-  bool categoryAlreadySelected(OrderCategory category) {
-    for (var order in orders) {
-      if (order.selectedCategory == category) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   bool isCategoryAvailable() {
-    return OrderCategory.values
-        .any((category) => !categoryAlreadySelected(category));
+    return true;
   }
 
   void submitRequest() {
     List<OfferInfo> offers = [];
     for (var order in orders) {
       final newItem = OfferInfo(
+          offerId: "unassigned",
           quantity: order.quantityNotifier.value,
+          expiryDate: order.expiryDate,
           category: order.selectedCategory);
 
       if (newItem.quantity > 0) offers.add(newItem);
@@ -74,6 +61,31 @@ class NewRequestPageState extends State<NewRequestPage> {
     ordersManager.addOpenOffers("HAO9gLWbTaT7z16pBoLGz019iSC3", offers, () {
       Navigator.pop(context);
     });
+  }
+
+  void _showDatePicker(OrderItem order) {
+    showDatePicker(
+      context: context, 
+      initialDate: order.expiryDate,
+      firstDate: DateTime.now(), 
+      lastDate: DateTime.now().add(Duration(days: 30))
+    ).then((date) {
+      if (date != null) {
+        setState(() {
+          order.expiryDate = date;
+        });
+      }
+    });
+  }
+
+  Color getButtonColors(Set<WidgetState> state) {
+    if (state.contains(WidgetState.hovered)) {
+      return Colors.blueGrey.withOpacity(0.9);
+    } else if (state.contains(WidgetState.focused) || state.contains(WidgetState.pressed)) {
+      return Colors.blueGrey.withOpacity(0.8);
+    } else {
+      return Colors.blueGrey;
+    }
   }
 
   @override
@@ -98,9 +110,6 @@ class NewRequestPageState extends State<NewRequestPage> {
                           DropdownButton<OrderCategory>(
                             value: orders[index].selectedCategory,
                             items: OrderCategory.values
-                                .where((category) =>
-                                    !categoryAlreadySelected(category) ||
-                                    category == orders[index].selectedCategory)
                                 .map((category) {
                               return DropdownMenuItem(
                                 value: category,
@@ -128,71 +137,96 @@ class NewRequestPageState extends State<NewRequestPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Quantity"),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ValueListenableBuilder<int>(
-                                valueListenable: orders[index].quantityNotifier,
-                                builder: (context, value, _) {
-                                  return IconButton(
-                                    icon: Icon(Icons.remove),
-                                    onPressed: (value > 1)
-                                        ? orders[index].decrementQuantity
-                                        : null,
-                                  );
-                                },
-                              ),
-                              SizedBox(
-                                width: 25,
-                                child: TextField(
-                                  controller: orders[index].quantityController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  onSubmitted: (value) {
-                                    int? intValue = int.tryParse(value);
-                                    if (intValue != null) {
-                                      orders[index].quantityNotifier.value = 
-                                        limitedValue(1, 99, intValue);
-                                      orders[index].quantityController.text = 
-                                        limitedValue(1, 99, intValue)
-                                          .toString();
-                                    }
-                                    else {
-                                      orders[index].quantityController.text =
-                                          orders[index]
-                                              .quantityNotifier
-                                              .value
+                              Text("Quantity", style: TextStyle(fontWeight: FontWeight.bold),),
+                              Row(
+                                children: [
+                                  ValueListenableBuilder<int>(
+                                    valueListenable: orders[index].quantityNotifier,
+                                    builder: (context, value, _) {
+                                      return IconButton(
+                                        icon: Icon(Icons.remove),
+                                        onPressed: (value > 1)
+                                            ? orders[index].decrementQuantity
+                                            : null,
+                                      );
+                                    },
+                                  ),
+                                  SizedBox(
+                                    width: 25,
+                                    child: TextField(
+                                      controller: orders[index].quantityController,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: <TextInputFormatter>[
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      onSubmitted: (value) {
+                                        int? intValue = int.tryParse(value);
+                                        if (intValue != null) {
+                                          orders[index].quantityNotifier.value = 
+                                            limitedValue(1, 99, intValue);
+                                          orders[index].quantityController.text = 
+                                            limitedValue(1, 99, intValue)
                                               .toString();
-                                    }
-                                  },
-                                  onChanged: (value) {
-                                    int? intValue = int.tryParse(value);
-                                    if (intValue != null) {
-                                      orders[index].quantityNotifier.value = 
-                                        limitedValue(1, 99, intValue);
-                                      orders[index].quantityController.text = 
-                                        limitedValue(1, 99, intValue)
-                                          .toString();
-                                    }
-                                  },
-                                ),
-                              ),
-                              ValueListenableBuilder<int>(
-                                valueListenable: orders[index].quantityNotifier,
-                                builder: (context, value, _) {
-                                  return IconButton(
-                                    icon: Icon(Icons.add),
-                                    onPressed: (value < 99)
-                                        ? orders[index].incrementQuantity
-                                        : null,
-                                  );
-                                },
+                                        }
+                                        else {
+                                          orders[index].quantityController.text =
+                                              orders[index]
+                                                  .quantityNotifier
+                                                  .value
+                                                  .toString();
+                                        }
+                                      },
+                                      onChanged: (value) {
+                                        int? intValue = int.tryParse(value);
+                                        if (intValue != null) {
+                                          orders[index].quantityNotifier.value = 
+                                            limitedValue(1, 99, intValue);
+                                          orders[index].quantityController.text = 
+                                            limitedValue(1, 99, intValue)
+                                              .toString();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  ValueListenableBuilder<int>(
+                                    valueListenable: orders[index].quantityNotifier,
+                                    builder: (context, value, _) {
+                                      return IconButton(
+                                        icon: Icon(Icons.add),
+                                        onPressed: (value < 99)
+                                            ? orders[index].incrementQuantity
+                                            : null,
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Expiry", style: TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(width: 10),
+                              TextButton.icon(
+                                icon: Icon(Icons.hourglass_bottom_rounded, color: Colors.white,),
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateColor.resolveWith(getButtonColors)
+                                ),
+                                onPressed: () {
+                                  _showDatePicker(orders[index]);
+                                }, 
+                                label: Text(
+                                  orders[index].getExpiryDescription(),
+                                  style: TextStyle(color: Colors.white)
+                                )
+                              )
+                            ],
+                          ),
+                        ]
                       ),
                     ],
                   );
@@ -234,11 +268,12 @@ int limitedValue(int lower, int upper, int value) {
 class OrderItem {
   final ValueNotifier<int> quantityNotifier = ValueNotifier<int>(1);
   OrderCategory selectedCategory;
-  final TextEditingController quantityController =
-      TextEditingController(text: '1');
+  DateTime expiryDate = DateTime.now().add(Duration(days: 7));
+  final TextEditingController quantityController;
 
   OrderItem({OrderCategory? defaultCategory})
-      : selectedCategory = defaultCategory ?? OrderCategory.BREAD;
+      : selectedCategory = defaultCategory ?? OrderCategory.BREAD,
+        quantityController = TextEditingController(text: '1');
 
   void incrementQuantity() {
     quantityNotifier.value++;
@@ -255,5 +290,11 @@ class OrderItem {
   void dispose() {
     quantityNotifier.dispose();
     quantityController.dispose();
+  }
+  
+  String getExpiryDescription() {
+    int days = expiryDate.difference(DateTime.now().subtract(Duration(days: 1))).inDays;
+
+    return "$days day${days > 1 ? "s" : ""}";
   }
 }

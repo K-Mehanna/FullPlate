@@ -28,6 +28,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
     super.initState();
 
     ordersManager.setOpenOffersListener(donorId, (newPending) {
+      print(newPending.length);
       if (!mounted) return;
       setState(() {
         pendingOffers.clear();
@@ -127,10 +128,6 @@ class _DonorDashboardState extends State<DonorDashboard> {
   }
 
   Widget buildOfferItem(OfferInfo offer) {
-    // return ListTile(
-    //     leading: offer.category.icon,
-    //     title: Text(offer.category.value),
-    //     trailing: Text("x${offer.quantity}"));
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -142,7 +139,19 @@ class _DonorDashboardState extends State<DonorDashboard> {
           ],
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.hourglass_bottom_rounded),
+                Text(
+                  offer.getExpiryDescription(),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            SizedBox(width: 10),
             Text(
               "x${offer.quantity}",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
