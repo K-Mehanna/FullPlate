@@ -28,7 +28,12 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: _pages[_selectedIndex]),
+      body: SafeArea(
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: _pages,
+        ),
+      ),
       bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
           destinations: const [

@@ -11,10 +11,9 @@ class OrdersManager {
     addOpenOffers(donorId, [offer], onCompletion);
   }
 
-  void removeOpenOffer(String donorId, OfferInfo offer, void Function() onCompletion) {
-    final donorRef = _db
-      .collection("donors")
-      .doc(donorId);
+  void removeOpenOffer(
+      String donorId, OfferInfo offer, void Function() onCompletion) {
+    final donorRef = _db.collection("donors").doc(donorId);
 
     final offerRef = donorRef
       .collection("openOffers")
@@ -23,12 +22,13 @@ class OrdersManager {
     offerRef.delete().then((res) {
       donorRef.get().then((docSnapshot) {
         DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
-        
-        donorRef.update({
-          "quantity": donor.quantity - offer.quantity
-        }).then((e) {
+
+        donorRef.update({"quantity": donor.quantity - offer.quantity}).then(
+            (e) {
           onCompletion();
-        }, onError: (e) => print("OrdersManager\n - removeOpenOffer: update donor $e"));
+        },
+            onError: (e) =>
+                print("OrdersManager\n - removeOpenOffer: update donor $e"));
       });
       onCompletion();
     }, onError: (e) => print("OrdersManager\n - removeOpenOffer: $e"));
@@ -53,7 +53,7 @@ class OrdersManager {
     List<String> orders = offers
       .map((offer) => offer.category).toSet().toList()
       .map((category) => category.code).toList();
-    
+
     _db.runTransaction((transaction) async {
       transaction.update(baseDocumentRef, {
         "offerSummary": FieldValue.arrayUnion(orders)
@@ -67,9 +67,8 @@ class OrdersManager {
         transaction.set(offerRef, offer.toFirestore());
       }
 
-      transaction.update(baseDocumentRef, {
-        "quantity": offers.map((a) => a.quantity).reduce((a, b) => a + b)
-      });
+      transaction.update(baseDocumentRef,
+          {"quantity": offers.map((a) => a.quantity).reduce((a, b) => a + b)});
     }).then((e) {
       onCompletion();
     }, onError: (e) => print("OrdersManager\n - _addOrders: $e"));
@@ -87,7 +86,8 @@ class OrdersManager {
 
         const nestedOffersPath = "openOffers";
 
-        _addOffers(baseDocumentRef, nestedOffersPath, constituentOffers, onCompletion);
+        _addOffers(
+            baseDocumentRef, nestedOffersPath, constituentOffers, onCompletion);
       });
     }, onError: (e) => print("OrdersManager\n - cancelJob: $e"));
   }
@@ -250,7 +250,6 @@ class OrdersManager {
     _fetchOfferCallback(query, callback);
   }
 
-
   void _fetchOfferCallback(Query<Map<String, dynamic>> query,
       void Function(List<OfferInfo>) callback) {
     query.get().then((querySnapshot) {
@@ -263,7 +262,6 @@ class OrdersManager {
       callback(offers);
     }, onError: (e) => print("OrdersManager\n - _fetchQueryCallback: $e"));
   }
-
 
   Query<Map<String, dynamic>> _buildJobsQuery(
       OrderStatus status, String? donorId, String? kitchenId) {

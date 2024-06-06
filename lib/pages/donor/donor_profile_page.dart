@@ -1,11 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/pages/title_page.dart';
-import 'package:cibu/pages/donor/job_detail_page.dart';
+import 'history_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 class DonorProfilePage extends StatefulWidget {
   const DonorProfilePage({super.key});
@@ -56,42 +56,127 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     });
   }
 
+  void _navigateToHistoryPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HistoryPage(
+          completedJobs: completedJobs,
+          kitchensInfo: kitchensInfo,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profile"),
+        title: Text(
+          "Profile",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: _signOut,
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text("Sign Out"),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              title: Text(
+                "Name",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+              subtitle: Text(
+                "John Doe", // Placeholder name
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: completedJobs.length,
-              itemBuilder: (context, index) {
-                final job = completedJobs[index];
-                return ListTile(
-                  title: Text(kitchensInfo[job.kitchenId]?.name ?? "--"),
-                  subtitle: Text("x${job.quantity} ${job.timeCompleted}"),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => JobDetailPage(job: job),
-                      ),
-                    );
-                  },
-                );
-              },
+            ListTile(
+              title: Text(
+                "Address",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+              subtitle: Text(
+                "123 Main St", // Placeholder address
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+              ),
             ),
-          ),
-        ],
+            ListTile(
+              title: Text(
+                "Email",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+              subtitle: Text(
+                "johndoe@example.com", // Placeholder email
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(top: 16.0),
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.history, color: Colors.white),
+                onPressed: _navigateToHistoryPage,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(16.0),
+                  backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                label: Text(
+                  "View History",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(top: 16.0),
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.logout, color: Colors.black),
+                onPressed: _signOut,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(16.0),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                label: Text(
+                  "Sign Out",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
