@@ -63,8 +63,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
               _auth.currentUser!.uid,
               openOffers,
               openOffers
-                  .map((offer) =>
-                      selectedQuantities[offer.offerId]!.value)
+                  .map((offer) => selectedQuantities[offer.offerId]!.value)
                   .toList(), () {
             Navigator.pop(context);
           });
@@ -127,6 +126,10 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Icon(
+                Icons.hourglass_bottom_rounded,
+              ),
+              Text(offer.getExpiryDescription()),
               ValueListenableBuilder<int>(
                 valueListenable: selected,
                 builder: (context, value, _) {
