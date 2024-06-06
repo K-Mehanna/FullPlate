@@ -27,13 +27,15 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
 
   LatLng? location;
 
+  final _auth = FirebaseAuth.instance;
+
   void updateDetailsToFirestore() {
     KitchenInfo kitchenInfo = KitchenInfo(
       name: nameController.text,
       location: location!,
       address: addressController.text,
-      kitchenId:
-          "vArN1MQqQfXSTTbgSP6MT5nzLz42", //FirebaseAuth.instance.currentUser!.uid
+      kitchenId: _auth.currentUser!.uid
+          //"vArN1MQqQfXSTTbgSP6MT5nzLz42", //FirebaseAuth.instance.currentUser!.uid
     );
 
     kitchensManager.addKitchen(kitchenInfo);

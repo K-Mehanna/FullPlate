@@ -24,6 +24,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
   late final Map<String, ValueNotifier<int>> selectedQuantities;
   late final Map<String, TextEditingController> controllers;
 
+  final _auth = FirebaseAuth.instance;
+
   @override
   void initState() {
     super.initState();
@@ -57,8 +59,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         onPressed: () {
           ordersManager.acceptOpenOffer(
               widget.donorInfo.donorId,
-              "vArN1MQqQfXSTTbgSP6MT5nzLz42",
-              //FirebaseAuth.instance.currentUser!.uid,
+              //"vArN1MQqQfXSTTbgSP6MT5nzLz42",
+              _auth.currentUser!.uid,
               openOffers,
               openOffers
                   .map((offer) =>

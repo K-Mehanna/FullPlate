@@ -1,8 +1,3 @@
-// import 'dart:async';
-
-import 'dart:typed_data';
-import 'dart:ui';
-
 import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/donor_info.dart';
@@ -12,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'dart:ui' as ui;
 
 class KitchenMapPage extends StatefulWidget {
   KitchenMapPage({super.key});
@@ -26,15 +20,15 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   final DonorsManager donorsManager = DonorsManager();
   late LocationPermission permission = LocationPermission.denied;
   late GoogleMapController mapController;
-  static LatLng currentPosition =
-      LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
+
+  static LatLng currentPosition = LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;
   String? sortBy = 'Sort By';
 
   void getCurrentLocation(void Function(Position) callback) async {
-    print('original: ${this.permission}');
+    print('original: $permission');
     if (permission != LocationPermission.whileInUse &&
         permission != LocationPermission.always) {
       LocationPermission permission = await Geolocator.requestPermission();
@@ -135,27 +129,25 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                child: Row(
-                  children: [
-                    Text('Radius'),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Icon(Icons.radar),
-                    ),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                        ),
+              Row(
+                children: [
+                  Text('Radius'),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Icon(Icons.radar),
+                  ),
+                  SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Row(
                 children: [

@@ -41,7 +41,7 @@
 //   void submitRequest() {
 //     final newItem =
 //         OfferInfo(quantity: quantityNotifier.value, category: selectedCategory);
-//     ordersManager.addOpenOffer(FirebaseAuth.instance.currentUser!.uid,
+//     ordersManager.addOpenOffer(_auth.currentUser!.uid,
 //         newItem); //"sec0ABRO6ReQz1hxiKfJ"
 //     Navigator.pop(context);
 //   }
@@ -157,6 +157,7 @@ class NewRequestPage extends StatefulWidget {
 class NewRequestPageState extends State<NewRequestPage> {
   final OrdersManager ordersManager = OrdersManager();
   final List<OrderItem> orders = [OrderItem()];
+  final _auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -214,12 +215,12 @@ class NewRequestPageState extends State<NewRequestPage> {
       if (newItem.quantity > 0) offers.add(newItem);
     }
 
-    // ordersManager.addOpenOffers(FirebaseAuth.instance.currentUser!.uid, offers, () {
-    //   Navigator.pop(context);
-    // });
-    ordersManager.addOpenOffers("HAO9gLWbTaT7z16pBoLGz019iSC3", offers, () {
+    ordersManager.addOpenOffers(_auth.currentUser!.uid, offers, () {
       Navigator.pop(context);
     });
+    // ordersManager.addOpenOffers("HAO9gLWbTaT7z16pBoLGz019iSC3", offers, () {
+    //   Navigator.pop(context);
+    // });
   }
 
   @override

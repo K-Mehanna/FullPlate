@@ -57,11 +57,11 @@ class UserButton extends StatelessWidget {
           context,
           MaterialPageRoute(
               builder: (context) => 
-              userType == UserType.DONOR
-                  ? DonorHomePage()
-                  : KitchenHomePage()
-              //AuthGate(userType: userType)
-              ),
+              // userType == UserType.DONOR
+              //     ? DonorHomePage()
+              //     : KitchenHomePage()
+              AuthGate(userType: userType)
+          ),
         );
       },
       child: Text(userType.value),

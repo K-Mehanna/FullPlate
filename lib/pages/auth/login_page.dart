@@ -1,10 +1,8 @@
 import 'package:cibu/pages/auth/donor_signup.dart';
 import 'package:cibu/pages/auth/kitchen_signup.dart';
-import 'package:cibu/pages/donor/donor_home_page.dart';
-import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
+import 'package:cibu/widgets/custom_alert_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/widgets/custom_text_field.dart';
 import 'package:cibu/widgets/custom_button.dart';
@@ -20,187 +18,93 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // text editing controllers
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  final _db = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
   bool isSignUp = false;
 
   Future<bool> userExists(String dbName, String userId) async {
-    DocumentSnapshot userDoc =
-        await FirebaseFirestore.instance.collection(dbName).doc(userId).get();
+    print("A user just signed in!");
+    DocumentSnapshot userDoc = await _db.collection(dbName).doc(userId).get();
+    print("We're here now!");
     return userDoc.exists;
   }
 
-  void signUserIn(BuildContext context) async {
-    // one of you guys do this
-
-    FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        )
-        .then(
-            (user) => {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => widget.userType == UserType.DONOR
-                          ? DonorSignupPage()
-                          : KitchenSignupPage(),
-                    ),
-                  )
-                },
-            onError: (e) => {
-                  // WRONG EMAIL
-                  if (e.code == 'weak-password')
-                    {
-                      // show error to user
-                      invalidMessage('Password is too weak'),
-                    }
-                  else if (e.code == 'email-already-in-use')
-                    {
-                      // show error to user
-                      invalidMessage('Email already in use'),
-                    }
-                  else
-                    {
-                      // show error to user
-                      invalidMessage('Error: ${e.code}'),
-                    },
-                  print("Error: ${e.code}"),
-                });
-
-    ////////
-
-    // try sign in
-
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
+  void signUserIn(BuildContext context) {
+    _auth
+      .signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
-      );
+      )
+      .then((userCredential) => {}
+        // userExists(
+        //   widget.userType == UserType.DONOR ? 'donors' : 'kitchens',
+        //   userCredential.user!.uid
+        // )
+        , onError: (e) => {
+          if (e.code == 'invalid-email') {
+            CustomAlertDialog(context, 'Invalid email'),
+          } else if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+            CustomAlertDialog(context, 'Incorrect login credentials'),
+          } else {
+            CustomAlertDialog(context, 'Error: ${e.code}'),
+          },
+          print("Error: ${e.code}"),
+        });
+      // .then((exists) => {
+      //   print("This is being run"),
+      //   if (exists) {
+      //     Navigator.pushReplacement(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => widget.userType == UserType.DONOR
+      //           ? DonorHomePage()
+      //           : KitchenHomePage(),
+      //       ),
+      //     )
+      //   } else {
+      //     invalidMessage('User not found. Check that you are registered as a ${widget.userType.value}'),
+      //     print("Error: User not found in database. Currently in ${widget.userType.value}"),
+      //     _auth.signOut(),
+      //   }
+      // });
+  }
 
-      User? user = userCredential.user;
-      if (user != null) {
-        bool exists = await userExists(
-            widget.userType == UserType.DONOR ? 'donors' : 'kitchens',
-            user.uid);
-        // pop the loading circle
-        //Navigator.pop(context);
-
-        //if (!context.mounted) return;
-        if (exists) {
-          // Navigate to the appropriate home page
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => widget.userType == UserType.DONOR
-                  ? DonorHomePage()
-                  : KitchenHomePage(),
-            ),
-          );
-        } else {
-          invalidMessage(
-              'User not found. Check that you are registered as a ${widget.userType.value}.');
-          await FirebaseAuth.instance.signOut();
+  void signUserUp(BuildContext context) {
+    _auth
+      .createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      )
+      .then((_) => {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => widget.userType == UserType.DONOR
+              ? DonorSignupPage()
+              : KitchenSignupPage(),
+          ),
+        )}, onError: (e) => {
+          if (e.code == 'invalid-email') {
+            CustomAlertDialog(context, 'Invalid email'),
+          } else if (e.code == 'email-already-in-use') {
+            CustomAlertDialog(context, 'Email already in use'),
+          } else if (e.code == 'weak-password') {
+            CustomAlertDialog(context, 'Password is too weak'),
+          } else {
+            CustomAlertDialog(context, 'Error: ${e.code}'),
+          },
+          print("Error: ${e.code}"),
         }
-      }
-    } on FirebaseAuthException catch (e) {
-      // pop the loading circle
-      //Navigator.pop(context);
-      // WRONG EMAIL
-      if (e.code == 'user-not-found' ||
-          e.code == 'wrong-password' ||
-          e.code == 'invalid-credential') {
-        // show error to user
-        invalidMessage('Invalid Login Credentials');
-      } else {
-        // show error to user
-        invalidMessage('Error: ${e.code}');
-      }
-      print("Error: ${e.code}");
-    }
-  }
-
-  void signUserUp(BuildContext context) async {
-    FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        )
-        .then(
-            (user) => {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => widget.userType == UserType.DONOR
-                          ? DonorSignupPage()
-                          : KitchenSignupPage(),
-                    ),
-                  )
-                },
-            onError: (e) => {
-                  // WRONG EMAIL
-                  if (e.code == 'weak-password')
-                    {
-                      // show error to user
-                      invalidMessage('Password is too weak'),
-                    }
-                  else if (e.code == 'email-already-in-use')
-                    {
-                      // show error to user
-                      invalidMessage('Email already in use'),
-                    }
-                  else
-                    {
-                      // show error to user
-                      invalidMessage('Error: ${e.code}'),
-                    },
-                  print("Error: ${e.code}"),
-                });
-  }
-
-  Widget adaptiveAction(
-      {required BuildContext context,
-      required VoidCallback onPressed,
-      required Widget child}) {
-    final ThemeData theme = Theme.of(context);
-    switch (theme.platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-      case TargetPlatform.windows:
-        return TextButton(onPressed: onPressed, child: child);
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        return CupertinoDialogAction(onPressed: onPressed, child: child);
-    }
+      );
   }
 
   // wrong email message popup
-  void invalidMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog.adaptive(
-          title: Text(message),
-          actions: [
-            adaptiveAction(
-              context: context,
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -284,9 +188,9 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        !isSignUp
-                            ? 'Not a member?'
-                            : 'Already have an account?',
+                        isSignUp
+                            ? 'Already have an account?'
+                            : 'Not a member?',
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                       const SizedBox(width: 4),
@@ -297,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                           });
                         },
                         child: Text(
-                          !isSignUp ? 'Register now' : 'Log In',
+                          isSignUp ? 'Log In' : 'Register now',
                           style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,

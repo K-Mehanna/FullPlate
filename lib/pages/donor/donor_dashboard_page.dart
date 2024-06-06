@@ -7,7 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/new_request_page.dart';
 import 'package:cibu/database/orders_manager.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 class DonorDashboard extends StatefulWidget {
   DonorDashboard({Key? key}) : super(key: key);
@@ -22,12 +21,16 @@ class _DonorDashboardState extends State<DonorDashboard> {
   List<JobInfo> acceptedJobs = [];
   List<OfferInfo> pendingOffers = [];
 
-  final String donorId =
-      "HAO9gLWbTaT7z16pBoLGz019iSC3"; //FirebaseAuth.instance.currentUser!.uid;
+  final _auth = FirebaseAuth.instance;
+
+  late final String donorId;
+      //"HAO9gLWbTaT7z16pBoLGz019iSC3"; //FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
     super.initState();
+
+    donorId = _auth.currentUser!.uid;
 
     ordersManager.setOpenOffersListener(donorId, (newPending) {
       if (!mounted) return;
