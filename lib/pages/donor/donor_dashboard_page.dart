@@ -3,6 +3,7 @@ import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cibu/pages/donor/job_detail_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/pages/donor/new_request_page.dart';
 import 'package:cibu/database/orders_manager.dart';
@@ -23,7 +24,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
   final _auth = FirebaseAuth.instance;
 
   late final String donorId;
-      //"HAO9gLWbTaT7z16pBoLGz019iSC3"; //FirebaseAuth.instance.currentUser!.uid;
+  //"HAO9gLWbTaT7z16pBoLGz019iSC3"; //FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -192,7 +193,9 @@ class _DonorDashboardState extends State<DonorDashboard> {
                           color: Colors.blueGrey.shade50,
                         ),
                         child: TextButton(
-                          style: ButtonStyle(padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 20))),
+                          style: ButtonStyle(
+                              padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(horizontal: 20))),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -213,7 +216,9 @@ class _DonorDashboardState extends State<DonorDashboard> {
                                 donorId, offer, () {});
                             Navigator.of(context).pop();
                           },
-                          style: ButtonStyle(padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 20))),
+                          style: ButtonStyle(
+                              padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(horizontal: 20))),
                           child: Text(
                             "Remove",
                             style: TextStyle(

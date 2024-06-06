@@ -26,11 +26,11 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   }
 
   void fetchCompletedJobs() {
-    //final user = FirebaseAuth.instance.currentUser;
-    const user = "HAO9gLWbTaT7z16pBoLGz019iSC3";
+    final user = FirebaseAuth.instance.currentUser;
+    //const user = "HAO9gLWbTaT7z16pBoLGz019iSC3";
     ordersManager.getJobsCompletion(
       OrderStatus.COMPLETED,
-      user,
+      user!.uid,
       null,
       (jobs) {
         setState(() {

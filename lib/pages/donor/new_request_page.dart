@@ -1,5 +1,6 @@
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/offer_info.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

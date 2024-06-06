@@ -34,7 +34,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
     _ordersManager.getJobsCompletion(
       OrderStatus.COMPLETED,
       null,
-      "vArN1MQqQfXSTTbgSP6MT5nzLz42",
+      //"vArN1MQqQfXSTTbgSP6MT5nzLz42",
+      FirebaseAuth.instance.currentUser!.uid,
       (jobs) {
         setState(() {
           _completedJobs = jobs;
@@ -57,7 +58,6 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
         MaterialPageRoute(builder: (context) => const TitlePage()),
       );
     });
-
   }
 
   void _navigateToHistoryPage() {
