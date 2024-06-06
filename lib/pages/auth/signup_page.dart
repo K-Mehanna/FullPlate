@@ -1,6 +1,6 @@
-import 'package:cibu/pages/auth/auth2/login_page2.dart';
 import 'package:cibu/pages/auth/donor_signup.dart';
 import 'package:cibu/pages/auth/kitchen_signup.dart';
+import 'package:cibu/pages/auth/login_page.dart';
 import 'package:cibu/widgets/custom_alert_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,14 +9,14 @@ import 'package:cibu/widgets/custom_text_field.dart';
 import 'package:cibu/widgets/custom_button.dart';
 import 'package:cibu/enums/user_type.dart';
 
-class SignUpPage2 extends StatefulWidget {
-  SignUpPage2({super.key});
+class SignUpPage extends StatefulWidget {
+  SignUpPage({super.key});
 
   @override
-  State<SignUpPage2> createState() => _SignUpPage2State();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPage2State extends State<SignUpPage2> {
+class _SignUpPageState extends State<SignUpPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final emailController = TextEditingController();
@@ -184,7 +184,7 @@ class _SignUpPage2State extends State<SignUpPage2> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoginPage2(),
+                              builder: (context) => LoginPage(),
                             ),
                           );
                         },

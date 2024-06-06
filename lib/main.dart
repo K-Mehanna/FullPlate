@@ -1,8 +1,7 @@
 import 'package:cibu/firebase_options.dart';
-import 'package:cibu/pages/auth/auth2/main2.dart';
+import 'package:cibu/pages/auth/auth_gate.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'pages/title_page.dart';
 
 
 void main() async {
@@ -10,7 +9,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp2());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,7 +24,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: TitlePage(),
+      home: AuthGate(),
     );
   }
 }

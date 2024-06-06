@@ -1,4 +1,4 @@
-import 'package:cibu/pages/auth/auth2/title_page2.dart';
+import 'package:cibu/pages/title_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,16 +15,10 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TitlePage2()
+          builder: (context) => TitlePage()
         ),
       );
     });
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => TitlePage()
-    //   ),
-    // );  
   }
 
   @override
