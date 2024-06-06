@@ -1,5 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
+import 'package:cibu/models/offer_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum OrderStatus {
@@ -48,6 +49,7 @@ class JobInfo {
 
   final OrderStatus status;
   final int quantity;
+  final List<OrderCategory> offerSummary;
 
   final String jobId;
 
@@ -58,6 +60,7 @@ class JobInfo {
       required this.kitchenId,
       required this.status,
       required this.quantity,
+      required this.offerSummary,
       this.jobId = "unassigned"
       });
 
@@ -74,6 +77,11 @@ class JobInfo {
       kitchenId: data['kitchenId'],
       status: OrderStatusExtension.fromString(data['status']),
       quantity: data['quantity'],
+      offerSummary: 
+        List
+          .from(data['offerSummary'])
+          .map((code) => OrderCategoryExtension.fromCode(code))
+          .toList(),
       jobId: snapshot.id
     );
 
@@ -88,7 +96,11 @@ class JobInfo {
       "donorId": donorId,
       "kitchenId": kitchenId,
       "status": status.value,
-      "quantity": quantity
+      "quantity": quantity,
+      "offerSummary": 
+        offerSummary
+          .map((offer) => offer.code)
+          .toList()
     };
   }
 }

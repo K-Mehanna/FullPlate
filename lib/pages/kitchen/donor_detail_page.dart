@@ -35,12 +35,12 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
 
         selectedQuantities = {
           for (var offer in openOffers)
-            offer.category.value: ValueNotifier<int>(offer.quantity),
+            offer.offerId: ValueNotifier<int>(offer.quantity),
         };
 
         controllers = {
           for (var offer in openOffers)
-            offer.category.value:
+            offer.offerId:
                 TextEditingController(text: offer.quantity.toString()),
         };
       });
@@ -62,7 +62,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
               openOffers,
               openOffers
                   .map((offer) =>
-                      selectedQuantities[offer.category.value]!.value)
+                      selectedQuantities[offer.offerId]!.value)
                   .toList(), () {
             Navigator.pop(context);
           });
@@ -117,8 +117,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final offer = items[index];
-        var selected = selectedQuantities[offer.category.value]!;
-        var controller = controllers[offer.category.value]!;
+        var selected = selectedQuantities[offer.offerId]!;
+        var controller = controllers[offer.offerId]!;
 
         return ListTile(
           title: Text(offer.category.value),

@@ -67,11 +67,15 @@ extension OrderCategoryExtension on OrderCategory {
 }
 
 class OfferInfo {
+  String offerId;
+  DateTime expiryDate;
   int quantity;
   int selectedQuantity = 0;
   final OrderCategory category;
 
   OfferInfo({
+    required this.offerId,
+    required this.expiryDate,
     required this.quantity,
     required this.category,
   });
@@ -82,6 +86,8 @@ class OfferInfo {
     final data = snapshot.data()!;
 
     final order = OfferInfo(
+      offerId: snapshot.id,
+      expiryDate: (data['expiryDate'] as Timestamp).toDate(),
       quantity: data['quantity'],
       category: OrderCategoryExtension.fromCode(data['category']),
     );
@@ -89,7 +95,17 @@ class OfferInfo {
     return order;
   }
 
+  String getExpiryDescription() {
+    int days = expiryDate.difference(DateTime.now().subtract(Duration(days: 1))).inDays;
+
+    return "$days day${days > 1 ? "s" : " "}";
+  }
+
   Map<String, dynamic> toFirestore() {
-    return {"quantity": quantity, "category": category.code};
+    return {
+      "quantity": quantity, 
+      "expiryDate": Timestamp.fromDate(expiryDate),
+      "category": category.code
+    };
   }
 }
