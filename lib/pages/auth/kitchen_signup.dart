@@ -3,6 +3,7 @@ import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/pages/kitchen/kitchen_home_page.dart';
 import 'package:cibu/widgets/custom_button.dart';
 import 'package:cibu/widgets/custom_text_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -27,7 +28,21 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
 
   LatLng? location;
 
+  final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
+
+  Future<void> markSignupAsComplete() async {
+    try {
+      await _db
+        .collection('users')
+        .doc(_auth.currentUser!.uid)
+        .set({
+        'completedProfile': true,
+      });
+    } catch (e) {
+      throw Exception("Error updating user profile: $e");
+    }
+  }
 
   void updateDetailsToFirestore() {
     KitchenInfo kitchenInfo = KitchenInfo(
@@ -114,6 +129,7 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
                     onTap: () {
                       if (formKey.currentState!.validate() && location != null) {
                         updateDetailsToFirestore();
+                        markSignupAsComplete();
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

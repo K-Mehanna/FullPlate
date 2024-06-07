@@ -40,6 +40,7 @@ class _SignUpPageState extends State<SignUpPage> {
         await _db.collection('users').doc(_auth.currentUser!.uid).set({
           'email': emailController.text,
           'userType': userType.value,
+          'completedProfile': false,
         }).then((_) {
           Navigator.pushReplacement(
             context,

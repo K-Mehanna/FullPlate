@@ -3,6 +3,7 @@ import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/pages/donor/donor_home_page.dart';
 import 'package:cibu/widgets/custom_button.dart';
 import 'package:cibu/widgets/custom_text_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -27,18 +28,32 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
 
   LatLng? location;
 
+  final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
-  Future<void> updateDetailsToFirestore() async {
+  void updateDetailsToFirestore() {
     DonorInfo donorInfo = DonorInfo(
       name: nameController.text,
-      location: location!,
+      location: location!, 
       address: addressController.text,
       donorId: _auth.currentUser!.uid, //"HAO9gLWbTaT7z16pBoLGz019iSC3", //FirebaseAuth.instance.currentUser!.uid,
       quantity: 0,
     );
 
     donorsManager.addDonor(donorInfo);
+  }
+
+  Future<void> markSignupAsComplete() async {
+    try {
+      await _db
+        .collection('users')
+        .doc(_auth.currentUser!.uid)
+        .set({
+        'completedProfile': true,
+      });
+    } catch (e) {
+      throw Exception("Error updating user profile: $e");
+    }
   }
 
   @override
@@ -111,15 +126,16 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                       }),
                   const SizedBox(height: 25),
                   CustomButton(
-                    onTap: () async {
+                    onTap: () {
                       if (formKey.currentState!.validate() && location != null) {
-                        await updateDetailsToFirestore().then((value) {
-                          Navigator.pushReplacement(
+                        updateDetailsToFirestore();
+                        markSignupAsComplete();
+                        Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => DonorHomePage())
-                          );
-                        });
+                                builder: (context) => DonorHomePage()
+                          )
+                        );
                       }
                     },
                     text: 'Next',

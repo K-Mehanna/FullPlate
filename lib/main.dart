@@ -18,7 +18,7 @@ void main() async {
   // firebase emulators:start --import ./emulators_data --export-on-exit
   // set to true to use emulator
   bool useEmulator = false;
-  
+
   if (useEmulator) {
     try {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
@@ -32,7 +32,7 @@ void main() async {
   } else {
     print('Emulator disabled');
   }
-
+  //await FirebaseAuth.instance.signOut();
   runApp(MyApp());
 }
 
