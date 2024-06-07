@@ -37,7 +37,7 @@ class TitlePage extends StatelessWidget {
           Center(
             child: Card(
               elevation: 8.0,
-              color: theme.colorScheme.primaryContainer,
+              color: Colors.grey.shade50, //theme.colorScheme.primaryContainer,
               child: IntrinsicWidth(
                 child: IntrinsicHeight(
                   child: Padding(
@@ -46,10 +46,7 @@ class TitlePage extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(
-                            "Welcome to Cibu!",
-                            style: titleStyle
-                          ),
+                          Text("Welcome to Cibu!", style: titleStyle),
                           SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -64,9 +61,7 @@ class TitlePage extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                child: Text(
-                                  'Sign Up'
-                                ),
+                                child: Text('Sign Up'),
                               ),
                               SizedBox(width: 10.0),
                               ElevatedButton(
@@ -93,7 +88,9 @@ class TitlePage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MapScreen(hasAppBar: true,),
+                                  builder: (context) => MapScreen(
+                                    hasAppBar: true,
+                                  ),
                                 ),
                               );
                             },
