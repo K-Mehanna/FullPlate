@@ -29,6 +29,55 @@ class _SignUpPageState extends State<SignUpPage> {
   final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
+  Future<void> signUpWithGoogle(BuildContext context) async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    try {
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      if (userCredential.additionalUserInfo!.isNewUser) {
+        try {
+          await _db.collection('users').doc(_auth.currentUser!.uid).set({
+            'email': _auth.currentUser!.email,
+            'userType': userType.value,
+            'completedProfile': false,
+          }).then((_) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => userType == UserType.DONOR
+                    ? DonorSignupPage()
+                    : KitchenSignupPage(),
+              ),
+            );
+          });
+        } catch (e) {
+          print("User Sign Up With Google");
+        }
+      }
+      // else sign is as usual
+      
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        if (e.code == 'account-exists-with-different-credential') {
+          CustomAlertDialog(context, 'Account exists with other credentials (email)');
+        } else if (e.code == 'invalid-credential') {
+          CustomAlertDialog(context, 'Invalid credentials');
+        } else {
+          CustomAlertDialog(context, 'Error: ${e.code}');
+        }
+      }
+      print("Error: ${e.code}");
+    }
+  }
+
   Future<void> signUserUp(BuildContext context) async {
     try {
       await _auth.createUserWithEmailAndPassword(
@@ -201,8 +250,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   CustomDivider(),
                   const SizedBox(height: 25),
                   ElevatedButton(
-                    onPressed: () {
-                      print('Sign in with google');
+                    onPressed: () async {
+                      await signUpWithGoogle(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white, // Background color

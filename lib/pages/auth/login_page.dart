@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/widgets/custom_text_field.dart';
 import 'package:cibu/widgets/custom_button.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 
 class LoginPage extends StatefulWidget {
   LoginPage({super.key});
@@ -20,6 +22,45 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   final _auth = FirebaseAuth.instance;
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    try {
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      if (userCredential.additionalUserInfo!.isNewUser) {
+        try {
+          if (context.mounted) {
+            CustomAlertDialog(context, 'User not found. Please sign up first.');
+          }
+          await userCredential.user!.delete();
+        } catch (e) {
+          print("User Sign Up With Google");
+        }
+      }
+      // else sign is as usual
+
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        if (e.code == 'account-exists-with-different-credential') {
+          CustomAlertDialog(context, 'Account exists with other credentials (email)');
+        } else if (e.code == 'invalid-credential') {
+          CustomAlertDialog(context, 'Invalid credentials');
+        } else {
+          CustomAlertDialog(context, 'Error: ${e.code}');
+        }
+      }
+      print("Error: ${e.code}");
+    }
+  }
 
   Future<void> signUserIn(BuildContext context) async {
     try {
@@ -39,17 +80,7 @@ class _LoginPageState extends State<LoginPage> {
       }
       print("Error: ${e.code}");
     }
-    //  _auth
-    //   .signInWithEmailAndPassword(
-    //     email: emailController.text,
-    //     password: passwordController.text,
-    //   )
-    //   .then((userCredential) => {}, onError: (e) => {
-
-    //   });
   }
-
-  // wrong email message popup
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +180,8 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 25),
 
                   ElevatedButton(
-                    onPressed: () {
-                      // Add your onPressed code here!
+                    onPressed: () async {
+                      await signInWithGoogle(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white, // Background color
@@ -177,9 +208,6 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   )
-
-
-
                 ],
               ),
             ),

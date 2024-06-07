@@ -1,9 +1,6 @@
-import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
-import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/kitchen_info.dart';
-import 'package:cibu/pages/kitchen/donor_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';

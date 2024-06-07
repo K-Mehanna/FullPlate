@@ -136,7 +136,9 @@ class _JobDetailPageState extends State<JobDetailPage> {
   }
 
   Widget _buildDetailRow(String label, String value) {
+    // ignore: unused_local_variable
     final ThemeData theme = Theme.of(context);
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Column(
