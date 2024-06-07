@@ -1,3 +1,5 @@
+import 'package:cibu/database/kitchens_manager.dart';
+import 'package:cibu/models/kitchen_info.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cibu/database/donors_manager.dart';
@@ -19,15 +21,20 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
   List<JobInfo> _completedJobs = [];
   Map<String, DonorInfo> _donorsInfo = {};
 
-  // Hard-coded user information for demonstration
-  String _name = "John Doe";
-  String _address = "123 Main St";
-  String _email = "johndoe@example.com";
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  KitchenInfo? kitchen; // should display donor
 
   @override
   void initState() {
     super.initState();
     _fetchCompletedJobs();
+
+    KitchensManager().getKitchenCompletion(_auth.currentUser!.uid, (kitchen) {
+      setState(() {
+        this.kitchen = kitchen;
+      });
+    });
   }
 
   void _fetchCompletedJobs() {
@@ -96,7 +103,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 ),
               ),
               subtitle: Text(
-                _name,
+                kitchen?.name ?? '',
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
@@ -111,7 +118,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 ),
               ),
               subtitle: Text(
-                _address,
+                kitchen?.address ?? '',
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
@@ -126,7 +133,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 ),
               ),
               subtitle: Text(
-                _email,
+                _auth.currentUser!.email!,
                 style: TextStyle(
                   fontSize: 16.0,
                 ),

@@ -1,3 +1,5 @@
+import 'package:cibu/database/donors_manager.dart';
+import 'package:cibu/models/donor_info.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
@@ -18,11 +20,21 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   final OrdersManager ordersManager = OrdersManager();
   List<JobInfo> completedJobs = [];
   Map<String, KitchenInfo> kitchensInfo = {};
+  
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  DonorInfo? donor; // should display donor
+
 
   @override
   void initState() {
     super.initState();
     fetchCompletedJobs();
+
+    DonorsManager().getDonorCompletion(_auth.currentUser!.uid, (donor) {
+      setState(() {
+        this.donor = donor;
+      });
+    });
   }
 
   void fetchCompletedJobs() {
@@ -92,7 +104,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 ),
               ),
               subtitle: Text(
-                "John Doe", // Placeholder name
+                donor?.name ?? '', // Placeholder name
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
@@ -107,7 +119,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 ),
               ),
               subtitle: Text(
-                "123 Main St", // Placeholder address
+                donor?.address ?? '', // Placeholder address
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
@@ -122,7 +134,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 ),
               ),
               subtitle: Text(
-                "johndoe@example.com", // Placeholder email
+                _auth.currentUser!.email!, // Placeholder email
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
