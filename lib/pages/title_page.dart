@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cibu/pages/auth/login_page.dart';
 import 'package:cibu/pages/auth/signup_page.dart';
 import 'package:cibu/pages/map_screen.dart';
+import 'package:cibu/pages/plain_map_screen.dart';
 import 'package:cibu/widgets/custom_divider.dart';
 import 'package:flutter/material.dart';
 
@@ -20,24 +21,25 @@ class TitlePage extends StatelessWidget {
     final ButtonStyle buttonTheme = ElevatedButton.styleFrom(
       backgroundColor: theme.colorScheme.primary,
       foregroundColor: theme.colorScheme.onPrimary,
+      elevation: 3,
     );
 
     return Scaffold(
       body: Stack(
         children: [
-          MapScreen(),
+          PlainMapScreen(),
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
               child: Container(
-                color: theme.colorScheme.surfaceDim.withOpacity(0.5),
+                color: theme.colorScheme.inversePrimary.withOpacity(0.25),
               ),
             ),
           ),
           Center(
             child: Card(
               elevation: 8.0,
-              color: Colors.grey.shade50, //theme.colorScheme.primaryContainer,
+              color: theme.colorScheme.surfaceContainer,
               child: IntrinsicWidth(
                 child: IntrinsicHeight(
                   child: Padding(
@@ -88,9 +90,7 @@ class TitlePage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MapScreen(
-                                    hasAppBar: true,
-                                  ),
+                                  builder: (context) => MapScreen(),
                                 ),
                               );
                             },

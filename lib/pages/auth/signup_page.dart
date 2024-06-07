@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:cibu/widgets/custom_text_field.dart';
 import 'package:cibu/widgets/custom_button.dart';
 import 'package:cibu/enums/user_type.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignUpPage extends StatefulWidget {
   SignUpPage({super.key});
@@ -40,12 +41,12 @@ class _SignUpPageState extends State<SignUpPage> {
           'email': emailController.text,
           'userType': userType.value,
         }).then((_) {
-           Navigator.pushReplacement(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => userType == UserType.DONOR
-                ? DonorSignupPage()
-                : KitchenSignupPage(),
+                  ? DonorSignupPage()
+                  : KitchenSignupPage(),
             ),
           );
         });
@@ -66,37 +67,6 @@ class _SignUpPageState extends State<SignUpPage> {
       }
       print("Error: ${e.code}");
     }
-
-
-
-    // _auth
-    //   .createUserWithEmailAndPassword(
-    //     email: emailController.text,
-    //     password: passwordController.text,
-    //   )
-      // .then((_) => _db.collection('users').doc(_auth.currentUser!.uid).set({
-      //     'email': emailController.text,
-      //     'userType': userType.value,
-      //   }), onError: (e) => {
-          // if (e.code == 'invalid-email') {
-          //   CustomAlertDialog(context, 'Invalid email'),
-          // } else if (e.code == 'email-already-in-use') {
-          //   CustomAlertDialog(context, 'Email already in use'),
-          // } else if (e.code == 'weak-password') {
-          //   CustomAlertDialog(context, 'Password is too weak'),
-          // } else {
-          //   CustomAlertDialog(context, 'Error: ${e.code}'),
-          // },
-          // print("Error: ${e.code}"),
-        // }
-    //   ).then((_) => Navigator.pushReplacement(
-    //       context,
-    //       MaterialPageRoute(
-    //         builder: (context) => userType == UserType.DONOR
-    //           ? DonorSignupPage()
-    //           : KitchenSignupPage(),
-    //       ),
-    //   ));
   }
 
   // wrong email message popup
@@ -109,8 +79,8 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          //title: Text('Signup Page'),
-        ),
+            //title: Text('Signup Page'),
+            ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Center(
@@ -124,7 +94,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     style: Theme.of(context).textTheme.displayMedium!,
                   ),
                   const SizedBox(height: 40),
-
                   CustomTextField(
                     controller: emailController,
                     hintText: 'Email',
@@ -136,9 +105,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 10),
-
                   CustomTextField(
                     controller: passwordController,
                     hintText: 'Password',
@@ -150,9 +117,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 10),
-
                   CustomTextField(
                     controller: confirmPasswordController,
                     hintText: 'Confirm Password',
@@ -164,25 +129,24 @@ class _SignUpPageState extends State<SignUpPage> {
                       return null;
                     },
                   ),
-                  
                   const SizedBox(height: 25),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("I am a: ", style: Theme.of(context).textTheme.labelLarge!),
+                        Text("I am a: ",
+                            style: Theme.of(context).textTheme.labelLarge!),
                         const SizedBox(width: 4),
                         SegmentedButton<UserType>(
                           segments: const <ButtonSegment<UserType>>[
                             ButtonSegment<UserType>(
-                                value: UserType.DONOR,
-                                label: Text('Donor'),
+                              value: UserType.DONOR,
+                              label: Text('Donor'),
                             ),
                             ButtonSegment<UserType>(
-                                value: UserType.KITCHEN,
-                                label: Text('Kitchen'),
+                              value: UserType.KITCHEN,
+                              label: Text('Kitchen'),
                             ),
                           ],
                           selected: <UserType>{userType},
@@ -195,10 +159,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ],
                     ),
                   ),
-
-
                   const SizedBox(height: 25),
-
                   CustomButton(
                     onTap: () async {
                       if (formKey.currentState!.validate()) {
@@ -207,9 +168,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     },
                     text: 'Sign Up',
                   ),
-
                   const SizedBox(height: 50),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -237,16 +196,12 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 25),
-
                   CustomDivider(),
-
                   const SizedBox(height: 25),
-
                   ElevatedButton(
                     onPressed: () {
-                      // Add your onPressed code here!
+                      print('Sign in with google');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white, // Background color
@@ -262,19 +217,18 @@ class _SignUpPageState extends State<SignUpPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Image.network(
-                        'http://pngimg.com/uploads/google/google_PNG19635.png',
-                        fit:BoxFit.cover, height: 36.0,),    
+                          'http://pngimg.com/uploads/google/google_PNG19635.png',
+                          fit: BoxFit.cover,
+                          height: 36.0,
+                        ),
                         SizedBox(width: 12.0),
                         Text(
                           'Sign Up with Google',
                           style: Theme.of(context).textTheme.titleLarge!,
-
                         ),
                       ],
                     ),
                   )
-
-
                 ],
               ),
             ),

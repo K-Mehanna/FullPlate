@@ -17,8 +17,8 @@ class JobDetailPage extends StatefulWidget {
 }
 
 class _JobDetailPageState extends State<JobDetailPage> {
-  DonorInfo? donor; // should display donor
-  KitchenInfo? kitchen; // should display kitchen
+  DonorInfo? donor;
+  KitchenInfo? kitchen;
   List<OfferInfo> constituentOffers = [];
 
   @override
@@ -27,7 +27,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
     DonorsManager().getDonorCompletion(widget.job.donorId, (donor) {
       if (!mounted) {
-        return; // to avoid calling setState after dispose (if the widget is disposed
+        return;
       }
       setState(() {
         this.donor = donor;
@@ -36,7 +36,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
     KitchensManager().getKitchenCompletion(widget.job.kitchenId, (kitchen) {
       if (!mounted) {
-        return; // to avoid calling setState after dispose (if the widget is disposed
+        return;
       }
       setState(() {
         this.kitchen = kitchen;
@@ -45,7 +45,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
     OrdersManager().getConstituentOffersCompletion(widget.job.jobId, (offers) {
       if (!mounted) {
-        return; // to avoid calling setState after dispose (if the widget is disposed
+        return;
       }
       setState(() {
         constituentOffers = offers;
@@ -55,87 +55,103 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Viewing Job"),
-      ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomCenter,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FloatingActionButton.extended(
-              heroTag: "job-complete",
-              onPressed: () {
-                OrdersManager().setJobCompleted(widget.job, () {
-                  Navigator.pop(context);
-                });
-              },
-              icon: Icon(Icons.check, color: Colors.white),
-              label:
-                  Text("Job Complete", style: TextStyle(color: Colors.white)),
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-            SizedBox(width: 30),
-            FloatingActionButton.extended(
-              heroTag: "job-cancel",
-              onPressed: () {
-                OrdersManager().cancelJob(widget.job, () {
-                  Navigator.pop(context);
-                });
-              },
-              icon: Icon(Icons.cancel, color: Colors.white),
-              label: Text("Cancel Job", style: TextStyle(color: Colors.white)),
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-          ],
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow(
-                "Kitchen", kitchen?.name ?? "--"), //todo kitchen details
-            _buildDetailRow("Address", kitchen?.address ?? "--"),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildDetailColumn("Quantity", "${widget.job.quantity}"),
-                _buildDetailColumn("Status", widget.job.status.value),
-              ],
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDetailRow("Kitchen", kitchen?.name ?? "--"),
+                    _buildDetailRow("Address", kitchen?.address ?? "--"),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildDetailColumn(
+                            "Quantity", "${widget.job.quantity}"),
+                        _buildDetailColumn("Status", widget.job.status.value),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Text("Offers", style: theme.textTheme.titleLarge),
+                    SizedBox(height: 8),
+                    _buildOfferList(),
+                  ],
+                ),
+              ),
             ),
-            _buildListItem(),
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FloatingActionButton.extended(
+                    heroTag: "job-complete",
+                    onPressed: () {
+                      OrdersManager().setJobCompleted(widget.job, () {
+                        Navigator.pop(context);
+                      });
+                    },
+                    icon: Icon(Icons.check, color: theme.colorScheme.primary),
+                    label: Text("Job Complete",
+                        style: TextStyle(color: theme.colorScheme.primary)),
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  SizedBox(width: 30),
+                  FloatingActionButton.extended(
+                    heroTag: "job-cancel",
+                    onPressed: () {
+                      OrdersManager().cancelJob(widget.job, () {
+                        Navigator.pop(context);
+                      });
+                    },
+                    icon: Icon(Icons.cancel,
+                        color: theme.colorScheme.onErrorContainer),
+                    label: Text("Cancel Job",
+                        style: TextStyle(
+                            color: theme.colorScheme.onErrorContainer)),
+                    backgroundColor: theme.colorScheme.errorContainer,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool withIcon = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-        if (withIcon)
-          Row(
-            children: [
-              Icon(Icons.person),
-              SizedBox(width: 8),
-              Text(value),
-            ],
-          )
-        else
-          Text(value),
-      ],
+  Widget _buildDetailRow(String label, String value) {
+    final ThemeData theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(value, style: TextStyle(color: Colors.grey[700], fontSize: 16)),
+        ],
+      ),
     );
   }
 
@@ -143,23 +159,37 @@ class _JobDetailPageState extends State<JobDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(value),
+        Text(label,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(value, style: TextStyle(fontSize: 16)),
       ],
     );
   }
 
-  ListView _buildListItem() {
+  Widget _buildOfferList() {
+    final ThemeData theme = Theme.of(context);
     return ListView.builder(
       shrinkWrap: true,
       itemCount: constituentOffers.length,
       itemBuilder: (context, index) {
         final offer = constituentOffers[index];
-
-        return ListTile(
-          leading: offer.category.icon,
-          title: Text(offer.category.value.toString()),
-          trailing: Text(offer.quantity.toString()),
+        return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: EdgeInsets.symmetric(vertical: 8.0),
+          child: ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            tileColor: theme.colorScheme.secondaryContainer,
+            leading: Icon(offer.category.icon.icon,
+                color: Theme.of(context).primaryColor),
+            title: Text(offer.category.value.toString(),
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            trailing:
+                Text(offer.quantity.toString(), style: TextStyle(fontSize: 16)),
+          ),
         );
       },
     );

@@ -20,10 +20,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   final OrdersManager ordersManager = OrdersManager();
   List<JobInfo> completedJobs = [];
   Map<String, KitchenInfo> kitchensInfo = {};
-  
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   DonorInfo? donor; // should display donor
-
 
   @override
   void initState() {
@@ -82,6 +81,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -182,7 +182,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
               ),

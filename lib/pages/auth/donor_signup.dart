@@ -29,7 +29,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
 
   final _auth = FirebaseAuth.instance;
 
-  void updateDetailsToFirestore() {
+  Future<void> updateDetailsToFirestore() async {
     DonorInfo donorInfo = DonorInfo(
       name: nameController.text,
       location: location!,
@@ -111,13 +111,15 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                       }),
                   const SizedBox(height: 25),
                   CustomButton(
-                    onTap: () {
+                    onTap: () async {
                       if (formKey.currentState!.validate() && location != null) {
-                        updateDetailsToFirestore();
-                        Navigator.pushReplacement(
+                        await updateDetailsToFirestore().then((value) {
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => DonorHomePage()));
+                                builder: (context) => DonorHomePage())
+                          );
+                        });
                       }
                     },
                     text: 'Next',
