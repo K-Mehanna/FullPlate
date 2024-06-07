@@ -14,7 +14,6 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   final List<Widget> _pages = [
     DonorDashboard(),
-    DonorProfilePage(),
     DonorProfilePage()
   ];
 

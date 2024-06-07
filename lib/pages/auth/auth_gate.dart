@@ -28,7 +28,7 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data != null) {
           getUserType(snapshot.data!.uid).then((value) {
             if (value == UserType.DONOR) {
               Navigator.pushReplacement(

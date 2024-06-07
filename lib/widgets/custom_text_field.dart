@@ -18,26 +18,25 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscureText,
-        validator: validator,
-        onTap: onTap,
-        decoration: InputDecoration(
-          labelText: hintText,
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-          fillColor: Colors.grey.shade200,
-          filled: true,
-          hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey[500])
+    final ThemeData theme = Theme.of(context);
+    
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      validator: validator,
+      onTap: onTap,
+      decoration: InputDecoration(
+        labelText: hintText,
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        fillColor: Colors.grey.shade200,
+        filled: true,
+        hintText: hintText,
+        hintStyle: TextStyle(color: Colors.grey[500])
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:cibu/pages/auth/signup_page.dart';
 import 'package:cibu/widgets/custom_alert_dialog.dart';
+import 'package:cibu/widgets/custom_divider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/widgets/custom_text_field.dart';
@@ -58,10 +59,10 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Login Page'),
+          //title: Text('Login Page'),
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Center(
             child: Form(
               key: formKey,
@@ -143,16 +144,39 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 25),
 
-                  Divider(),
+                  CustomDivider(),
 
                   const SizedBox(height: 25),
 
-                  CustomButton(
-                    onTap: () {},
-                    text: 'Log In with Google',
-                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add your onPressed code here!
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white, // Background color
+                      foregroundColor: Colors.black, // Text color
+                      side: BorderSide(color: Colors.grey), // Border color
+                      padding: EdgeInsets.all(15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Row(
+                      //mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.network(
+                        'http://pngimg.com/uploads/google/google_PNG19635.png',
+                        fit:BoxFit.cover, height: 36.0,),    
+                        SizedBox(width: 12.0),
+                        Text(
+                          'Log in with Google',
+                          style: Theme.of(context).textTheme.titleLarge!,
 
-
+                        ),
+                      ],
+                    ),
+                  )
 
 
 

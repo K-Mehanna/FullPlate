@@ -8,22 +8,22 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(25),
-        margin: const EdgeInsets.symmetric(horizontal: 25),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: theme.colorScheme.secondary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+            style: theme.textTheme.titleLarge!.copyWith(
+              color: theme.colorScheme.onSecondary,
             ),
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:cibu/pages/auth/donor_signup.dart';
 import 'package:cibu/pages/auth/kitchen_signup.dart';
 import 'package:cibu/pages/auth/login_page.dart';
 import 'package:cibu/widgets/custom_alert_dialog.dart';
+import 'package:cibu/widgets/custom_divider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -108,10 +109,10 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Signup Page'),
+          //title: Text('Signup Page'),
         ),
         body: SingleChildScrollView(
-          //padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Center(
             child: Form(
               key: formKey,
@@ -164,7 +165,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     },
                   ),
                   
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -239,14 +240,39 @@ class _SignUpPageState extends State<SignUpPage> {
 
                   const SizedBox(height: 25),
 
-                  Divider(),
+                  CustomDivider(),
 
                   const SizedBox(height: 25),
 
-                  CustomButton(
-                    onTap: () {},
-                    text: 'Sign Up with Google',
-                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add your onPressed code here!
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white, // Background color
+                      foregroundColor: Colors.black, // Text color
+                      side: BorderSide(color: Colors.grey), // Border color
+                      padding: EdgeInsets.all(15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Row(
+                      //mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.network(
+                        'http://pngimg.com/uploads/google/google_PNG19635.png',
+                        fit:BoxFit.cover, height: 36.0,),    
+                        SizedBox(width: 12.0),
+                        Text(
+                          'Sign Up with Google',
+                          style: Theme.of(context).textTheme.titleLarge!,
+
+                        ),
+                      ],
+                    ),
+                  )
 
 
                 ],

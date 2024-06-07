@@ -52,75 +52,78 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
           title: Text('Kitchen Page'),
           automaticallyImplyLeading: false,
         ),
-        body: Center(
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Text(
-                    'Thanks!\nWe still need a bit more info',
-                    style: Theme.of(context).textTheme.headlineMedium!,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Center(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      'Thanks!\nWe still need a bit more info',
+                      style: Theme.of(context).textTheme.headlineMedium!,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 40),
-                CustomTextField(
-                  controller: nameController,
-                  hintText: 'Organisation Name',
-                  obscureText: false,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a name';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 25),
-                CustomTextField(
-                    controller: addressController,
-                    hintText: 'Address',
+                  const SizedBox(height: 40),
+                  CustomTextField(
+                    controller: nameController,
+                    hintText: 'Organisation Name',
                     obscureText: false,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter an address';
+                        return 'Please enter a name';
                       }
                       return null;
                     },
-                    onTap: () async {
-                      // generate a new token here
-                      final sessionToken = Uuid().v4();
-
-                      final Suggestion? result = await showSearch(
-                        context: context,
-                        delegate: AddressSearch(sessionToken),
-                      );
-
-                      if (result != null && result.placeId.isNotEmpty) {
-                        final addressCoords =
-                            await PlaceApiProvider(sessionToken)
-                                .getPlaceDetailFromId(result.placeId);
-                        setState(() {
-                          addressController.text = result.description;
-                          location = addressCoords;
-                        });
+                  ),
+                  const SizedBox(height: 25),
+                  CustomTextField(
+                      controller: addressController,
+                      hintText: 'Address',
+                      obscureText: false,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an address';
+                        }
+                        return null;
+                      },
+                      onTap: () async {
+                        // generate a new token here
+                        final sessionToken = Uuid().v4();
+          
+                        final Suggestion? result = await showSearch(
+                          context: context,
+                          delegate: AddressSearch(sessionToken),
+                        );
+          
+                        if (result != null && result.placeId.isNotEmpty) {
+                          final addressCoords =
+                              await PlaceApiProvider(sessionToken)
+                                  .getPlaceDetailFromId(result.placeId);
+                          setState(() {
+                            addressController.text = result.description;
+                            location = addressCoords;
+                          });
+                        }
+                      }),
+                  const SizedBox(height: 25),
+                  CustomButton(
+                    onTap: () {
+                      if (formKey.currentState!.validate() && location != null) {
+                        updateDetailsToFirestore();
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => KitchenHomePage()));
                       }
-                    }),
-                const SizedBox(height: 25),
-                CustomButton(
-                  onTap: () {
-                    if (formKey.currentState!.validate() && location != null) {
-                      updateDetailsToFirestore();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => KitchenHomePage()));
-                    }
-                  },
-                  text: 'Next',
-                ),
-              ],
+                    },
+                    text: 'Next',
+                  ),
+                ],
+              ),
             ),
           ),
         ),
