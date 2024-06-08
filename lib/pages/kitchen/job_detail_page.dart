@@ -61,6 +61,9 @@ class _JobDetailPageState extends State<JobDetailPage> {
             onPressed: _onShareWithResult,
             icon: Icon(Icons.share),
           ),
+          SizedBox(
+            width: 10,
+          ),
         ],
       ),
       body: Padding(
