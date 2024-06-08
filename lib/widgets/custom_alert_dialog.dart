@@ -18,8 +18,8 @@ Widget adaptiveAction({
   }
 }
 
-void CustomAlertDialog(BuildContext context, String message) {
-  showDialog(
+Future<void> CustomAlertDialog(BuildContext context, String message) {
+  return showDialog(
     context: context,
     builder: (context) {
       return AlertDialog.adaptive(

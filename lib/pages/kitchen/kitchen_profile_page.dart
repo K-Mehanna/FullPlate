@@ -1,5 +1,8 @@
 import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/models/kitchen_info.dart';
+import 'package:cibu/widgets/custom_alert_dialog.dart';
+import 'package:cibu/widgets/custom_snack_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cibu/database/donors_manager.dart';
@@ -79,15 +82,124 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
     );
   }
 
+  Future<void> _deletionConfirmation(BuildContext outerContext) async {
+    showDialog(
+      context: outerContext,
+      builder: (context) {
+        return AlertDialog.adaptive(
+          title: const Text("Are you sure you want to delete your account?"),
+          content: const Text("This will delete ALL your currently accepted and pending jobs.\n\nThis action cannot be undone."),
+          actions: [
+            adaptiveAction(
+              context: context,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            adaptiveAction(
+              context: context,
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteAccount(outerContext);
+              },
+              child: const Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    try {
+      await FirebaseFirestore.instance
+        .collection("users")
+        .doc(_auth.currentUser!.uid)
+        .delete();
+
+      await FirebaseFirestore.instance
+        .collection("kitchens")
+        .doc(_auth.currentUser!.uid)
+        .delete();
+
+      // faraz can you delete the jobs that are not completed (i.e pending and accepted jobs)
+      // also need to send cancel request
+      print("Reached here: ${context.mounted}");
+
+      await _auth.currentUser!.delete();
+
+      if (context.mounted) {
+        showCustomSnackBar(context, "Account deleted successfully");
+      }
+
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const TitlePage()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      print("Error happened (${context.mounted}): ${e.message}");
+      if (context.mounted) {
+        showCustomSnackBar(context, e.message!);
+      }
+    }
+  }
+
+  
+
+  Widget profileButton(
+    BuildContext context, 
+    String text, 
+    IconData icon,
+    void Function() onPressed, 
+    Color backgroundColor, 
+    Color textColor) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 16.0),
+      child: ElevatedButton.icon(
+        icon: Icon(icon, color: textColor),
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.all(16.0),
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        label: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "Profile",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -140,52 +252,29 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
               ),
             ),
             SizedBox(height: 16.0),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(top: 16.0),
-              child: ElevatedButton.icon(
-                icon: Icon(Icons.history, color: Colors.white),
-                onPressed: _navigateToHistoryPage,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(16.0),
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                label: Text(
-                  "View History",
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(top: 16.0),
-              child: ElevatedButton.icon(
-                icon: Icon(Icons.logout, color: Colors.black),
-                onPressed: _signOut,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(16.0),
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                label: Text(
-                  "Sign Out",
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
+
+            profileButton(
+                context,
+                "View History",
+                Icons.history,
+                _navigateToHistoryPage,
+                theme.colorScheme.tertiaryContainer,
+                theme.colorScheme.onTertiaryContainer),
+            profileButton(
+                context,
+                "Sign Out",
+                Icons.logout,
+                _signOut,
+                theme.colorScheme.inverseSurface,
+                theme.colorScheme.onInverseSurface),
+
+            profileButton(
+                context,
+                "Delete Account",
+                Icons.delete,
+                () async => _deletionConfirmation(context),
+                theme.colorScheme.errorContainer,
+                theme.colorScheme.onErrorContainer),
           ],
         ),
       ),

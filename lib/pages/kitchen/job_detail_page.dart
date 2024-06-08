@@ -4,6 +4,7 @@ import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class JobDetailPage extends StatefulWidget {
   final JobInfo job;
@@ -35,19 +36,39 @@ class _JobDetailPageState extends State<JobDetailPage> {
     });
   }
 
+  void _onShareWithResult() {
+    String donorName = donor?.name ?? "--";
+    String donorAddress = donor?.address ?? "--";
+    String h = "";
+    OrdersManager().getConstituentOffersCompletion(widget.job.jobId,
+        (offers) async {
+      for (var offer in offers) {
+        h += "${offer.category.value}  x${offer.quantity}\n";
+      }
+      await Share.share(
+        'Here\'s the collection details:\n\nName: $donorName\nAddress: $donorAddress\n\nDetails:\n$h\nLink: https://maps.google.com/?q=${donorAddress.replaceAll(' ', '+')}',
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Viewing Job"),
+        actions: [
+          IconButton(
+            onPressed: _onShareWithResult,
+            icon: Icon(Icons.share),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow(
-                "Donor", donor?.name ?? "--"), 
+            _buildDetailRow("Donor", donor?.name ?? "--"),
             _buildDetailRow("Address", donor?.address ?? "--"),
             SizedBox(height: 16),
             Row(

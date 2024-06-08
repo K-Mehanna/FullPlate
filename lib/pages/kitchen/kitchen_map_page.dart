@@ -22,7 +22,8 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   final DonorsManager donorsManager = DonorsManager();
   late GoogleMapController mapController;
 
-  static LatLng currentPosition = LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
+  static LatLng currentPosition =
+      LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;
@@ -91,13 +92,14 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Available donors'),
-        elevation: 2,
       ),
       body: SlidingUpPanel(
-        color: Colors.blueGrey.shade50,
+        color: theme.colorScheme.surface,
         snapPoint: 0.5,
         minHeight: 65.0,
         maxHeight: 550.0,
@@ -175,6 +177,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                   ),
                   DropdownButtonHideUnderline(
                     child: DropdownButton2<String>(
+                      iconStyleData: IconStyleData(
+                        iconSize: 18,
+                      ),
                       isExpanded: false,
                       hint: Row(
                         children: [
@@ -248,8 +253,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          DonorDetailPage(donorInfo: donors[index]),
+                      builder: (context) => DonorDetailPage(
+                        donorInfo: donors[index],
+                      ),
                     ),
                   );
                 },
@@ -327,7 +333,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DonorDetailPage(donorInfo: donor),
+                    builder: (context) => DonorDetailPage(
+                      donorInfo: donor,
+                    ),
                   ),
                 );
               },

@@ -15,7 +15,7 @@ class TitlePage extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     final TextStyle titleStyle = theme.textTheme.headlineLarge!.copyWith(
-      color: theme.colorScheme.onPrimaryContainer,
+      color: theme.colorScheme.onSurface,
     );
 
     final ButtonStyle buttonTheme = ElevatedButton.styleFrom(

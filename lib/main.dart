@@ -44,7 +44,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cibu',
       debugShowCheckedModeBanner: false,
-      theme: MaterialTheme(Typography.blackCupertino).light(),
+      theme: MaterialTheme(Typography.blackCupertino).lightHighContrast(),
+      //darkTheme: MaterialTheme(Typography.blackCupertino).dark(),
       // ThemeData(
       //   useMaterial3: true,
       //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
