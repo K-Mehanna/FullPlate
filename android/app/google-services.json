@@ -9,10 +9,23 @@
       "client_info": {
         "mobilesdk_app_id": "1:195101899668:android:6dcc38108b60b0c322ad81",
         "android_client_info": {
-          "package_name": "com.DRP39.cibu"
+          "package_name": "com.DRP39.Cibu"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "195101899668-l0mnklrat3egurbtbkna685bkqchmnbe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.DRP39.Cibu",
+            "certificate_hash": "70e2b22130b2ee684b95c486d05fa869b288c865"
+          }
+        },
+        {
+          "client_id": "195101899668-1lnuvgn4ebsenkcksrjeek7md0tq94as.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDdimaGKGQ6DL9wNFl0FonJu9rZeJ5aJs8"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "195101899668-1lnuvgn4ebsenkcksrjeek7md0tq94as.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "195101899668-veqkmnbvj2tod34pirqltcb6rckqsaue.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.FMEnterprises.firstFlutterApp"
+              }
+            }
+          ]
         }
       }
     }
