@@ -34,9 +34,10 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
   void updateDetailsToFirestore() {
     DonorInfo donorInfo = DonorInfo(
       name: nameController.text,
-      location: location!, 
+      location: location!,
       address: addressController.text,
-      donorId: _auth.currentUser!.uid, //"HAO9gLWbTaT7z16pBoLGz019iSC3", //FirebaseAuth.instance.currentUser!.uid,
+      donorId: _auth.currentUser!
+          .uid, //"HAO9gLWbTaT7z16pBoLGz019iSC3", //FirebaseAuth.instance.currentUser!.uid,
       quantity: 0,
     );
 
@@ -45,10 +46,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
 
   Future<void> markSignupAsComplete() async {
     try {
-      await _db
-        .collection('users')
-        .doc(_auth.currentUser!.uid)
-        .update({
+      await _db.collection('users').doc(_auth.currentUser!.uid).update({
         'completedProfile': true,
       });
     } catch (e) {
@@ -63,6 +61,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text('Donor Page'),
           automaticallyImplyLeading: false,
@@ -106,12 +105,12 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                       onTap: () async {
                         // generate a new token here
                         final sessionToken = Uuid().v4();
-          
+        
                         final Suggestion? result = await showSearch(
                           context: context,
                           delegate: AddressSearch(sessionToken),
                         );
-          
+        
                         if (result != null && result.placeId.isNotEmpty) {
                           final addressCoords =
                               await PlaceApiProvider(sessionToken)
@@ -125,20 +124,21 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                   const SizedBox(height: 25),
                   CustomButton(
                     onTap: () {
-                      if (formKey.currentState!.validate() && location != null) {
+                      if (formKey.currentState!.validate() &&
+                          location != null) {
                         updateDetailsToFirestore();
                         markSignupAsComplete();
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => DonorHomePage()
-                          )
-                        );
+                                builder: (context) => DonorHomePage()));
                       }
                     },
                     text: 'Next',
                   ),
-                  Spacer(flex: 2,),
+                  Spacer(
+                    flex: 2,
+                  ),
                 ],
               ),
             ),

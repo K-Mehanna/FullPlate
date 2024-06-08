@@ -45,11 +45,7 @@ class MyApp extends StatelessWidget {
       title: 'Cibu',
       debugShowCheckedModeBanner: false,
       theme: MaterialTheme(Typography.blackCupertino).lightHighContrast(),
-      //darkTheme: MaterialTheme(Typography.blackCupertino).dark(),
-      // ThemeData(
-      //   useMaterial3: true,
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      // ),
+      //darkTheme: MaterialTheme(Typography.blackCupertino).dark(),  
       home: AuthGate(),
     );
   }

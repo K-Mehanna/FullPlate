@@ -63,6 +63,7 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text('Kitchen Page'),
           automaticallyImplyLeading: false,
