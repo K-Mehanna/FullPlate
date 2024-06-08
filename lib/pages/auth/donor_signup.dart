@@ -48,7 +48,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
       await _db
         .collection('users')
         .doc(_auth.currentUser!.uid)
-        .set({
+        .update({
         'completedProfile': true,
       });
     } catch (e) {

@@ -36,7 +36,7 @@ class _KitchenSignupPageState extends State<KitchenSignupPage> {
       await _db
         .collection('users')
         .doc(_auth.currentUser!.uid)
-        .set({
+        .update({
         'completedProfile': true,
       });
     } catch (e) {
