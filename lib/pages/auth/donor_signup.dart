@@ -75,12 +75,10 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      'Thanks!\nWe still need a bit more info',
-                      style: Theme.of(context).textTheme.headlineMedium!,
-                    ),
+                  Spacer(),
+                  Text(
+                    'Thanks!\nWe still need a bit more info',
+                    style: Theme.of(context).textTheme.headlineMedium!,
                   ),
                   const SizedBox(height: 40),
                   CustomTextField(
@@ -140,6 +138,7 @@ class _DonorSignupPageState extends State<DonorSignupPage> {
                     },
                     text: 'Next',
                   ),
+                  Spacer(flex: 2,),
                 ],
               ),
             ),
