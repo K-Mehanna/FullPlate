@@ -28,6 +28,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
         //_pages[_selectedIndex]
       ),
       bottomNavigationBar: NavigationBar(
+        elevation: 10,
+        surfaceTintColor: Theme.of(context).colorScheme.inversePrimary,
         selectedIndex: _selectedIndex,
         destinations: const [
           NavigationDestination(

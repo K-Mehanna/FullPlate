@@ -510,6 +510,13 @@ extension MaterialSchemeUtils on MaterialScheme {
       inverseSurface: inverseSurface,
       onInverseSurface: inverseOnSurface,
       inversePrimary: inversePrimary,
+      surfaceDim: surfaceDim,
+      surfaceBright: surfaceBright,
+      surfaceContainerLowest: surfaceContainerLowest,
+      surfaceContainerLow: surfaceContainerLow,
+      surfaceContainer: surfaceContainer,
+      surfaceContainerHigh: surfaceContainerHigh,
+      surfaceContainerHighest: surfaceContainerHighest,
     );
   }
 }

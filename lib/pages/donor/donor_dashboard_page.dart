@@ -154,14 +154,16 @@ class _DonorDashboardState extends State<DonorDashboard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.hourglass_bottom_rounded),
+                Icon(
+                  Icons.hourglass_bottom_rounded,
+                ),
                 Text(
                   offer.getExpiryDescription(),
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            SizedBox(width: 10),
+            SizedBox(width: 12),
             Text(
               "x${offer.quantity}",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

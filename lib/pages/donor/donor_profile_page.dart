@@ -61,13 +61,14 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     );
   }
 
-    Future<void> _deletionConfirmation(BuildContext outerContext) async {
+  Future<void> _deletionConfirmation(BuildContext outerContext) async {
     showDialog(
       context: outerContext,
       builder: (context) {
         return AlertDialog.adaptive(
           title: const Text("Are you sure you want to delete your account?"),
-          content: const Text("This will delete ALL your currently accepted and pending jobs.\n\nThis action cannot be undone."),
+          content: const Text(
+              "This will delete ALL your currently accepted and pending jobs.\n\nThis action cannot be undone."),
           actions: [
             adaptiveAction(
               context: context,
@@ -103,14 +104,14 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   Future<void> _deleteAccount(BuildContext context) async {
     try {
       await FirebaseFirestore.instance
-        .collection("users")
-        .doc(_auth.currentUser!.uid)
-        .delete();
+          .collection("users")
+          .doc(_auth.currentUser!.uid)
+          .delete();
 
       await FirebaseFirestore.instance
-        .collection("donors")
-        .doc(_auth.currentUser!.uid)
-        .delete();
+          .collection("donors")
+          .doc(_auth.currentUser!.uid)
+          .delete();
 
       // faraz can you delete the jobs that are not completed (i.e pending and accepted jobs)
       // also need to send cancel request
@@ -135,22 +136,16 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     }
   }
 
-  
-
-  Widget profileButton(
-    BuildContext context, 
-    String text, 
-    IconData icon,
-    void Function() onPressed, 
-    Color backgroundColor, 
-    Color textColor) {
-    return SizedBox(
+  Widget profileButton(BuildContext context, String text, IconData icon,
+      void Function() onPressed, Color backgroundColor, Color textColor) {
+    return Container(
       width: double.infinity,
-      //margin: const EdgeInsets.only(top: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: ElevatedButton.icon(
         icon: Icon(icon, color: textColor),
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
+          elevation: 6.0,
           padding: const EdgeInsets.all(16.0),
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
@@ -197,9 +192,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       appBar: AppBar(
         title: Text(
           "Profile",
-          style: TextStyle(
-            fontWeight: FontWeight.bold
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         //backgroundColor: Colors.white,
       ),
@@ -208,123 +201,60 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListTile(
-              title: Text(
-                "Name",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
-              ),
-              subtitle: Text(
-                donor?.name ?? '', // Placeholder name
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text(
-                "Address",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
-              ),
-              subtitle: Text(
-                donor?.address ?? '', // Placeholder address
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text(
-                "Email",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
-              ),
-              subtitle: Text(
-                _auth.currentUser!.email!, // Placeholder email
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
+            Card(
+              color: theme.colorScheme.surfaceContainer,
+              elevation: 5,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      "Name",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    subtitle: Text(
+                      donor?.name ?? '', // Placeholder name
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Address",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    subtitle: Text(
+                      donor?.address ?? '', // Placeholder address
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Email",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    subtitle: Text(
+                      _auth.currentUser!.email!, // Placeholder email
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 16.0),
-            // Container(
-            //   width: double.infinity,
-            //   margin: const EdgeInsets.only(top: 16.0),
-            //   child: ElevatedButton.icon(
-            //     icon: Icon(Icons.history, color: theme.colorScheme.inversePrimary),
-            //     onPressed: _navigateToHistoryPage,
-            //     style: ElevatedButton.styleFrom(
-            //       padding: const EdgeInsets.all(16.0),
-            //       backgroundColor: theme.colorScheme.inversePrimary,
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8.0),
-            //       ),
-            //     ),
-            //     label: Text(
-            //       "View History",
-            //       style: TextStyle(
-            //         fontSize: 16.0,
-            //         fontWeight: FontWeight.bold,
-            //         color: theme.colorScheme.onPrimary,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Container(
-            //   width: double.infinity,
-            //   margin: const EdgeInsets.only(top: 16.0),
-            //   child: ElevatedButton.icon(
-            //     icon: Icon(Icons.logout, color: theme.colorScheme.inverseSurface),
-            //     onPressed: _signOut,
-            //     style: ElevatedButton.styleFrom(
-            //       padding: const EdgeInsets.all(16.0),
-            //       backgroundColor: theme.colorScheme.inverseSurface,
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8.0),
-            //       ),
-            //     ),
-            //     label: Text(
-            //       "Sign Out",
-            //       style: TextStyle(
-            //         fontSize: 16.0,
-            //         fontWeight: FontWeight.bold,
-            //         color: theme.colorScheme.onInverseSurface,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-
-            // Container(
-            //   width: double.infinity,
-            //   margin: const EdgeInsets.only(top: 16.0),
-            //   child: ElevatedButton.icon(
-            //     icon: Icon(Icons.delete, color: theme.colorScheme.onErrorContainer),
-            //     onPressed: () {},
-            //     style: ElevatedButton.styleFrom(
-            //       padding: const EdgeInsets.all(16.0),
-            //       backgroundColor: theme.colorScheme.errorContainer,
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8.0),
-            //       ),
-            //     ),
-            //     label: Text(
-            //       "Delete Account",
-            //       style: TextStyle(
-            //         fontSize: 16.0,
-            //         fontWeight: FontWeight.bold,
-            //         color: theme.colorScheme.errorContainer,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-
             profileButton(
                 context,
                 "View History",
@@ -332,9 +262,8 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 _navigateToHistoryPage,
                 theme.colorScheme.tertiaryContainer,
                 theme.colorScheme.onTertiaryContainer),
-
-            SizedBox(height: 16.0), 
-
+            SizedBox(height: 16.0),
+            Spacer(),
             profileButton(
                 context,
                 "Sign Out",
@@ -342,9 +271,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 _signOut,
                 theme.colorScheme.inverseSurface,
                 theme.colorScheme.onInverseSurface),
-              
             SizedBox(height: 16.0),
-
             profileButton(
                 context,
                 "Delete Account",
@@ -352,8 +279,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 () async => _deletionConfirmation(context),
                 theme.colorScheme.errorContainer,
                 theme.colorScheme.onErrorContainer),
-
-
           ],
         ),
       ),

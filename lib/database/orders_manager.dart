@@ -21,27 +21,25 @@ class OrdersManager {
       donorRef.get().then((docSnapshot) {
         DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
 
-        donorRef
-          .update({
-            "quantity": donor.quantity - offer.quantity
-          })
-          .then((e) {
-            offersRef
+        donorRef.update({"quantity": donor.quantity - offer.quantity}).then(
+            (e) {
+          offersRef
               .where("category", isEqualTo: offer.category.code)
               .count()
               .get()
               .then((res) {
-                if (res.count == 0) {
-                  donorRef
-                    .update({
-                      "offerSummary": FieldValue.arrayRemove([offer.category.code])
-                    })
-                    .then((res) {
-                      onCompletion();
-                    }, onError: (e) => print("iehfoiewhf :(((())))"));
-                }
-              });
-          }, onError: (e) => print("OrdersManager\n - removeOpenOffer: update donor $e"));});
+            if (res.count == 0) {
+              donorRef.update({
+                "offerSummary": FieldValue.arrayRemove([offer.category.code])
+              }).then((res) {
+                onCompletion();
+              }, onError: (e) => print("iehfoiewhf :(((())))"));
+            }
+          });
+        },
+            onError: (e) =>
+                print("OrdersManager\n - removeOpenOffer: update donor $e"));
+      });
       onCompletion();
     }, onError: (e) => print("OrdersManager\n - removeOpenOffer: $e"));
   }
@@ -68,6 +66,7 @@ class OrdersManager {
         .map((category) => category.code)
         .toList();
 
+    print('Reached here');
     _db.runTransaction((transaction) async {
       final baseDoc = await transaction.get(baseDocumentRef);
       int previousQuantity = baseDoc.get("quantity");

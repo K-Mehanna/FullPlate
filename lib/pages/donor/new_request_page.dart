@@ -231,20 +231,22 @@ class NewRequestPageState extends State<NewRequestPage> {
                                         TextStyle(fontWeight: FontWeight.bold)),
                                 SizedBox(width: 10),
                                 TextButton.icon(
-                                    icon: Icon(
-                                      Icons.hourglass_bottom_rounded,
-                                      color: Colors.white,
-                                    ),
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            WidgetStateColor.resolveWith(
-                                                getButtonColors)),
-                                    onPressed: () {
-                                      _showDatePicker(orders[index]);
-                                    },
-                                    label: Text(
-                                        orders[index].getExpiryDescription(),
-                                        style: TextStyle(color: Colors.white)))
+                                  icon: Icon(
+                                    Icons.hourglass_bottom_rounded,
+                                    color: Colors.white,
+                                  ),
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          WidgetStateColor.resolveWith(
+                                              getButtonColors)),
+                                  onPressed: () {
+                                    _showDatePicker(orders[index]);
+                                  },
+                                  label: Text(
+                                      overflow: TextOverflow.ellipsis,
+                                      orders[index].getExpiryDescription(),
+                                      style: TextStyle(color: Colors.white)),
+                                )
                               ],
                             ),
                           ]),
@@ -287,7 +289,7 @@ int limitedValue(int lower, int upper, int value) {
 class OrderItem {
   final ValueNotifier<int> quantityNotifier = ValueNotifier<int>(1);
   OrderCategory selectedCategory;
-  DateTime expiryDate = DateTime.now().add(Duration(days: 7));
+  DateTime? expiryDate; // = DateTime.now().add(Duration(days: 7));
   final TextEditingController quantityController;
 
   OrderItem({OrderCategory? defaultCategory})
@@ -312,7 +314,10 @@ class OrderItem {
   }
 
   String getExpiryDescription() {
-    int days = expiryDate
+    if (expiryDate == null) {
+      return "None";
+    }
+    int days = expiryDate!
         .difference(DateTime.now().subtract(Duration(days: 1)))
         .inDays;
 

@@ -35,8 +35,10 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final userCredential = await _auth.signInWithCredential(credential);
+      print("User signed in with google");
 
       if (userCredential.additionalUserInfo!.isNewUser) {
+        print("user is new");
         try {
           if (context.mounted) {
             CustomAlertDialog(context, 'User not found. Please sign up first.');
@@ -47,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
       // else sign is as usual
+      FirebaseAuth.instance.currentUser!.reload();
 
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
@@ -68,6 +71,11 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text,
         password: passwordController.text,
       );
+
+      print("User Signed In: ${_auth.currentUser == null ? 'No' : 'Yes'}");
+      print("Context mounted: ${context.mounted}");
+
+      await FirebaseAuth.instance.currentUser!.reload();
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
         if (e.code == 'invalid-email') {
@@ -84,6 +92,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("Login page build");
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();

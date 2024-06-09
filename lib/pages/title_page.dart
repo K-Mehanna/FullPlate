@@ -12,6 +12,8 @@ class TitlePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Title page build");
+
     final ThemeData theme = Theme.of(context);
 
     final TextStyle titleStyle = theme.textTheme.headlineLarge!.copyWith(

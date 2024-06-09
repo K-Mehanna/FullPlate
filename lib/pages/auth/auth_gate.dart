@@ -14,17 +14,18 @@ class AuthGate extends StatelessWidget {
 
   Future<UserInfo> getUserInfo(String userId) async {
     try {
-      DocumentSnapshot<Map<String, dynamic>> docSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .get();
+      DocumentSnapshot<Map<String, dynamic>> docSnapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
 
       return UserInfo.fromFirestore(docSnapshot);
     } catch (e) {
       print("Error getting document: $e");
-      
-      await FirebaseAuth.instance.signOut();
-      
+
+      //await FirebaseAuth.instance.signOut();
+
       // maybe this might work
       throw Exception("Error getting document: $e");
     }
@@ -32,24 +33,45 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    print("AuthGate build");
+
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+      stream: FirebaseAuth.instance.userChanges(),
       builder: (context, snapshot) {
+        print(
+            "Snapshot Updated!: snapshot.hasData: ${snapshot.hasData}, snapshot.data is null: ${snapshot.data == null}");
         if (snapshot.hasData && snapshot.data != null) {
           getUserInfo(snapshot.data!.uid).then((userInfo) {
+            // switch ((userInfo.userType, userInfo.completedProfile)) {
+            //   case (UserType.DONOR, true):    return DonorHomePage();
+            //   case (UserType.KITCHEN, true):  return KitchenHomePage();
+            //   case (UserType.DONOR, false):   return DonorSignupPage();
+            //   case (UserType.KITCHEN, false): return KitchenSignupPage();
+            // }
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) {
                 switch ((userInfo.userType, userInfo.completedProfile)) {
-                  case (UserType.DONOR, true):    return DonorHomePage();
-                  case (UserType.KITCHEN, true):  return KitchenHomePage();
-                  case (UserType.DONOR, false):   return DonorSignupPage();
-                  case (UserType.KITCHEN, false): return KitchenSignupPage();
+                  case (UserType.DONOR, true):
+                    return DonorHomePage();
+                  case (UserType.KITCHEN, true):
+                    return KitchenHomePage();
+                  case (UserType.DONOR, false):
+                    return DonorSignupPage();
+                  case (UserType.KITCHEN, false):
+                    return KitchenSignupPage();
                 }
               }),
             );
           });
-          return CircularProgressIndicator();
+          return Container(
+            color: theme.colorScheme.surface,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+          //CircularProgressIndicator();
         } else {
           return TitlePage();
         }
