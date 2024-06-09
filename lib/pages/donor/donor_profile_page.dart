@@ -332,6 +332,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 _navigateToHistoryPage,
                 theme.colorScheme.tertiaryContainer,
                 theme.colorScheme.onTertiaryContainer),
+
+            SizedBox(height: 16.0), 
+
             profileButton(
                 context,
                 "Sign Out",
@@ -339,6 +342,8 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 _signOut,
                 theme.colorScheme.inverseSurface,
                 theme.colorScheme.onInverseSurface),
+              
+            SizedBox(height: 16.0),
 
             profileButton(
                 context,

@@ -13,17 +13,27 @@ class HistoryPage extends StatelessWidget {
     required this.donorsInfo,
   }) : super(key: key);
 
+  String getDate(JobInfo job) {
+    final time = job.timeCompleted;
+    if (time == null) {
+      return "--";
+    }
+    var year = time.year;
+    var month = time.month;
+    var day = time.day;
+
+    return "$day/$month/$year";
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "History",
-          style: TextStyle(
-            fontWeight: FontWeight.bold
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -31,26 +41,41 @@ class HistoryPage extends StatelessWidget {
           itemCount: completedJobs.length,
           itemBuilder: (context, index) {
             final job = completedJobs[index];
+            String date = getDate(job);
             return Card(
+              color: theme.colorScheme.tertiaryContainer,
+              shadowColor: theme.colorScheme.inversePrimary,
               margin: const EdgeInsets.symmetric(vertical: 8.0),
-              elevation: 2.0,
+              elevation: 7.5,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10.0, horizontal: 15.0),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                 title: Text(
                   donorsInfo[job.donorId]?.name ?? "--",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                subtitle: Text(
-                  "x${job.quantity} ${job.timeCompleted}",
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Colors.grey[600],
-                  ),
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onTertiaryContainer,
+                      fontSize: 24),
+                ),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "x${job.quantity}",
+                      style: TextStyle(
+                          color: theme.colorScheme.onTertiaryContainer,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      "Collected on: $date",
+                      style: TextStyle(
+                          color: theme.colorScheme.onTertiaryContainer,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
                 onTap: () {
                   Navigator.push(

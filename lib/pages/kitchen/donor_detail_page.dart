@@ -4,13 +4,13 @@ import 'package:cibu/database/donors_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class DonorDetailPage extends StatefulWidget {
   final DonorInfo donorInfo;
@@ -31,15 +31,15 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
   ValueNotifier<Map<String, dynamic>> carStats =
       ValueNotifier<Map<String, dynamic>>(
     {
-      "distance": {"text": "--", "value": 0},
-      "duration": {"text": "--", "value": 0},
+      "distance": {"text": "...", "value": 0},
+      "duration": {"text": "...", "value": 0},
     },
   );
   ValueNotifier<Map<String, dynamic>> walkingStats =
       ValueNotifier<Map<String, dynamic>>(
     {
-      "distance": {"text": "--", "value": 0},
-      "duration": {"text": "--", "value": 0},
+      "distance": {"text": "...", "value": 0},
+      "duration": {"text": "...", "value": 0},
     },
   );
   LatLng? currentPosition;
@@ -136,6 +136,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
     theme = Theme.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Viewing Request"),
       ),
@@ -161,10 +162,26 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Donor name", widget.donorInfo.name),
-            SizedBox(height: 16),
-            _buildDetailRow("Donor address", widget.donorInfo.address),
-            SizedBox(height: 16),
+            GestureDetector(
+              onTap: () => MapsLauncher.launchQuery(widget.donorInfo.address),
+              // ignore: sized_box_for_whitespace
+              child: Container(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDetailRow("Donor name", widget.donorInfo.name),
+                    SizedBox(height: 16),
+                    _buildDetailRow("Donor address", widget.donorInfo.address),
+                    SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+            // _buildDetailRow("Donor name", widget.donorInfo.name),
+            // SizedBox(height: 16),
+            // _buildDetailRow("Donor address", widget.donorInfo.address),
+            // SizedBox(height: 16),
             Text(
               "Distance/time to donor (driving/walking)",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -193,11 +210,17 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Category", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Spacer(flex: 3,),
+                  Text("Category",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Spacer(
+                    flex: 3,
+                  ),
                   Text("Expiry", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Spacer(flex: 2,),
-                  Text("Quantity", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Spacer(
+                    flex: 2,
+                  ),
+                  Text("Quantity",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -239,7 +262,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
             "duration": {"text": "Cannot get time", "value": 0},
           };
         }
-            print(carStats);
+        print(carStats);
 
         try {
           Dio()
@@ -254,7 +277,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                 "duration": {"text": "Cannot get time", "value": 0},
               };
             }
-                print(walkStats);
+            print(walkStats);
             callback(carStats, walkStats);
           });
         } catch (e) {
@@ -278,10 +301,20 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         return Card(
           color: theme.colorScheme.inversePrimary,
           child: ListTile(
-            title: Text(
-              offer.category.value,
-              style: TextStyle(
-                color: theme.colorScheme.onSecondary,
+            title: FittedBox(
+              alignment: Alignment.centerLeft,
+              fit: BoxFit.scaleDown,
+              child: Text(
+                offer.category.value,
+                style:
+                    // theme.textTheme.titleLarge!.copyWith(
+                    //   fontWeight: FontWeight.bold,
+                    //   //color: theme.colorScheme.onSecondary,
+                    // ),
+                    TextStyle(
+                  fontWeight: FontWeight.w500,
+                  //color: theme.colorScheme.onSecondary,
+                ),
               ),
             ),
             trailing: Row(
@@ -291,6 +324,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                   Icons.hourglass_bottom_rounded,
                 ),
                 Text(offer.getExpiryDescription()),
+                //SizedBox(width: 16),
                 ValueListenableBuilder<int>(
                   valueListenable: selected,
                   builder: (context, value, _) {
@@ -310,7 +344,6 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                   child: TextField(
                     decoration: InputDecoration.collapsed(
                       hintText: '',
-
                     ),
                     controller: controller,
                     keyboardType: TextInputType.number,
@@ -323,7 +356,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                           intValue >= 0 &&
                           intValue <= offer.quantity) {
                         selected.value = intValue;
-                      } else if (intValue != null && intValue > offer.quantity) {
+                      } else if (intValue != null &&
+                          intValue > offer.quantity) {
                         controller.text = offer.quantity.toString();
                       } else if (intValue != null && intValue < 0) {
                         controller.text = "0";
@@ -359,6 +393,18 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
           ),
         );
       },
+    );
+  }
+}
+
+
+class DonorInfoCard extends StatelessWidget {
+  const DonorInfoCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      
     );
   }
 }

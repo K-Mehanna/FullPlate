@@ -166,9 +166,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
     void Function() onPressed, 
     Color backgroundColor, 
     Color textColor) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      margin: const EdgeInsets.only(top: 16.0),
       child: ElevatedButton.icon(
         icon: Icon(icon, color: textColor),
         onPressed: onPressed,
@@ -262,6 +261,9 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 _navigateToHistoryPage,
                 theme.colorScheme.tertiaryContainer,
                 theme.colorScheme.onTertiaryContainer),
+
+            SizedBox(height: 16.0),
+
             profileButton(
                 context,
                 "Sign Out",
@@ -269,6 +271,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 _signOut,
                 theme.colorScheme.inverseSurface,
                 theme.colorScheme.onInverseSurface),
+              
+            SizedBox(height: 16.0),
 
             profileButton(
                 context,

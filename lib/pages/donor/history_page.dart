@@ -13,6 +13,18 @@ class HistoryPage extends StatelessWidget {
     required this.kitchensInfo,
   }) : super(key: key);
 
+  String getDate(JobInfo job) {
+    final time = job.timeCompleted;
+    if (time == null) {
+      return "--";
+    }
+    var year = time.year;
+    var month = time.month;
+    var day = time.day;
+
+    return "$day / $month / $year";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,13 +40,14 @@ class HistoryPage extends StatelessWidget {
         itemCount: completedJobs.length,
         itemBuilder: (context, index) {
           final job = completedJobs[index];
+          final date = getDate(job);
           final kitchenName = kitchensInfo[job.kitchenId]?.name ?? "--";
           return Card(
             elevation: 2.0,
             margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: ListTile(
               title: Text(kitchenName),
-              subtitle: Text("x${job.quantity} ${job.timeCompleted}"),
+              subtitle: Text("x${job.quantity} $date"),
               onTap: () {
                 Navigator.push(
                   context,

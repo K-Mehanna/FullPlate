@@ -21,7 +21,11 @@ class _DonorHomePageState extends State<DonorHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: _pages[_selectedIndex]
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: _pages,
+        ),
+        //_pages[_selectedIndex]
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,

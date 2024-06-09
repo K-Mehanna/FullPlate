@@ -22,6 +22,8 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   final DonorsManager donorsManager = DonorsManager();
   late GoogleMapController mapController;
 
+  final PanelController _pc = PanelController();
+  double panelPosition = 0.0;
   static LatLng currentPosition =
       LatLng(51.4988, -0.176894); // LatLng(51.5032, 0.1195);
   late List<DonorInfo> donors = [];
@@ -90,9 +92,11 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     });
   }
 
+  late ThemeData theme;
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +108,11 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         ),
       ),
       body: SlidingUpPanel(
+        controller: _pc,
         color: theme.colorScheme.surface,
+        onPanelSlide: (position) {
+          panelPosition = position;
+        },
         snapPoint: 0.5,
         minHeight: 65.0,
         maxHeight: 550.0,
@@ -157,13 +165,41 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   Widget _ordersScrollingList(ScrollController sc) {
     return Column(
       children: [
-        Icon(Icons.keyboard_arrow_up),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 15.0),
-          child: Text(
-            'Available donors',
-            style: TextStyle(
-              fontSize: 20,
+        GestureDetector(
+          onTap: () {
+            if (panelPosition < 0.1) {
+              _pc.animatePanelToPosition(0.5).then((a) {
+                panelPosition = _pc.panelPosition;
+              });
+              // _pc.open().then((a) {
+              //   panelPosition = _pc.panelPosition;
+              // });
+            } else if (panelPosition < 0.55) {
+              _pc.open().then((a) {
+                panelPosition = _pc.panelPosition;
+              });
+            } else {
+              _pc.close().then((a) {
+                panelPosition = _pc.panelPosition;
+              });
+            }
+          },
+          child: Container(
+            color: Colors.transparent,
+            width: double.infinity,
+            child: Column(
+              children: [
+                Icon(Icons.keyboard_arrow_up),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 15.0),
+                  child: Text(
+                    'Available donors',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -266,7 +302,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: theme.colorScheme.inversePrimary,
                     border: Border.all(color: Colors.grey.shade400),
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -352,30 +388,3 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   }
   //);
 }
-
-// Future<BitmapDescriptor> iconDataToBitmapDescriptorSync(IconData iconData, {double size = 100}) async {
-//   final PictureRecorder recorder = PictureRecorder();
-//   final Canvas canvas = Canvas(recorder);
-
-//   final TextPainter textPainter = TextPainter(
-//     textDirection: TextDirection.ltr,
-//   );
-//   textPainter.text = TextSpan(
-//     text: String.fromCharCode(iconData.codePoint),
-//     style: TextStyle(
-//       color: Colors.black, // Change the color as needed
-//       fontSize: size,
-//       fontFamily: iconData.fontFamily,
-//     ),
-//   );
-
-//   textPainter.layout();
-//   textPainter.paint(canvas, Offset(0, 0));
-
-//   final ui.Image image = recorder.endRecording().toImage(size.toInt(), size.toInt());
-
-//   final ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-//   final Uint8List pngBytes = byteData.buffer.asUint8List();
-
-//   return BitmapDescriptor.fromBytes(pngBytes);
-// }

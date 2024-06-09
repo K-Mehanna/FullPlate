@@ -94,24 +94,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FloatingActionButton.extended(
-                    heroTag: "job-complete",
-                    onPressed: () {
-                      OrdersManager().setJobCompleted(widget.job, () {
-                        Navigator.pop(context);
-                      });
-                    },
-                    icon: Icon(Icons.check, color: theme.colorScheme.primary),
-                    label: Text("Job Complete",
-                        style: TextStyle(color: theme.colorScheme.primary)),
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  SizedBox(width: 30),
-                  FloatingActionButton.extended(
+                children: [FloatingActionButton.extended(
                     heroTag: "job-cancel",
                     onPressed: () {
                       OrdersManager().cancelJob(widget.job, () {
@@ -124,6 +107,22 @@ class _JobDetailPageState extends State<JobDetailPage> {
                         style: TextStyle(
                             color: theme.colorScheme.onErrorContainer)),
                     backgroundColor: theme.colorScheme.errorContainer,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  SizedBox(width: 30),
+                  FloatingActionButton.extended(
+                    heroTag: "job-complete",
+                    onPressed: () {
+                      OrdersManager().setJobCompleted(widget.job, () {
+                        Navigator.pop(context);
+                      });
+                    },
+                    icon: Icon(Icons.check, color: theme.colorScheme.primary),
+                    label: Text("Job Complete",
+                        style: TextStyle(color: theme.colorScheme.primary)),
+                    backgroundColor: theme.colorScheme.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

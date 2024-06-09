@@ -67,11 +67,11 @@ class NewRequestPageState extends State<NewRequestPage> {
 
   void _showDatePicker(OrderItem order) {
     showDatePicker(
-      context: context, 
-      initialDate: order.expiryDate,
-      firstDate: DateTime.now(), 
-      lastDate: DateTime.now().add(Duration(days: 30))
-    ).then((date) {
+            context: context,
+            initialDate: order.expiryDate,
+            firstDate: DateTime.now(),
+            lastDate: DateTime.now().add(Duration(days: 30)))
+        .then((date) {
       if (date != null) {
         setState(() {
           order.expiryDate = date;
@@ -83,7 +83,8 @@ class NewRequestPageState extends State<NewRequestPage> {
   Color getButtonColors(Set<WidgetState> state) {
     if (state.contains(WidgetState.hovered)) {
       return Colors.blueGrey.withOpacity(0.9);
-    } else if (state.contains(WidgetState.focused) || state.contains(WidgetState.pressed)) {
+    } else if (state.contains(WidgetState.focused) ||
+        state.contains(WidgetState.pressed)) {
       return Colors.blueGrey.withOpacity(0.8);
     } else {
       return Colors.blueGrey;
@@ -111,8 +112,7 @@ class NewRequestPageState extends State<NewRequestPage> {
                         children: [
                           DropdownButton<OrderCategory>(
                             value: orders[index].selectedCategory,
-                            items: OrderCategory.values
-                                .map((category) {
+                            items: OrderCategory.values.map((category) {
                               return DropdownMenuItem(
                                 value: category,
                                 child: Text(category.value),
@@ -137,99 +137,117 @@ class NewRequestPageState extends State<NewRequestPage> {
                         ],
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Quantity", style: TextStyle(fontWeight: FontWeight.bold),),
-                              Row(
-                                children: [
-                                  ValueListenableBuilder<int>(
-                                    valueListenable: orders[index].quantityNotifier,
-                                    builder: (context, value, _) {
-                                      return IconButton(
-                                        icon: Icon(Icons.remove),
-                                        onPressed: (value > 1)
-                                            ? orders[index].decrementQuantity
-                                            : null,
-                                      );
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 25,
-                                    child: TextField(
-                                      controller: orders[index].quantityController,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.digitsOnly
-                                      ],
-                                      onSubmitted: (value) {
-                                        int? intValue = int.tryParse(value);
-                                        if (intValue != null) {
-                                          orders[index].quantityNotifier.value = 
-                                            limitedValue(1, 99, intValue);
-                                          orders[index].quantityController.text = 
-                                            limitedValue(1, 99, intValue)
-                                              .toString();
-                                        }
-                                        else {
-                                          orders[index].quantityController.text =
-                                              orders[index]
-                                                  .quantityNotifier
-                                                  .value
-                                                  .toString();
-                                        }
-                                      },
-                                      onChanged: (value) {
-                                        int? intValue = int.tryParse(value);
-                                        if (intValue != null) {
-                                          orders[index].quantityNotifier.value = 
-                                            limitedValue(1, 99, intValue);
-                                          orders[index].quantityController.text = 
-                                            limitedValue(1, 99, intValue)
-                                              .toString();
-                                        }
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Quantity",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Row(
+                                  children: [
+                                    ValueListenableBuilder<int>(
+                                      valueListenable:
+                                          orders[index].quantityNotifier,
+                                      builder: (context, value, _) {
+                                        return IconButton(
+                                          icon: Icon(Icons.remove),
+                                          onPressed: (value > 1)
+                                              ? orders[index].decrementQuantity
+                                              : null,
+                                        );
                                       },
                                     ),
-                                  ),
-                                  ValueListenableBuilder<int>(
-                                    valueListenable: orders[index].quantityNotifier,
-                                    builder: (context, value, _) {
-                                      return IconButton(
-                                        icon: Icon(Icons.add),
-                                        onPressed: (value < 99)
-                                            ? orders[index].incrementQuantity
-                                            : null,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Expiry", style: TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(width: 10),
-                              TextButton.icon(
-                                icon: Icon(Icons.hourglass_bottom_rounded, color: Colors.white,),
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateColor.resolveWith(getButtonColors)
+                                    SizedBox(
+                                      width: 25,
+                                      child: TextField(
+                                        controller:
+                                            orders[index].quantityController,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        onSubmitted: (value) {
+                                          int? intValue = int.tryParse(value);
+                                          if (intValue != null) {
+                                            orders[index]
+                                                    .quantityNotifier
+                                                    .value =
+                                                limitedValue(1, 99, intValue);
+                                            orders[index]
+                                                    .quantityController
+                                                    .text =
+                                                limitedValue(1, 99, intValue)
+                                                    .toString();
+                                          } else {
+                                            orders[index]
+                                                    .quantityController
+                                                    .text =
+                                                orders[index]
+                                                    .quantityNotifier
+                                                    .value
+                                                    .toString();
+                                          }
+                                        },
+                                        onChanged: (value) {
+                                          int? intValue = int.tryParse(value);
+                                          if (intValue != null) {
+                                            orders[index]
+                                                    .quantityNotifier
+                                                    .value =
+                                                limitedValue(1, 99, intValue);
+                                            orders[index]
+                                                    .quantityController
+                                                    .text =
+                                                limitedValue(1, 99, intValue)
+                                                    .toString();
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    ValueListenableBuilder<int>(
+                                      valueListenable:
+                                          orders[index].quantityNotifier,
+                                      builder: (context, value, _) {
+                                        return IconButton(
+                                          icon: Icon(Icons.add),
+                                          onPressed: (value < 99)
+                                              ? orders[index].incrementQuantity
+                                              : null,
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
-                                onPressed: () {
-                                  _showDatePicker(orders[index]);
-                                }, 
-                                label: Text(
-                                  orders[index].getExpiryDescription(),
-                                  style: TextStyle(color: Colors.white)
-                                )
-                              )
-                            ],
-                          ),
-                        ]
-                      ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Expiry",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                                SizedBox(width: 10),
+                                TextButton.icon(
+                                    icon: Icon(
+                                      Icons.hourglass_bottom_rounded,
+                                      color: Colors.white,
+                                    ),
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            WidgetStateColor.resolveWith(
+                                                getButtonColors)),
+                                    onPressed: () {
+                                      _showDatePicker(orders[index]);
+                                    },
+                                    label: Text(
+                                        orders[index].getExpiryDescription(),
+                                        style: TextStyle(color: Colors.white)))
+                              ],
+                            ),
+                          ]),
                     ],
                   );
                 },
@@ -257,8 +275,7 @@ class NewRequestPageState extends State<NewRequestPage> {
 }
 
 int limitedValue(int lower, int upper, int value) {
-  if (value >= lower &&
-    value <= upper) {
+  if (value >= lower && value <= upper) {
     return value;
   } else if (value > upper) {
     return upper;
@@ -293,9 +310,11 @@ class OrderItem {
     quantityNotifier.dispose();
     quantityController.dispose();
   }
-  
+
   String getExpiryDescription() {
-    int days = expiryDate.difference(DateTime.now().subtract(Duration(days: 1))).inDays;
+    int days = expiryDate
+        .difference(DateTime.now().subtract(Duration(days: 1)))
+        .inDays;
 
     return "$days day${days > 1 ? "s" : ""}";
   }
