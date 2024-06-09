@@ -180,34 +180,31 @@ class _SignUpPageState extends State<SignUpPage> {
                     },
                   ),
                   const SizedBox(height: 25),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("I am a: ",
-                            style: Theme.of(context).textTheme.labelLarge!),
-                        const SizedBox(width: 4),
-                        SegmentedButton<UserType>(
-                          segments: const <ButtonSegment<UserType>>[
-                            ButtonSegment<UserType>(
-                              value: UserType.DONOR,
-                              label: Text('Donor'),
-                            ),
-                            ButtonSegment<UserType>(
-                              value: UserType.KITCHEN,
-                              label: Text('Kitchen'),
-                            ),
-                          ],
-                          selected: <UserType>{userType},
-                          onSelectionChanged: (Set<UserType> newSelection) {
-                            setState(() {
-                              userType = newSelection.first;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("I am a: ",
+                          style: Theme.of(context).textTheme.labelLarge!),
+                      const SizedBox(width: 4),
+                      SegmentedButton<UserType>(
+                        segments: const <ButtonSegment<UserType>>[
+                          ButtonSegment<UserType>(
+                            value: UserType.DONOR,
+                            label: Text('Donor'),
+                          ),
+                          ButtonSegment<UserType>(
+                            value: UserType.KITCHEN,
+                            label: Text('Kitchen'),
+                          ),
+                        ],
+                        selected: <UserType>{userType},
+                        onSelectionChanged: (Set<UserType> newSelection) {
+                          setState(() {
+                            userType = newSelection.first;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 25),
                   CustomButton(

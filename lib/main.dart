@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cibu',
       debugShowCheckedModeBanner: false,
-      theme: MaterialTheme(Typography.blackCupertino).lightHighContrast(),
+      theme: MaterialTheme(Typography.blackCupertino).lightMediumContrast(),
       //darkTheme: MaterialTheme(Typography.blackCupertino).dark(),  
       home: AuthGate(),
     );

@@ -49,6 +49,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
 
   late final Map<String, ValueNotifier<int>> selectedQuantities;
   late final Map<String, TextEditingController> controllers;
+  late ThemeData theme;
 
   final _auth = FirebaseAuth.instance;
 
@@ -132,6 +133,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Viewing Request"),
@@ -190,10 +193,11 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Category",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text("Quantity",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("Category", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Spacer(flex: 3,),
+                  Text("Expiry", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Spacer(flex: 2,),
+                  Text("Quantity", style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -221,6 +225,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
     LatLng src = currentPosition!;
     String key = "AIzaSyDusgS3hbLeajpaVitxr7rEol3AJHmr5-4";
     Map<String, dynamic> carStats;
+    Map<String, dynamic> walkStats;
     try {
       Dio()
           .get(
@@ -228,6 +233,13 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
           .then((value) {
         final user = jsonDecode(value.toString()) as Map<String, dynamic>;
         carStats = user["rows"][0]["elements"][0];
+        if (carStats.length == 1) {
+          carStats = {
+            "distance": {"text": "Cannot get distance", "value": 0},
+            "duration": {"text": "Cannot get time", "value": 0},
+          };
+        }
+            print(carStats);
 
         try {
           Dio()
@@ -235,7 +247,15 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                   'https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${dest.latitude},${dest.longitude}&origins=${src.latitude},${src.longitude}&mode=walking&key=$key')
               .then((value) {
             final user = jsonDecode(value.toString()) as Map<String, dynamic>;
-            callback(carStats, user["rows"][0]["elements"][0]);
+            walkStats = user["rows"][0]["elements"][0];
+            if (walkStats.length == 1) {
+              walkStats = {
+                "distance": {"text": "Cannot get distance", "value": 0},
+                "duration": {"text": "Cannot get time", "value": 0},
+              };
+            }
+                print(walkStats);
+            callback(carStats, walkStats);
           });
         } catch (e) {
           print(e);
@@ -255,75 +275,87 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         var selected = selectedQuantities[offer.offerId]!;
         var controller = controllers[offer.offerId]!;
 
-        return ListTile(
-          title: Text(offer.category.value),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.hourglass_bottom_rounded,
+        return Card(
+          color: theme.colorScheme.inversePrimary,
+          child: ListTile(
+            title: Text(
+              offer.category.value,
+              style: TextStyle(
+                color: theme.colorScheme.onSecondary,
               ),
-              Text(offer.getExpiryDescription()),
-              ValueListenableBuilder<int>(
-                valueListenable: selected,
-                builder: (context, value, _) {
-                  return IconButton(
-                    icon: Icon(Icons.remove),
-                    onPressed: (value > 0)
-                        ? () {
-                            selected.value--;
-                            controller.text = selected.value.toString();
-                          }
-                        : null,
-                  );
-                },
-              ),
-              SizedBox(
-                width: 25, // Adjust width as necessary
-                child: TextField(
-                  controller: controller,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  onChanged: (value) {
-                    int? intValue = int.tryParse(value);
-                    if (intValue != null &&
-                        intValue >= 0 &&
-                        intValue <= offer.quantity) {
-                      selected.value = intValue;
-                    } else if (intValue != null && intValue > offer.quantity) {
-                      controller.text = offer.quantity.toString();
-                    } else if (intValue != null && intValue < 0) {
-                      controller.text = "0";
-                    }
-                  },
-                  onSubmitted: (value) {
-                    int? intValue = int.tryParse(value);
-                    if (intValue != null) {
-                      selected.value = intValue;
-                    } else {
-                      controller.text =
-                          selected.value.toString(); // Reset to valid value
-                    }
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.hourglass_bottom_rounded,
+                ),
+                Text(offer.getExpiryDescription()),
+                ValueListenableBuilder<int>(
+                  valueListenable: selected,
+                  builder: (context, value, _) {
+                    return IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: (value > 0)
+                          ? () {
+                              selected.value--;
+                              controller.text = selected.value.toString();
+                            }
+                          : null,
+                    );
                   },
                 ),
-              ),
-              ValueListenableBuilder<int>(
-                valueListenable: selected,
-                builder: (context, value, _) {
-                  return IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: (value < offer.quantity)
-                        ? () {
-                            selected.value++;
-                            controller.text = selected.value.toString();
-                          }
-                        : null,
-                  );
-                },
-              )
-            ],
+                SizedBox(
+                  width: 25, // Adjust width as necessary
+                  child: TextField(
+                    decoration: InputDecoration.collapsed(
+                      hintText: '',
+
+                    ),
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onChanged: (value) {
+                      int? intValue = int.tryParse(value);
+                      if (intValue != null &&
+                          intValue >= 0 &&
+                          intValue <= offer.quantity) {
+                        selected.value = intValue;
+                      } else if (intValue != null && intValue > offer.quantity) {
+                        controller.text = offer.quantity.toString();
+                      } else if (intValue != null && intValue < 0) {
+                        controller.text = "0";
+                      }
+                    },
+                    onSubmitted: (value) {
+                      int? intValue = int.tryParse(value);
+                      if (intValue != null) {
+                        selected.value = intValue;
+                      } else {
+                        controller.text =
+                            selected.value.toString(); // Reset to valid value
+                      }
+                    },
+                  ),
+                ),
+                ValueListenableBuilder<int>(
+                  valueListenable: selected,
+                  builder: (context, value, _) {
+                    return IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: (value < offer.quantity)
+                          ? () {
+                              selected.value++;
+                              controller.text = selected.value.toString();
+                            }
+                          : null,
+                    );
+                  },
+                )
+              ],
+            ),
           ),
         );
       },

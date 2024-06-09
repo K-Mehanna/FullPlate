@@ -144,9 +144,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     void Function() onPressed, 
     Color backgroundColor, 
     Color textColor) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      margin: const EdgeInsets.only(top: 16.0),
+      //margin: const EdgeInsets.only(top: 16.0),
       child: ElevatedButton.icon(
         icon: Icon(icon, color: textColor),
         onPressed: onPressed,
