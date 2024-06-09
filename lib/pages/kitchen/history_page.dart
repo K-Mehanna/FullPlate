@@ -32,7 +32,9 @@ class HistoryPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           "History",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: Padding(

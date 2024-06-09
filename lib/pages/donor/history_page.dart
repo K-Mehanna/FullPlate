@@ -1,3 +1,4 @@
+import 'package:cibu/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/kitchen_info.dart';
@@ -27,6 +28,7 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -36,29 +38,61 @@ class HistoryPage extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView.builder(
-        itemCount: completedJobs.length,
-        itemBuilder: (context, index) {
-          final job = completedJobs[index];
-          final date = getDate(job);
-          final kitchenName = kitchensInfo[job.kitchenId]?.name ?? "--";
-          return Card(
-            elevation: 2.0,
-            margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: ListTile(
-              title: Text(kitchenName),
-              subtitle: Text("x${job.quantity} $date"),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => JobDetailPage(job: job),
-                  ),
-                );
-              },
-            ),
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.builder(
+          itemCount: completedJobs.length,
+          itemBuilder: (context, index) {
+            final job = completedJobs[index];
+            final date = getDate(job);
+            final kitchenName = kitchensInfo[job.kitchenId]?.name ?? "--";
+            return Card(
+              color: theme.colorScheme.tertiaryContainer,
+              shadowColor: theme.colorScheme.inversePrimary,
+              margin: EdgeInsets.symmetric(vertical: 8.0),
+              elevation: 7.5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                title: Text(
+                  kitchenName,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onTertiaryContainer,
+                      fontSize: 24),
+                ),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "x${job.quantity}",
+                      style: TextStyle(
+                          color: theme.colorScheme.onTertiaryContainer,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      "Collected on: $date",
+                      style: TextStyle(
+                          color: theme.colorScheme.onTertiaryContainer,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => JobDetailPage(job: job),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
