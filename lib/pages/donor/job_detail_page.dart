@@ -58,7 +58,9 @@ class _JobDetailPageState extends State<JobDetailPage> {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Viewing Job"),
+        title: Text(
+          "Viewing Job"
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

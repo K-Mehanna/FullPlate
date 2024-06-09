@@ -65,7 +65,12 @@ class _DonorDashboardState extends State<DonorDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Dashboard"),
+        title: Text(
+          "Dashboard",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _addNewRequest(),

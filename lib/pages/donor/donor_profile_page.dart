@@ -197,7 +197,9 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       appBar: AppBar(
         title: Text(
           "Profile",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          ),
         ),
         //backgroundColor: Colors.white,
       ),

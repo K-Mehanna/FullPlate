@@ -96,7 +96,12 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Available donors'),
+        title: const Text(
+          'Available donors',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: SlidingUpPanel(
         color: theme.colorScheme.surface,

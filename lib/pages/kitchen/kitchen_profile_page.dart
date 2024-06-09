@@ -198,7 +198,9 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
       appBar: AppBar(
         title: const Text(
           "Profile",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          ),
         ),
       ),
       body: Padding(

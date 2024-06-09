@@ -19,7 +19,9 @@ class HistoryPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           "History",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          ),
         ),
         backgroundColor: Colors.white,
       ),
