@@ -96,7 +96,7 @@ class HistoryPage extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.production_quantity_limits,
+                        Icon(Icons.numbers,
                             size: 16,
                             color: theme.colorScheme.onTertiaryContainer),
                         const SizedBox(width: 4),
