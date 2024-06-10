@@ -2,7 +2,7 @@ import 'package:cibu/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/kitchen_info.dart';
-import 'package:cibu/pages/donor/job_detail_page.dart';
+import 'package:cibu/pages/donor/job_detail_page_for_history.dart';
 
 class HistoryPage extends StatelessWidget {
   final List<JobInfo> completedJobs;
