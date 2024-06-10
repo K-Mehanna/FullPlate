@@ -93,182 +93,234 @@ class NewRequestPageState extends State<NewRequestPage> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add new items"),
+        title: Text(
+          "Add new items",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 6.0),
         child: Column(
           children: [
             Expanded(
               child: ListView.builder(
                 itemCount: orders.length,
                 itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          DropdownButton<OrderCategory>(
-                            value: orders[index].selectedCategory,
-                            items: OrderCategory.values.map((category) {
-                              return DropdownMenuItem(
-                                value: category,
-                                child: Text(category.value),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                orders[index].selectedCategory = value!;
-                              });
-                            },
-                          ),
-                          if (orders.length != 1)
-                            IconButton(
-                              icon: Icon(Icons.close),
-                              onPressed: () => removeOrder(index),
-                            )
-                          else
-                            (IconButton(
-                              icon: Icon(Icons.close),
-                              onPressed: null,
-                            ))
-                        ],
+                  return Card(
+                    elevation: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                        horizontal: 10.0,
                       ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              DropdownButton<OrderCategory>(
+                                underline: Container(),
+                                value: orders[index].selectedCategory,
+                                items: OrderCategory.values.map((category) {
+                                  return DropdownMenuItem(
+                                    value: category,
+                                    child: Text(category.value),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    orders[index].selectedCategory = value!;
+                                  });
+                                },
+                              ),
+                              if (orders.length != 1)
+                                IconButton(
+                                  icon: Icon(Icons.close),
+                                  onPressed: () => removeOrder(index),
+                                )
+                              else
+                                (IconButton(
+                                  icon: Icon(Icons.close),
+                                  onPressed: null,
+                                ))
+                            ],
+                          ),
+                          Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Quantity",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
                                 Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    ValueListenableBuilder<int>(
-                                      valueListenable:
-                                          orders[index].quantityNotifier,
-                                      builder: (context, value, _) {
-                                        return IconButton(
-                                          icon: Icon(Icons.remove),
-                                          onPressed: (value > 1)
-                                              ? orders[index].decrementQuantity
-                                              : null,
-                                        );
-                                      },
+                                    Text(
+                                      "Quantity",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(
-                                      width: 25,
-                                      child: TextField(
-                                        controller:
-                                            orders[index].quantityController,
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.digitsOnly
-                                        ],
-                                        onSubmitted: (value) {
-                                          int? intValue = int.tryParse(value);
-                                          if (intValue != null) {
-                                            orders[index]
-                                                    .quantityNotifier
-                                                    .value =
-                                                limitedValue(1, 99, intValue);
-                                            orders[index]
-                                                    .quantityController
-                                                    .text =
-                                                limitedValue(1, 99, intValue)
-                                                    .toString();
-                                          } else {
-                                            orders[index]
-                                                    .quantityController
-                                                    .text =
+                                    Row(
+                                      children: [
+                                        ValueListenableBuilder<int>(
+                                          valueListenable:
+                                              orders[index].quantityNotifier,
+                                          builder: (context, value, _) {
+                                            return IconButton(
+                                              icon: Icon(Icons.remove),
+                                              onPressed: (value > 1)
+                                                  ? orders[index]
+                                                      .decrementQuantity
+                                                  : null,
+                                            );
+                                          },
+                                        ),
+                                        SizedBox(
+                                          width: 25,
+                                          child: TextField(
+                                            controller: orders[index]
+                                                .quantityController,
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              //enabledBorder: InputBorder.none,
+                                            ),
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly
+                                            ],
+                                            onSubmitted: (value) {
+                                              int? intValue =
+                                                  int.tryParse(value);
+                                              if (intValue != null) {
                                                 orders[index]
-                                                    .quantityNotifier
-                                                    .value
-                                                    .toString();
-                                          }
-                                        },
-                                        onChanged: (value) {
-                                          int? intValue = int.tryParse(value);
-                                          if (intValue != null) {
-                                            orders[index]
-                                                    .quantityNotifier
-                                                    .value =
-                                                limitedValue(1, 99, intValue);
-                                            orders[index]
+                                                        .quantityNotifier
+                                                        .value =
+                                                    limitedValue(
+                                                        1, 99, intValue);
+                                                orders[index]
                                                     .quantityController
-                                                    .text =
-                                                limitedValue(1, 99, intValue)
+                                                    .text = limitedValue(
+                                                        1, 99, intValue)
                                                     .toString();
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    ValueListenableBuilder<int>(
-                                      valueListenable:
-                                          orders[index].quantityNotifier,
-                                      builder: (context, value, _) {
-                                        return IconButton(
-                                          icon: Icon(Icons.add),
-                                          onPressed: (value < 99)
-                                              ? orders[index].incrementQuantity
-                                              : null,
-                                        );
-                                      },
+                                              } else {
+                                                orders[index]
+                                                        .quantityController
+                                                        .text =
+                                                    orders[index]
+                                                        .quantityNotifier
+                                                        .value
+                                                        .toString();
+                                              }
+                                            },
+                                            onChanged: (value) {
+                                              int? intValue =
+                                                  int.tryParse(value);
+                                              if (intValue != null) {
+                                                orders[index]
+                                                        .quantityNotifier
+                                                        .value =
+                                                    limitedValue(
+                                                        1, 99, intValue);
+                                                orders[index]
+                                                    .quantityController
+                                                    .text = limitedValue(
+                                                        1, 99, intValue)
+                                                    .toString();
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                        ValueListenableBuilder<int>(
+                                          valueListenable:
+                                              orders[index].quantityNotifier,
+                                          builder: (context, value, _) {
+                                            return IconButton(
+                                              icon: Icon(Icons.add),
+                                              onPressed: (value < 99)
+                                                  ? orders[index]
+                                                      .incrementQuantity
+                                                  : null,
+                                            );
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Expiry",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                SizedBox(width: 10),
-                                TextButton.icon(
-                                  icon: Icon(
-                                    Icons.hourglass_bottom_rounded,
-                                    color: Colors.white,
-                                  ),
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          WidgetStateColor.resolveWith(
-                                              getButtonColors)),
-                                  onPressed: () {
-                                    _showDatePicker(orders[index]);
-                                  },
-                                  label: Text(
-                                      overflow: TextOverflow.ellipsis,
-                                      orders[index].getExpiryDescription(),
-                                      style: TextStyle(color: Colors.white)),
-                                )
-                              ],
-                            ),
-                          ]),
-                    ],
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Expiry",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(width: 10),
+                                    TextButton.icon(
+                                      icon: Icon(
+                                        Icons.hourglass_bottom_rounded,
+                                        color: Colors.white,
+                                      ),
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              WidgetStateColor.resolveWith(
+                                                  getButtonColors)),
+                                      onPressed: () {
+                                        _showDatePicker(orders[index]);
+                                      },
+                                      label: Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          orders[index].getExpiryDescription(),
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                    )
+                                  ],
+                                ),
+                              ]),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
             ),
-            ElevatedButton.icon(
-              onPressed: isCategoryAvailable() ? addOrder : null,
-              icon: Icon(Icons.add),
-              label: Text("Add another item"),
-            ),
-            SizedBox(height: 16),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: ElevatedButton.icon(
-                onPressed: submitRequest,
-                icon: Icon(Icons.check),
-                label: Text("Done"),
+            Container(
+              margin: EdgeInsets.only(bottom: 4, top: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton.extended(
+                    heroTag: "add-another-item",
+                    onPressed: isCategoryAvailable() ? addOrder : null,
+                    icon: Icon(Icons.add, color: Colors.black),
+                    label: Text(
+                      "Add another item",
+                      style: TextStyle(color: Colors.grey[800], fontSize: 16.0),
+                    ),
+                    backgroundColor: theme.colorScheme.surfaceContainer,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  FloatingActionButton.extended(
+                    heroTag: "done",
+                    onPressed: submitRequest,
+                    icon: Icon(Icons.check,
+                        color: theme.colorScheme.onPrimaryContainer),
+                    label: Text("Done",
+                        style: TextStyle(
+                            color: theme.colorScheme.onPrimaryContainer,
+                            fontSize: 16.0)),
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ],
               ),
-            ),
+            )
           ],
         ),
       ),

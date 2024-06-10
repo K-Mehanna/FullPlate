@@ -154,7 +154,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      tileColor: theme.colorScheme.surfaceBright,
+                      tileColor: theme.colorScheme.inversePrimary,
                       leading: Icon(
                         offer.category.icon.icon,
                         color: theme.colorScheme.onSurfaceVariant,

@@ -23,7 +23,6 @@ class HistoryPage extends StatelessWidget {
     var month = time.month;
     var day = time.day;
 
-    //return time.toString();
     return "$day ${DateFormat('MMMM').format(DateTime(0, month))} $year";
   }
 
@@ -57,38 +56,65 @@ class HistoryPage extends StatelessWidget {
               child: ListTile(
                 shape: ShapeBorder.lerp(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                   0.5,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                     vertical: 10.0, horizontal: 15.0),
-                title: Text(
-                  donorsInfo[job.donorId]?.name ?? "--",
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onTertiaryContainer,
-                      fontSize: 999999999999999),
-                      // fontSize: 16),
-                ),
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                title: Row(
                   children: [
-                    Text(
-                      "x${job.quantity}",
-                      style: TextStyle(
-                          color: theme.colorScheme.onTertiaryContainer,
-                          fontWeight: FontWeight.w500),
+                    Icon(
+                      Icons.location_on,
+                      size: 18,
+                      color: theme.colorScheme.onTertiaryContainer,
                     ),
+                    const SizedBox(width: 4),
                     Text(
-                      "Collected on: $date",
+                      donorsInfo[job.donorId]?.name ?? "--",
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
+                          fontWeight: FontWeight.bold,
                           color: theme.colorScheme.onTertiaryContainer,
-                          fontWeight: FontWeight.w600),
+                          fontSize: 18),
+                    ),
+                  ],
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.production_quantity_limits,
+                            size: 16,
+                            color: theme.colorScheme.onTertiaryContainer),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Quantity: ${job.quantity}",
+                          style: TextStyle(
+                              color: theme.colorScheme.onTertiaryContainer,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.date_range,
+                            size: 16,
+                            color: theme.colorScheme.onTertiaryContainer),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Collected on: $date",
+                          style: TextStyle(
+                              color: theme.colorScheme.onTertiaryContainer,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
                     ),
                   ],
                 ),

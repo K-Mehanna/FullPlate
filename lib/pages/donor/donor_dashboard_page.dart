@@ -112,6 +112,9 @@ class _DonorDashboardState extends State<DonorDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSectionTitle("Unassigned", pendingOffers.length),
+                  SizedBox(
+                    height: 4,
+                  ),
                   Expanded(
                     child: ListView(
                       children: pendingOffers.map(buildOfferItem).toList(),
@@ -141,7 +144,9 @@ class _DonorDashboardState extends State<DonorDashboard> {
   }
 
   Widget buildJobItem(JobInfo job) {
+    final ThemeData theme = Theme.of(context);
     return Card(
+      color: theme.colorScheme.inversePrimary,
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
         onTap: () {
@@ -185,6 +190,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
   }
 
   Widget buildOfferItem(OfferInfo offer) {
+    final ThemeData theme = Theme.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
@@ -249,45 +255,56 @@ class _DonorDashboardState extends State<DonorDashboard> {
                           ),
                         ),
                         actions: [
-                          Container(
-                            //color: Colors.red,
-                            //padding: EdgeInsets.symmetric(horizontal: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: Colors.blueGrey.shade50,
-                            ),
-                            child: TextButton(
-                              style: ButtonStyle(
-                                  padding: WidgetStateProperty.all(
-                                      EdgeInsets.symmetric(horizontal: 20))),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                "Cancel",
-                                //style: TextStyle(color: Colors.white),
+                          TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(theme
+                                  .colorScheme.tertiaryContainer
+                                  .withOpacity(0.2)),
+                              shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              padding: WidgetStateProperty.all(
+                                EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 13),
                               ),
                             ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(30),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.grey.shade900),
                             ),
-                            child: TextButton(
-                              onPressed: () {
-                                ordersManager.removeOpenOffer(
-                                    donorId, offer, () {});
-                                Navigator.of(context).pop();
-                              },
-                              style: ButtonStyle(
-                                  padding: WidgetStateProperty.all(
-                                      EdgeInsets.symmetric(horizontal: 20))),
-                              child: Text(
-                                "Remove",
-                                style: TextStyle(
-                                  color: Colors.white,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ordersManager.removeOpenOffer(
+                                  donorId, offer, () {});
+                              Navigator.of(context).pop();
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  // WidgetStateProperty.all(Colors.red),
+                                  WidgetStateProperty.all(
+                                      theme.colorScheme.errorContainer),
+                              shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
+                              ),
+                              padding: WidgetStateProperty.all(
+                                EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 13,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              "Remove",
+                              style: TextStyle(
+                                color: Colors.white,
                               ),
                             ),
                           ),

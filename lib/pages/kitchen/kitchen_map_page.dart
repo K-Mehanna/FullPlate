@@ -189,9 +189,6 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
               _pc.animatePanelToPosition(0.5).then((a) {
                 panelPosition = _pc.panelPosition;
               });
-              // _pc.open().then((a) {
-              //   panelPosition = _pc.panelPosition;
-              // });
             } else if (panelPosition < 0.55) {
               _pc.open().then((a) {
                 panelPosition = _pc.panelPosition;
@@ -203,7 +200,14 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
             }
           },
           child: Container(
-            color: Colors.transparent,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+              //color: theme.colorScheme.surfaceContainer,
+            ),
+            //color: theme.colorScheme.surfaceContainer, //Colors.transparent,
             width: double.infinity,
             child: Column(
               children: [
@@ -214,6 +218,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                     'Available donors',
                     style: TextStyle(
                       fontSize: 20,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -248,7 +253,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                             'Sort by',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Theme.of(context).hintColor,
+                              color: Colors.grey.shade700,
                             ),
                           ),
                         ],
@@ -284,7 +289,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: Colors.black26,
+                            color: Colors.grey.shade600,
                           ),
                         ),
                       ),
@@ -323,60 +328,36 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                     donorsManager.getOfferDonorsCompletion(createMarkers);
                   });
                 },
-                /*
-                Card(
-                  elevation: 3,
-                  color: theme.colorScheme.surfaceContainer,
-                  child: ListTile(
-                    title: FittedBox(
-                      alignment: Alignment.centerLeft,
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        offer.category.value,
-                        style:
-                            // theme.textTheme.titleLarge!.copyWith(
-                            //   fontWeight: FontWeight.bold,
-                            //   //color: theme.colorScheme.onSecondary,
-                            // ),
-                            TextStyle(
-                          fontWeight: FontWeight.w500,
-                          //color: theme.colorScheme.onSecondary,
-                        ),
-                      ),
-                    ),
-                 */
                 child: Container(
                   margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
                   //padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
                   child: Card(
-                      // decoration: BoxDecoration(
-                      //   color: theme.colorScheme.surfaceContainer,
-                      //   border: Border.all(color: Colors.grey.shade400),
-                      //   borderRadius: BorderRadius.circular(10),
-                      // ),
-                      child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          donors[index].name,
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              'x${donors[index].quantity}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.inversePrimary,
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            donors[index].name,
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                'x${donors[index].quantity}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  )),
+                  ),
                 ),
               );
             },

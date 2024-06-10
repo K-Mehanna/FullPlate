@@ -19,6 +19,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: IndexedStack(
@@ -27,25 +28,35 @@ class _DonorHomePageState extends State<DonorHomePage> {
         ),
         //_pages[_selectedIndex]
       ),
-      bottomNavigationBar: NavigationBar(
-        elevation: 10,
-        surfaceTintColor: Theme.of(context).colorScheme.inversePrimary,
-        selectedIndex: _selectedIndex,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard'
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person),
-            label: 'Profile'
-          ),
-        ],
-        onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        }
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: theme.colorScheme.surfaceDim.withOpacity(0.5),
+              blurRadius: 5,
+            ),
+          ],
+        ),
+        child: NavigationBar(
+          elevation: 10,
+          surfaceTintColor: Theme.of(context).colorScheme.inversePrimary,
+          selectedIndex: _selectedIndex,
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard'
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person),
+              label: 'Profile'
+            ),
+          ],
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
+        ),
       ),
     );
   }

@@ -27,6 +27,8 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
     return Scaffold(
       body: SafeArea(
         // child: _pages[_selectedIndex],
@@ -35,15 +37,25 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
           children: _pages,
         ),
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: theme.colorScheme.surfaceDim.withOpacity(0.5),
+              blurRadius: 5,
+            ),
+          ],
+        ),
+        child: NavigationBar(
           selectedIndex: _selectedIndex,
           destinations: const [
-            NavigationDestination(
-                icon: Icon(Icons.dashboard), label: 'Dashboard'),
+            NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
             NavigationDestination(icon: Icon(Icons.map), label: 'Map'),
             NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
           ],
-          onDestinationSelected: onTapped),
+          onDestinationSelected: onTapped
+        )
+      ),
     );
   }
 }

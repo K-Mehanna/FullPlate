@@ -144,7 +144,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
                     },
                     icon: Icon(Icons.check,
                         color: theme.colorScheme.onPrimaryContainer),
-                    label: Text("Job Complete",
+                    label: Text("Job Collected",
                         style: TextStyle(
                             color: theme.colorScheme.onPrimaryContainer)),
                     backgroundColor: theme.colorScheme.primaryContainer,
