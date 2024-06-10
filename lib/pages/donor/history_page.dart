@@ -1,8 +1,8 @@
-import 'package:cibu/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/pages/donor/job_detail_page_for_history.dart';
+import 'package:intl/intl.dart';
 
 class HistoryPage extends StatelessWidget {
   final List<JobInfo> completedJobs;
@@ -23,7 +23,8 @@ class HistoryPage extends StatelessWidget {
     var month = time.month;
     var day = time.day;
 
-    return "$day / $month / $year";
+    //return time.toString();
+    return "$day ${DateFormat('MMMM').format(DateTime(0, month))} $year";
   }
 
   @override
@@ -52,32 +53,75 @@ class HistoryPage extends StatelessWidget {
               margin: EdgeInsets.symmetric(vertical: 8.0),
               elevation: 7.5,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(10.0),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                title: Text(
-                  kitchenName,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onTertiaryContainer,
-                      fontSize: 24),
+                shape: ShapeBorder.lerp(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  0.5,
                 ),
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10.0, horizontal: 15.0),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "x${job.quantity}",
-                      style: TextStyle(
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 18,
                           color: theme.colorScheme.onTertiaryContainer,
-                          fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          kitchenName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onTertiaryContainer,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "Collected on: $date",
-                      style: TextStyle(
-                          color: theme.colorScheme.onTertiaryContainer,
-                          fontWeight: FontWeight.w500),
+                  ],
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.production_quantity_limits,
+                            size: 16,
+                            color: theme.colorScheme.onTertiaryContainer),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Quantity: ${job.quantity}",
+                          style: TextStyle(
+                              color: theme.colorScheme.onTertiaryContainer,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.date_range,
+                            size: 16,
+                            color: theme.colorScheme.onTertiaryContainer),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Collected on: $date",
+                          style: TextStyle(
+                              color: theme.colorScheme.onTertiaryContainer,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
                     ),
                   ],
                 ),

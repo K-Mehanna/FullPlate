@@ -63,6 +63,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height / 3;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -82,23 +83,41 @@ class _DonorDashboardState extends State<DonorDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: screenHeight,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle(
+                        "Waiting for pickup",
+                        acceptedJobs.length,
+                      ),
+                      ListView(
+                        shrinkWrap: true,
+                        children: acceptedJobs.map(buildJobItem).toList(),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 15),
             Expanded(
-              child: ListView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionTitle(
-                            "Waiting for pickup", acceptedJobs.length),
-                        ...acceptedJobs.map(buildJobItem)
-                      ]),
-                  SizedBox(height: 15),
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionTitle("Unassigned", pendingOffers.length),
-                        ...pendingOffers.map(buildOfferItem)
-                      ])
+                  _buildSectionTitle("Unassigned", pendingOffers.length),
+                  Expanded(
+                    child: ListView(
+                      children: pendingOffers.map(buildOfferItem).toList(),
+                    ),
+                  ),
+                  //...pendingOffers.map(buildOfferItem)
                 ],
               ),
             ),
@@ -122,10 +141,8 @@ class _DonorDashboardState extends State<DonorDashboard> {
   }
 
   Widget buildJobItem(JobInfo job) {
-    return ListTile(
-      leading: Icon(Icons.person),
-      title: Text(kitchensInfo[job.kitchenId]?.name ?? "..."),
-      trailing: Text("x${job.quantity}"),
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
       onTap: () {
         Navigator.push(
           context,
@@ -134,119 +151,171 @@ class _DonorDashboardState extends State<DonorDashboard> {
           ),
         );
       },
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10.0,
+            vertical: 16.0,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.person),
+              SizedBox(width: 8),
+              Text(
+                kitchensInfo[job.kitchenId]?.name ?? "...",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Spacer(),
+              Text(
+                "x${job.quantity}",
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(width: 16),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   Widget buildOfferItem(OfferInfo offer) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            offer.category.icon,
-            SizedBox(width: 8),
-            Text(offer.category.value, style: TextStyle(fontSize: 18)),
-          ],
-        ),
-        Row(
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  Icons.hourglass_bottom_rounded,
-                ),
+                offer.category.icon,
+                SizedBox(width: 10),
                 Text(
-                  offer.getExpiryDescription(),
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  offer.category.value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
-            SizedBox(width: 12),
-            Text(
-              "x${offer.quantity}",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.close,
-                size: 20,
-                color: Colors.grey.shade600,
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: Text(
-                      "Remove item",
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(
+                      Icons.hourglass_bottom_rounded,
+                    ),
+                    Text(
+                      offer.getExpiryDescription(),
                       style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold
                       ),
                     ),
-                    content: Text(
-                      "Are you sure you want to remove this item?",
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    actions: [
-                      Container(
-                        //color: Colors.red,
-                        //padding: EdgeInsets.symmetric(horizontal: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.blueGrey.shade50,
-                        ),
-                        child: TextButton(
-                          style: ButtonStyle(
-                              padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(horizontal: 20))),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            "Cancel",
-                            //style: TextStyle(color: Colors.white),
+                  ],
+                ),
+                SizedBox(width: 12),
+                Text(
+                  "x${offer.quantity}",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 20,
+                    color: Colors.grey.shade600,
+                  ),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: Text(
+                          "Remove item",
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(30),
+                        content: Text(
+                          "Are you sure you want to remove this item?",
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
                         ),
-                        child: TextButton(
-                          onPressed: () {
-                            ordersManager.removeOpenOffer(
-                                donorId, offer, () {});
-                            Navigator.of(context).pop();
-                          },
-                          style: ButtonStyle(
-                              padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(horizontal: 20))),
-                          child: Text(
-                            "Remove",
-                            style: TextStyle(
-                              color: Colors.white,
+                        actions: [
+                          Container(
+                            //color: Colors.red,
+                            //padding: EdgeInsets.symmetric(horizontal: 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              color: Colors.blueGrey.shade50,
+                            ),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                  padding: WidgetStateProperty.all(
+                                      EdgeInsets.symmetric(horizontal: 20))),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "Cancel",
+                                //style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                ordersManager.removeOpenOffer(
+                                    donorId, offer, () {});
+                                Navigator.of(context).pop();
+                              },
+                              style: ButtonStyle(
+                                  padding: WidgetStateProperty.all(
+                                      EdgeInsets.symmetric(horizontal: 20))),
+                              child: Text(
+                                "Remove",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildSectionTitle(String title, int count) {
-    return Text("$title ($count)",
-        style: TextStyle(fontWeight: FontWeight.bold));
+    return Text(
+      "$title ($count)",
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+    );
   }
 }

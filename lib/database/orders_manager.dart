@@ -250,8 +250,12 @@ class OrdersManager {
 
   void getOpenOffersCompletion(
       String donorId, void Function(List<OfferInfo>) callback) {
-    final query =
-        _db.collection("donors").doc(donorId).collection("openOffers");
+    final query = _db
+      .collection("donors")
+      .doc(donorId)
+      .collection("openOffers")
+      .where("expiryDate", isGreaterThan: Timestamp.fromDate(DateTime.now()))
+      .orderBy("expiryDate");
 
     _fetchOfferCallback(query, callback);
   }
@@ -325,8 +329,12 @@ class OrdersManager {
 
   void setOpenOffersListener(
       String donorId, void Function(List<OfferInfo>) callback) {
-    final query =
-        _db.collection("donors").doc(donorId).collection("openOffers");
+    final query = _db
+      .collection("donors")
+      .doc(donorId)
+      .collection("openOffers")
+      .where("expiryDate", isGreaterThan: Timestamp.fromDate(DateTime.now()))
+      .orderBy("expiryDate");
 
     query.snapshots().listen((querySnapshot) {
       List<OfferInfo> offers = [];

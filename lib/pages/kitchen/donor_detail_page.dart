@@ -138,7 +138,19 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("Viewing Request"),
+        actions: [
+          IconButton(
+            onPressed: () => MapsLauncher.launchQuery(widget.donorInfo.address),
+            icon: Icon(Icons.map),
+            color: theme.colorScheme.primary,
+          )
+        ],
+        title: Text(
+          "Viewing Request",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -162,19 +174,70 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () => MapsLauncher.launchQuery(widget.donorInfo.address),
-              // ignore: sized_box_for_whitespace
-              child: Container(
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildDetailRow("Donor name", widget.donorInfo.name),
-                    SizedBox(height: 16),
-                    _buildDetailRow("Donor address", widget.donorInfo.address),
-                    SizedBox(height: 16),
-                  ],
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                color: theme.colorScheme.surfaceContainer,
+                elevation: 5,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () =>
+                      MapsLauncher.launchQuery(widget.donorInfo.address),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildDetailRow("Donor name", widget.donorInfo.name),
+                        SizedBox(height: 16),
+                        _buildDetailRow(
+                            "Donor address", widget.donorInfo.address),
+                        SizedBox(height: 16),
+                        Text(
+                          "Distance/time to donor",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // SizedBox(
+                            //   width: 5,
+                            // ),
+                            Icon(
+                              Icons.directions_car,
+                            ),
+                            SizedBox(
+                              width: 30,
+                            ),
+                            Text(carStats.value["distance"]["text"]),
+                            SizedBox(
+                              width: 30,
+                            ),
+                            Text(carStats.value["duration"]["text"]),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // SizedBox(
+                            //   width: 5,
+                            // ),
+                            Icon(
+                              Icons.directions_walk,
+                            ),
+                            SizedBox(
+                              width: 30,
+                            ),
+                            Text(walkingStats.value["distance"]["text"]),
+                            SizedBox(
+                              width: 30,
+                            ),
+                            Text(walkingStats.value["duration"]["text"]),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -182,29 +245,8 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
             // SizedBox(height: 16),
             // _buildDetailRow("Donor address", widget.donorInfo.address),
             // SizedBox(height: 16),
-            Text(
-              "Distance/time to donor (driving/walking)",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(carStats.value["distance"]["text"]),
-                    Text(carStats.value["duration"]["text"]),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(walkingStats.value["distance"]["text"]),
-                    Text(walkingStats.value["duration"]["text"]),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
+
+            SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.only(right: 40.0, left: 16.0),
               child: Row(
@@ -224,7 +266,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                 ],
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 10),
             Expanded(child: _buildOfferItemSelection(openOffers)),
           ],
         ),
@@ -299,6 +341,7 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
         var controller = controllers[offer.offerId]!;
 
         return Card(
+          elevation: 3,
           color: theme.colorScheme.inversePrimary,
           child: ListTile(
             title: FittedBox(
@@ -397,14 +440,11 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
   }
 }
 
-
 class DonorInfoCard extends StatelessWidget {
   const DonorInfoCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      
-    );
+    return Card();
   }
 }

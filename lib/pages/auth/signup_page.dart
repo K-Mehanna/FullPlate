@@ -263,11 +263,11 @@ class _SignUpPageState extends State<SignUpPage> {
                       //mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Image.network(
-                          'http://pngimg.com/uploads/google/google_PNG19635.png',
+                        Image(
+                          image: AssetImage('lib/assets/google.png'),
                           fit: BoxFit.cover,
                           height: 36.0,
-                        ),
+                        ),  
                         SizedBox(width: 12.0),
                         Text(
                           'Sign Up with Google',

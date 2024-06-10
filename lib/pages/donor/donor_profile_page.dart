@@ -33,6 +33,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     fetchCompletedJobs();
 
     DonorsManager().getDonorCompletion(_auth.currentUser!.uid, (donor) {
+      if (!mounted) return;
       setState(() {
         this.donor = donor;
       });
@@ -47,11 +48,13 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       user!.uid,
       null,
       (jobs) {
+        if (!mounted) return;
         setState(() {
           completedJobs = jobs;
         });
         for (var job in jobs) {
           KitchensManager().getKitchenCompletion(job.kitchenId, (kitchen) {
+            if (!mounted) return;
             setState(() {
               kitchensInfo[kitchen.kitchenId] = kitchen;
             });

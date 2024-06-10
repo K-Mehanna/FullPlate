@@ -75,9 +75,36 @@ class DonorsManager {
 
   void addDonor(DonorInfo donorInfo) {
     _db
-        .collection("donors")
-        .doc(donorInfo.donorId)
-        .set(donorInfo.toFirestore())
-        .then((a) {}, onError: (e) => print("Error: in addDonor"));
+      .collection("donors")
+      .doc(donorInfo.donorId)
+      .set(donorInfo.toFirestore())
+      .then((a) {}, onError: (e) => print("Error: in addDonor"));
+  }
+
+  void deleteDonorCompletion(DonorInfo donor, void Function(bool) onCompletion) {
+    if (donor.quantity > 0) {
+      onCompletion(false);
+      return;
+    }
+
+    final openOffersRef = _db
+      .collection("donors")
+      .doc(donor.donorId)
+      .collection("openOffers");
+    
+    openOffersRef
+      .get()
+      .then((docSnapshots) {
+        bool outcome = true;
+        
+        for (var docSnapshot in docSnapshots.docs) {
+          outcome &= docSnapshot.exists;
+          openOffersRef
+            .doc(docSnapshot.id)
+            .delete();
+        }
+
+        onCompletion(outcome);
+      }, onError: (e) => print("DonorsManager\n - deleteDonor $e"));
   }
 }

@@ -51,7 +51,7 @@ class NewRequestPageState extends State<NewRequestPage> {
       final newItem = OfferInfo(
           offerId: "unassigned",
           quantity: order.quantityNotifier.value,
-          expiryDate: order.expiryDate,
+          expiryDate: order.expiryDate ?? DateTime.utc(4000, 1, 1),
           category: order.selectedCategory);
 
       if (newItem.quantity > 0) offers.add(newItem);

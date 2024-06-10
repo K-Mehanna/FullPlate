@@ -5,6 +5,7 @@ import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class JobDetailPage extends StatefulWidget {
   final JobInfo job;
@@ -53,6 +54,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Viewing Job"),
@@ -61,8 +63,10 @@ class _JobDetailPageState extends State<JobDetailPage> {
             onPressed: _onShareWithResult,
             icon: Icon(Icons.share),
           ),
-          SizedBox(
-            width: 10,
+          IconButton(
+            onPressed: () => MapsLauncher.launchQuery(donor!.address),
+            icon: Icon(Icons.map),
+            color: theme.colorScheme.primary,
           ),
         ],
       ),

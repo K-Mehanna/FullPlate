@@ -21,7 +21,8 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
 
   final _auth = FirebaseAuth.instance;
 
-  late final String kitchenId; //= "vArN1MQqQfXSTTbgSP6MT5nzLz42"; //FirebaseAuth.instance.currentUser!.uid;
+  late final String
+      kitchenId; //= "vArN1MQqQfXSTTbgSP6MT5nzLz42"; //FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
       processDonorsInfo(newAccepted);
       if (!mounted) return;
       setState(() {
+        if (!mounted) return;
         acceptedJobs.clear();
         acceptedJobs.addAll(newAccepted);
       });
@@ -56,13 +58,14 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildSectionTitle("Active Jobs", acceptedJobs.length),
             Expanded(
-              child: ListView(children: [
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  _buildSectionTitle("Active Jobs", acceptedJobs.length),
-                  ...acceptedJobs.map(buildJobItem)
-                ])
-              ]),
+              child: ListView.builder(
+                itemCount: acceptedJobs.length,
+                itemBuilder: (context, index) {
+                  return buildJobItem(acceptedJobs[index]);
+                },
+              ),
             ),
           ],
         ),
@@ -77,6 +80,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
       DonorsManager().getDonorCompletion(order.donorId, (donor) {
         if (!mounted) return;
         setState(() {
+          if (!mounted) return;
           donorsInfo[order.donorId] = donor;
         });
       });
@@ -100,7 +104,12 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   }
 
   Widget _buildSectionTitle(String title, int count) {
-    return Text("$title ($count)",
-        style: TextStyle(fontWeight: FontWeight.bold));
+    return Text(
+      "$title ($count)",
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+    );
   }
 }

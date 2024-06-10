@@ -59,7 +59,10 @@ class _JobDetailPageState extends State<JobDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Viewing Job"
+          "Viewing Job",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: Padding(
@@ -94,7 +97,8 @@ class _JobDetailPageState extends State<JobDetailPage> {
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [FloatingActionButton.extended(
+                children: [
+                  FloatingActionButton.extended(
                     heroTag: "job-cancel",
                     onPressed: () {
                       OrdersManager().cancelJob(widget.job, () {
@@ -119,9 +123,11 @@ class _JobDetailPageState extends State<JobDetailPage> {
                         Navigator.pop(context);
                       });
                     },
-                    icon: Icon(Icons.check, color: theme.colorScheme.primary),
+                    icon: Icon(Icons.check,
+                        color: theme.colorScheme.onPrimaryContainer),
                     label: Text("Job Complete",
-                        style: TextStyle(color: theme.colorScheme.primary)),
+                        style: TextStyle(
+                            color: theme.colorScheme.onPrimaryContainer)),
                     backgroundColor: theme.colorScheme.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -139,7 +145,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
   Widget _buildDetailRow(String label, String value) {
     // ignore: unused_local_variable
     final ThemeData theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Column(
@@ -171,30 +177,33 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
   Widget _buildOfferList() {
     final ThemeData theme = Theme.of(context);
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: constituentOffers.length,
-      itemBuilder: (context, index) {
-        final offer = constituentOffers[index];
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: EdgeInsets.symmetric(vertical: 8.0),
-          child: ListTile(
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.5, // Adjust the height as needed
+      child: ListView.builder(
+        itemCount: constituentOffers.length,
+        itemBuilder: (context, index) {
+          final offer = constituentOffers[index];
+          return Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            tileColor: theme.colorScheme.secondaryContainer,
-            leading: Icon(offer.category.icon.icon,
-                color: Theme.of(context).primaryColor),
-            title: Text(offer.category.value.toString(),
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            trailing:
-                Text(offer.quantity.toString(), style: TextStyle(fontSize: 16)),
-          ),
-        );
-      },
+            margin: EdgeInsets.symmetric(vertical: 8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              tileColor: theme.colorScheme.inversePrimary,
+              leading: Icon(
+                offer.category.icon.icon,
+              ),
+              title: Text(offer.category.value.toString(),
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              trailing:
+                  Text(offer.quantity.toString(), style: TextStyle(fontSize: 16)),
+            ),
+          );
+        },
+      ),
     );
   }
 }

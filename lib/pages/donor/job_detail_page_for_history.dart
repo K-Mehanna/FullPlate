@@ -59,7 +59,8 @@ class _JobDetailPageState extends State<JobDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Viewing Job"
+          "Viewing Job",
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -100,7 +101,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
   Widget _buildDetailRow(String label, String value) {
     // ignore: unused_local_variable
     final ThemeData theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Column(
@@ -113,7 +114,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(value, style: TextStyle(color: Colors.grey[700], fontSize: 16)),
+          Text(value, style: TextStyle(color: Colors.grey[900], fontSize: 16)),
         ],
       ),
     );
@@ -138,6 +139,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
       itemBuilder: (context, index) {
         final offer = constituentOffers[index];
         return Card(
+          elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -146,9 +148,9 @@ class _JobDetailPageState extends State<JobDetailPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            tileColor: theme.colorScheme.secondaryContainer,
+            tileColor: theme.colorScheme.inversePrimary,
             leading: Icon(offer.category.icon.icon,
-                color: Theme.of(context).primaryColor),
+                color: Theme.of(context).colorScheme.onSurface),
             title: Text(offer.category.value.toString(),
                 style: TextStyle(fontWeight: FontWeight.bold)),
             trailing:

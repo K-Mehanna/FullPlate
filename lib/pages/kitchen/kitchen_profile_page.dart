@@ -35,6 +35,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
 
     KitchensManager().getKitchenCompletion(_auth.currentUser!.uid, (kitchen) {
       setState(() {
+        if (!mounted) return;
         this.kitchen = kitchen;
       });
     });
@@ -48,11 +49,13 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
       FirebaseAuth.instance.currentUser!.uid,
       (jobs) {
         setState(() {
+          if (!mounted) return;
           _completedJobs = jobs;
         });
         for (var job in jobs) {
           DonorsManager().getDonorCompletion(job.donorId, (donor) {
             setState(() {
+              if (!mounted) return;
               _donorsInfo[donor.donorId] = donor;
             });
           });
@@ -88,7 +91,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
       builder: (context) {
         return AlertDialog.adaptive(
           title: const Text("Are you sure you want to delete your account?"),
-          content: const Text("This will delete ALL your currently accepted and pending jobs.\n\nThis action cannot be undone."),
+          content: const Text(
+              "This will delete ALL your currently accepted and pending jobs.\n\nThis action cannot be undone."),
           actions: [
             adaptiveAction(
               context: context,
@@ -124,14 +128,14 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
   Future<void> _deleteAccount(BuildContext context) async {
     try {
       await FirebaseFirestore.instance
-        .collection("users")
-        .doc(_auth.currentUser!.uid)
-        .delete();
+          .collection("users")
+          .doc(_auth.currentUser!.uid)
+          .delete();
 
       await FirebaseFirestore.instance
-        .collection("kitchens")
-        .doc(_auth.currentUser!.uid)
-        .delete();
+          .collection("kitchens")
+          .doc(_auth.currentUser!.uid)
+          .delete();
 
       // faraz can you delete the jobs that are not completed (i.e pending and accepted jobs)
       // also need to send cancel request
@@ -157,15 +161,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
     }
   }
 
-  
-
-  Widget profileButton(
-    BuildContext context, 
-    String text, 
-    IconData icon,
-    void Function() onPressed, 
-    Color backgroundColor, 
-    Color textColor) {
+  Widget profileButton(BuildContext context, String text, IconData icon,
+      void Function() onPressed, Color backgroundColor, Color textColor) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -197,9 +194,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
       appBar: AppBar(
         title: const Text(
           "Profile",
-          style: TextStyle(
-            fontWeight: FontWeight.bold
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -207,53 +202,60 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListTile(
-              title: Text(
-                "Name",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
-              ),
-              subtitle: Text(
-                kitchen?.name ?? '',
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text(
-                "Address",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
-              ),
-              subtitle: Text(
-                kitchen?.address ?? '',
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text(
-                "Email",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
-              ),
-              subtitle: Text(
-                _auth.currentUser!.email!,
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
+            Card(
+              color: theme.colorScheme.surfaceContainer,
+              elevation: 5,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      "Name",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    subtitle: Text(
+                      kitchen?.name ?? '', // Placeholder name
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Address",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    subtitle: Text(
+                      kitchen?.address ?? '', // Placeholder address
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Email",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    subtitle: Text(
+                      _auth.currentUser!.email!, // Placeholder email
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 16.0),
-
             profileButton(
                 context,
                 "View History",
@@ -261,9 +263,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 _navigateToHistoryPage,
                 theme.colorScheme.tertiaryContainer,
                 theme.colorScheme.onTertiaryContainer),
-
             SizedBox(height: 16.0),
-
             profileButton(
                 context,
                 "Sign Out",
@@ -271,9 +271,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 _signOut,
                 theme.colorScheme.inverseSurface,
                 theme.colorScheme.onInverseSurface),
-              
             SizedBox(height: 16.0),
-
             profileButton(
                 context,
                 "Delete Account",

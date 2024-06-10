@@ -74,7 +74,19 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   @override
   void initState() {
     super.initState();
-    print('in here');
+
+    // ordersManager.setJobsListener(OrderStatus.ACCEPTED, null, kitchenId,
+    //     (newAccepted) {
+    //   processDonorsInfo(newAccepted);
+    //   if (!mounted) return;
+    //   setState(() {
+    //     if (!mounted) return;
+    //     acceptedJobs.clear();
+    //     acceptedJobs.addAll(newAccepted);
+    //   });
+    // })
+
+    // ordersManager.setOpenOffersListener(donorId, callback)
 
     donorsManager.getOfferDonorsCompletion(createMarkers);
 
@@ -87,6 +99,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
       mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
 
       setState(() {
+        if (!mounted) {
+          return;
+        }
         currentPosition = newPosition;
       });
     });
@@ -151,6 +166,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
       },
       onApplyButtonClick: (list) {
         setState(() {
+          if (!mounted) {
+            return;
+          }
           selectedCategoryList = List.from(list!);
           donorsManager.getFilteredOfferDonorsCompletion(
               createMarkers, selectedCategoryList);
@@ -251,6 +269,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                       value: sortParam,
                       onChanged: (String? value) {
                         setState(() {
+                          if (!mounted) {
+                            return;
+                          }
                           sortParam = value;
                           donorsManager.getFilteredOfferDonorsCompletion(
                               createMarkers, selectedCategoryList);
@@ -298,31 +319,64 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                         donorInfo: donors[index],
                       ),
                     ),
-                  );
+                  ).then((a) {
+                    donorsManager.getOfferDonorsCompletion(createMarkers);
+                  });
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.inversePrimary,
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
-                  child: Row(
-                    children: [
-                      Text(
-                        donors[index].name,
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text('x${donors[index].quantity}'),
+                /*
+                Card(
+                  elevation: 3,
+                  color: theme.colorScheme.surfaceContainer,
+                  child: ListTile(
+                    title: FittedBox(
+                      alignment: Alignment.centerLeft,
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        offer.category.value,
+                        style:
+                            // theme.textTheme.titleLarge!.copyWith(
+                            //   fontWeight: FontWeight.bold,
+                            //   //color: theme.colorScheme.onSecondary,
+                            // ),
+                            TextStyle(
+                          fontWeight: FontWeight.w500,
+                          //color: theme.colorScheme.onSecondary,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                 */
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  //padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                  child: Card(
+                      // decoration: BoxDecoration(
+                      //   color: theme.colorScheme.surfaceContainer,
+                      //   border: Border.all(color: Colors.grey.shade400),
+                      //   borderRadius: BorderRadius.circular(10),
+                      // ),
+                      child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          donors[index].name,
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'x${donors[index].quantity}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
                 ),
               );
             },
@@ -342,9 +396,11 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   }
 
   void createMarkers(List<DonorInfo> donorList) {
-    print('donors: $donorList');
     print("\nKitchenMapPageState - createMarkers()\n");
     setState(() {
+      if (!mounted) {
+        return;
+      }
       markers.clear();
 
       if (sortParam == 'Distance') {
@@ -357,11 +413,13 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
       }
 
       donors = donorList;
-      print('donors: $donors');
     });
 
     for (var donor in donorList) {
       setState(() {
+        if (!mounted) {
+          return;
+        }
         markers.add(
           Marker(
             //icon: image,
@@ -378,7 +436,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                       donorInfo: donor,
                     ),
                   ),
-                );
+                ).then((a) {
+                  donorsManager.getOfferDonorsCompletion(createMarkers);
+                });
               },
             ),
           ),
@@ -386,5 +446,4 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
       });
     }
   }
-  //);
 }

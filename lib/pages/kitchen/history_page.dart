@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/pages/kitchen/job_detail_page.dart';
+import 'package:intl/intl.dart';
 
 class HistoryPage extends StatelessWidget {
   final List<JobInfo> completedJobs;
@@ -22,7 +23,8 @@ class HistoryPage extends StatelessWidget {
     var month = time.month;
     var day = time.day;
 
-    return "$day/$month/$year";
+    //return time.toString();
+    return "$day ${DateFormat('MMMM').format(DateTime(0, month))} $year";
   }
 
   @override
@@ -53,14 +55,25 @@ class HistoryPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                shape: ShapeBorder.lerp(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  0.5,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10.0, horizontal: 15.0),
                 title: Text(
                   donorsInfo[job.donorId]?.name ?? "--",
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.onTertiaryContainer,
-                      fontSize: 24),
+                      fontSize: 999999999999999),
+                      // fontSize: 16),
                 ),
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,7 +88,7 @@ class HistoryPage extends StatelessWidget {
                       "Collected on: $date",
                       style: TextStyle(
                           color: theme.colorScheme.onTertiaryContainer,
-                          fontWeight: FontWeight.w500),
+                          fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),

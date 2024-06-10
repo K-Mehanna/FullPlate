@@ -29,6 +29,7 @@ class _KitchenHomePageState extends State<KitchenHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
+        // child: _pages[_selectedIndex],
         child: IndexedStack(
           index: _selectedIndex,
           children: _pages,
