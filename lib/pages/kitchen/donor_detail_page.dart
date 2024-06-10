@@ -195,7 +195,10 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                         SizedBox(height: 16),
                         Text(
                           "Distance/time to donor",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -209,11 +212,17 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                             SizedBox(
                               width: 30,
                             ),
-                            Text(carStats.value["distance"]["text"]),
+                            Text(
+                              carStats.value["distance"]["text"],
+                              style: TextStyle(fontSize: 16),
+                            ),
                             SizedBox(
                               width: 30,
                             ),
-                            Text(carStats.value["duration"]["text"]),
+                            Text(
+                              carStats.value["duration"]["text"],
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ],
                         ),
                         Row(
@@ -228,11 +237,17 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
                             SizedBox(
                               width: 30,
                             ),
-                            Text(walkingStats.value["distance"]["text"]),
+                            Text(
+                              walkingStats.value["distance"]["text"],
+                              style: TextStyle(fontSize: 16),
+                            ),
                             SizedBox(
                               width: 30,
                             ),
-                            Text(walkingStats.value["duration"]["text"]),
+                            Text(
+                              walkingStats.value["duration"]["text"],
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ],
                         ),
                       ],
@@ -278,8 +293,14 @@ class _DonorDetailPageState extends State<DonorDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(value),
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        Text(value, style: TextStyle(fontSize: 16)),
       ],
     );
   }

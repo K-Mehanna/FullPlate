@@ -70,16 +70,39 @@ class OrdersManager {
     _db.runTransaction((transaction) async {
       final baseDoc = await transaction.get(baseDocumentRef);
       int previousQuantity = baseDoc.get("quantity");
+      List<int> previousOfferQuantities = [];
+
+      for (var offer in offers) {
+        if (offer.offerId == "unassigned") {
+          previousOfferQuantities.add(0);
+        } else {
+          final offerDoc = await baseDocumentRef
+              .collection(nestedOffersPath)
+              .doc(offer.offerId)
+              .get();
+
+          if (offerDoc.exists) {
+            previousOfferQuantities.add(offerDoc.data()!["quantity"]);
+          } else {
+            previousOfferQuantities.add(0);
+          }
+        }
+      }
 
       transaction.update(
           baseDocumentRef, {"offerSummary": FieldValue.arrayUnion(orders)});
 
-      for (var offer in offers) {
+      for (int i = 0; i < offers.length; i++) {
+        final offer = offers[i];
+
         final offerRef = baseDocumentRef
             .collection(nestedOffersPath)
             .doc(offer.offerId == "unassigned" ? null : offer.offerId);
 
-        transaction.set(offerRef, offer.toFirestore());
+        var data = offer.toFirestore();
+        data["quantity"] += previousOfferQuantities[i];
+
+        transaction.set(offerRef, data);
       }
 
       transaction.update(baseDocumentRef, {
@@ -251,11 +274,11 @@ class OrdersManager {
   void getOpenOffersCompletion(
       String donorId, void Function(List<OfferInfo>) callback) {
     final query = _db
-      .collection("donors")
-      .doc(donorId)
-      .collection("openOffers")
-      .where("expiryDate", isGreaterThan: Timestamp.fromDate(DateTime.now()))
-      .orderBy("expiryDate");
+        .collection("donors")
+        .doc(donorId)
+        .collection("openOffers")
+        .where("expiryDate", isGreaterThan: Timestamp.fromDate(DateTime.now()))
+        .orderBy("expiryDate");
 
     _fetchOfferCallback(query, callback);
   }
@@ -330,11 +353,11 @@ class OrdersManager {
   void setOpenOffersListener(
       String donorId, void Function(List<OfferInfo>) callback) {
     final query = _db
-      .collection("donors")
-      .doc(donorId)
-      .collection("openOffers")
-      .where("expiryDate", isGreaterThan: Timestamp.fromDate(DateTime.now()))
-      .orderBy("expiryDate");
+        .collection("donors")
+        .doc(donorId)
+        .collection("openOffers")
+        .where("expiryDate", isGreaterThan: Timestamp.fromDate(DateTime.now()))
+        .orderBy("expiryDate");
 
     query.snapshots().listen((querySnapshot) {
       List<OfferInfo> offers = [];

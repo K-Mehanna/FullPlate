@@ -32,7 +32,26 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
     OrdersManager().getConstituentOffersCompletion(widget.job.jobId, (offers) {
       setState(() {
-        constituentOffers = offers;
+        constituentOffers.clear();
+
+        Map<OrderCategory, int> categories =
+            offers.map((o) => o.category).toSet().fold({}, (map, category) {
+          map[category] = 0;
+          return map;
+        });
+
+        for (var offer in offers) {
+          categories[offer.category] =
+              categories[offer.category]! + offer.quantity;
+        }
+
+        categories.forEach((category, quantity) {
+          constituentOffers.add(OfferInfo(
+              category: category,
+              quantity: quantity,
+              offerId: "unassigned",
+              expiryDate: DateTime.now()));
+        });
       });
     });
   }
@@ -54,19 +73,25 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Viewing Job"),
+        title: Text(
+          "Viewing Job",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: _onShareWithResult,
             icon: Icon(Icons.share),
+            color: theme.colorScheme.onSurface,
           ),
           IconButton(
             onPressed: () => MapsLauncher.launchQuery(donor!.address),
             icon: Icon(Icons.map),
-            color: theme.colorScheme.primary,
+            color: theme.colorScheme.onSurface,
           ),
         ],
       ),
@@ -75,39 +100,109 @@ class _JobDetailPageState extends State<JobDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Donor", donor?.name ?? "--"),
-            _buildDetailRow("Address", donor?.address ?? "--"),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildDetailColumn("Quantity", "${widget.job.quantity}"),
-                _buildDetailColumn("Status", widget.job.status.value),
-              ],
+            Card(
+              color: theme.colorScheme.surfaceContainer,
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: EdgeInsets.only(bottom: 16),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDetailRow(
+                      "Donor",
+                      donor?.name ?? "--",
+                    ),
+                    _buildDetailRow("Address", donor?.address ?? "--"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildDetailColumn(
+                            "Quantity", "${widget.job.quantity}"),
+                        _buildDetailColumn("Status", widget.job.status.value),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-            _buildListItem(),
+            SizedBox(height: 16),
+            Text(
+              "Offers",
+              style: theme.textTheme.headlineMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 8),
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: constituentOffers.length,
+                itemBuilder: (context, index) {
+                  final offer = constituentOffers[index];
+                  return Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      tileColor: theme.colorScheme.surfaceBright,
+                      leading: Icon(
+                        offer.category.icon.icon,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      title: Text(
+                        offer.category.value.toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      trailing: Text(
+                        offer.quantity.toString(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool withIcon = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-        if (withIcon)
-          Row(
-            children: [
-              Icon(Icons.person),
-              SizedBox(width: 8),
-              Text(value),
-            ],
-          )
-        else
-          Text(value),
-      ],
+  Widget _buildDetailRow(String label, String value) {
+    // ignore: unused_local_variable
+    final ThemeData theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(value, style: TextStyle(color: Colors.grey[700], fontSize: 16)),
+        ],
+      ),
     );
   }
 
@@ -115,25 +210,10 @@ class _JobDetailPageState extends State<JobDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(value),
+        Text(label,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(value, style: TextStyle(fontSize: 16)),
       ],
-    );
-  }
-
-  ListView _buildListItem() {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: constituentOffers.length,
-      itemBuilder: (context, index) {
-        final offer = constituentOffers[index];
-
-        return ListTile(
-          leading: offer.category.icon,
-          title: Text(offer.category.value.toString()),
-          trailing: Text(offer.quantity.toString()),
-        );
-      },
     );
   }
 }

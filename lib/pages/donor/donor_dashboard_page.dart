@@ -141,17 +141,17 @@ class _DonorDashboardState extends State<DonorDashboard> {
   }
 
   Widget buildJobItem(JobInfo job) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => JobDetailPage(job: job),
-          ),
-        );
-      },
-      child: Card(
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => JobDetailPage(job: job),
+            ),
+          );
+        },
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 10.0,
@@ -215,20 +215,15 @@ class _DonorDashboardState extends State<DonorDashboard> {
                     ),
                     Text(
                       offer.getExpiryDescription(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold
-                      ),
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 SizedBox(width: 12),
                 Text(
                   "x${offer.quantity}",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 IconButton(
                   icon: Icon(

@@ -70,31 +70,50 @@ class _JobDetailPageState extends State<JobDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: SingleChildScrollView(
+            Card( // Wrapped kitchen details in a Card widget
+              color: theme.colorScheme.surfaceContainer,
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: EdgeInsets.only(bottom: 16),
+              child: Padding(
+                padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildDetailRow("Kitchen", kitchen?.name ?? "--"),
                     _buildDetailRow("Address", kitchen?.address ?? "--"),
-                    SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildDetailColumn(
-                            "Quantity", "${widget.job.quantity}"),
+                        _buildDetailColumn("Quantity", "${widget.job.quantity}"),
                         _buildDetailColumn("Status", widget.job.status.value),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    Text("Offers", style: theme.textTheme.titleLarge),
-                    SizedBox(height: 8),
-                    _buildOfferList(),
                   ],
                 ),
               ),
+              
             ),
-            Center(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 16),
+                  Text(
+                    "Offers",
+                    style: theme.textTheme.titleLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  _buildOfferList(),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -142,6 +161,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
     );
   }
 
+
   Widget _buildDetailRow(String label, String value) {
     // ignore: unused_local_variable
     final ThemeData theme = Theme.of(context);
@@ -177,13 +197,14 @@ class _JobDetailPageState extends State<JobDetailPage> {
 
   Widget _buildOfferList() {
     final ThemeData theme = Theme.of(context);
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.5, // Adjust the height as needed
+    return Expanded(
       child: ListView.builder(
+        shrinkWrap: true,
         itemCount: constituentOffers.length,
         itemBuilder: (context, index) {
           final offer = constituentOffers[index];
           return Card(
+            elevation: 5,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -198,8 +219,8 @@ class _JobDetailPageState extends State<JobDetailPage> {
               ),
               title: Text(offer.category.value.toString(),
                   style: TextStyle(fontWeight: FontWeight.bold)),
-              trailing:
-                  Text(offer.quantity.toString(), style: TextStyle(fontSize: 16)),
+              trailing: Text(offer.quantity.toString(),
+                  style: TextStyle(fontSize: 16)),
             ),
           );
         },

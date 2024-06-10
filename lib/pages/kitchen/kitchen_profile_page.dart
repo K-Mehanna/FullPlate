@@ -169,6 +169,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
         icon: Icon(icon, color: textColor),
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
+          elevation: 2.0,
           padding: const EdgeInsets.all(16.0),
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
@@ -263,7 +264,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
                 _navigateToHistoryPage,
                 theme.colorScheme.tertiaryContainer,
                 theme.colorScheme.onTertiaryContainer),
-            SizedBox(height: 16.0),
+            // SizedBox(height: 16.0),
+            Spacer(),
             profileButton(
                 context,
                 "Sign Out",

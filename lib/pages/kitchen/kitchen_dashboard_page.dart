@@ -88,18 +88,62 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   }
 
   Widget buildJobItem(JobInfo job) {
-    return ListTile(
-      leading: Icon(Icons.person),
-      title: Text(donorsInfo[job.donorId]?.name ?? "..."),
-      trailing: Text("x${job.quantity}"),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => JobDetailPage(job: job),
+    final ThemeData theme = Theme.of(context);
+    // return ListTile(
+    //   leading: Icon(Icons.person),
+    //   title: Text(donorsInfo[job.donorId]?.name ?? "..."),
+    //   trailing: Text("x${job.quantity}"),
+    //   onTap: () {
+    //     Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //         builder: (context) => JobDetailPage(job: job),
+    //       ),
+    //     );
+    //   },
+    // );
+    return Card(
+      color: theme.colorScheme.inversePrimary,
+      elevation: 4,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => JobDetailPage(job: job),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10.0,
+            vertical: 16.0,
           ),
-        );
-      },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.person),
+              SizedBox(width: 8),
+              Text(
+                donorsInfo[job.donorId]?.name ?? "...",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Spacer(),
+              Text(
+                "x${job.quantity}",
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(width: 16),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
