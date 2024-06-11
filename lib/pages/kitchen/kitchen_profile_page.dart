@@ -193,6 +193,7 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           "Profile",
           style: TextStyle(fontWeight: FontWeight.bold),

@@ -66,6 +66,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
     final screenHeight = MediaQuery.of(context).size.height / 3;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           "Dashboard",
           style: TextStyle(

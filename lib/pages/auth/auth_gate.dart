@@ -23,59 +23,83 @@ class AuthGate extends StatelessWidget {
       return UserInfo.fromFirestore(docSnapshot);
     } catch (e) {
       print("Error getting document: $e");
-
-      //await FirebaseAuth.instance.signOut();
-
-      // maybe this might work
       throw Exception("Error getting document: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    print("AuthGate build");
-
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.userChanges(),
       builder: (context, snapshot) {
-        print(
-            "Snapshot Updated!: snapshot.hasData: ${snapshot.hasData}, snapshot.data is null: ${snapshot.data == null}");
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingScreen(context);
+        }
+
         if (snapshot.hasData && snapshot.data != null) {
-          getUserInfo(snapshot.data!.uid).then((userInfo) {
-            // switch ((userInfo.userType, userInfo.completedProfile)) {
-            //   case (UserType.DONOR, true):    return DonorHomePage();
-            //   case (UserType.KITCHEN, true):  return KitchenHomePage();
-            //   case (UserType.DONOR, false):   return DonorSignupPage();
-            //   case (UserType.KITCHEN, false): return KitchenSignupPage();
-            // }
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) {
-                switch ((userInfo.userType, userInfo.completedProfile)) {
-                  case (UserType.DONOR, true):
-                    return DonorHomePage();
-                  case (UserType.KITCHEN, true):
-                    return KitchenHomePage();
-                  case (UserType.DONOR, false):
-                    return DonorSignupPage();
-                  case (UserType.KITCHEN, false):
-                    return KitchenSignupPage();
-                }
-              }),
-            );
-          });
-          return Container(
-            color: theme.colorScheme.surface,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
+          return FutureBuilder<UserInfo>(
+            future: getUserInfo(snapshot.data!.uid),
+            builder: (context, userInfoSnapshot) {
+              if (userInfoSnapshot.connectionState == ConnectionState.waiting) {
+                return _buildLoadingScreen(context);
+              }
+
+              if (userInfoSnapshot.hasError) {
+                return _buildErrorScreen(context, userInfoSnapshot.error!);
+              }
+
+              if (userInfoSnapshot.hasData) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _navigateToCorrectPage(context, userInfoSnapshot.data!);
+                });
+                return _buildLoadingScreen(context);
+              }
+
+              return _buildErrorScreen(context, Exception("Unexpected error"));
+            },
           );
-          //CircularProgressIndicator();
         } else {
           return TitlePage();
         }
       },
+    );
+  }
+
+  Widget _buildLoadingScreen(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildErrorScreen(BuildContext context, Object error) {
+    return Scaffold(
+      body: Center(
+        child: Text("Error: $error"),
+      ),
+    );
+  }
+
+  void _navigateToCorrectPage(BuildContext context, UserInfo userInfo) {
+    final Widget destination;
+
+    switch ((userInfo.userType, userInfo.completedProfile)) {
+      case (UserType.DONOR, true):
+        destination = DonorHomePage();
+      case (UserType.KITCHEN, true):
+        destination = KitchenHomePage();
+      case (UserType.DONOR, false):
+        destination = DonorSignupPage();
+      case (UserType.KITCHEN, false):
+        destination = KitchenSignupPage();
+      default:
+        destination = TitlePage();
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
     );
   }
 }

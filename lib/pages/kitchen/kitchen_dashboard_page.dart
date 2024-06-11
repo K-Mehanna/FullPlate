@@ -46,6 +46,7 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           "Dashboard",
           style: TextStyle(

@@ -5,7 +5,6 @@ import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:maps_launcher/maps_launcher.dart';
 
 class JobDetailPage extends StatefulWidget {
   final JobInfo job;

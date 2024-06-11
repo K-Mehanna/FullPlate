@@ -193,6 +193,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           "Profile",
           style: TextStyle(fontWeight: FontWeight.bold),
