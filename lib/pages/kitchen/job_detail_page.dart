@@ -107,25 +107,29 @@ class _JobDetailPageState extends State<JobDetailPage> {
                 borderRadius: BorderRadius.circular(10),
               ),
               margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildDetailRow(
-                      "Donor",
-                      donor?.name ?? "--",
-                    ),
-                    _buildDetailRow("Address", donor?.address ?? "--"),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildDetailColumn(
-                            "Quantity", "${widget.job.quantity}"),
-                        _buildDetailColumn("Status", widget.job.status.value),
-                      ],
-                    ),
-                  ],
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => MapsLauncher.launchQuery(donor!.address),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailRow(
+                        "Donor",
+                        donor?.name ?? "--",
+                      ),
+                      _buildDetailRow("Address", donor?.address ?? "--"),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildDetailColumn(
+                              "Quantity", "${widget.job.quantity}"),
+                          _buildDetailColumn("Status", widget.job.status.value),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

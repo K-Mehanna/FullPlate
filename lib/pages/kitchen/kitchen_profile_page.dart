@@ -34,8 +34,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
     _fetchCompletedJobs();
 
     KitchensManager().getKitchenCompletion(_auth.currentUser!.uid, (kitchen) {
+      if (!mounted) return;
       setState(() {
-        if (!mounted) return;
         this.kitchen = kitchen;
       });
     });
@@ -48,14 +48,14 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
       //"vArN1MQqQfXSTTbgSP6MT5nzLz42",
       FirebaseAuth.instance.currentUser!.uid,
       (jobs) {
+        if (!mounted) return;
         setState(() {
-          if (!mounted) return;
           _completedJobs = jobs;
         });
         for (var job in jobs) {
           DonorsManager().getDonorCompletion(job.donorId, (donor) {
+            if (!mounted) return;
             setState(() {
-              if (!mounted) return;
               _donorsInfo[donor.donorId] = donor;
             });
           });

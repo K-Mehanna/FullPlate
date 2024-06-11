@@ -29,7 +29,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   late List<DonorInfo> donors = [];
   late Set<Marker> markers = {};
   OrderCategory? filters = OrderCategory.FRUIT_VEG;
-  List<String> sortParams = ['Distance', 'Quantity', 'Recent'];
+  List<String> sortParams = ['Distance', 'Quantity'];
   String? sortParam;
   List<OrderCategory> selectedCategoryList = OrderCategory.values;
 
@@ -98,10 +98,10 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
 
       mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
 
+      if (!mounted) {
+        return;
+      }
       setState(() {
-        if (!mounted) {
-          return;
-        }
         currentPosition = newPosition;
       });
     });
@@ -137,9 +137,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         ),
         panelBuilder: (ScrollController sc) => _ordersScrollingList(sc),
         body: GoogleMap(
-          myLocationButtonEnabled: true,
           myLocationEnabled: true,
-          mapType: MapType.terrain,
+          myLocationButtonEnabled: true,
+          //mapType: MapType.terrain,
           onMapCreated: _onMapCreated,
           padding: EdgeInsets.only(
             bottom: 250,
@@ -165,6 +165,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
         return category.value.toLowerCase().contains(query.toLowerCase());
       },
       onApplyButtonClick: (list) {
+        if (!mounted) {
+          return;
+        }
         setState(() {
           if (!mounted) {
             return;
@@ -273,10 +276,10 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                           .toList(),
                       value: sortParam,
                       onChanged: (String? value) {
+                        if (!mounted) {
+                          return;
+                        }
                         setState(() {
-                          if (!mounted) {
-                            return;
-                          }
                           sortParam = value;
                           donorsManager.getFilteredOfferDonorsCompletion(
                               createMarkers, selectedCategoryList);
@@ -378,10 +381,10 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
 
   void createMarkers(List<DonorInfo> donorList) {
     print("\nKitchenMapPageState - createMarkers()\n");
+    if (!mounted) {
+      return;
+    }
     setState(() {
-      if (!mounted) {
-        return;
-      }
       markers.clear();
 
       if (sortParam == 'Distance') {
@@ -389,18 +392,16 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
             .compareTo(_distanceBetween(b.location, currentPosition)));
       } else if (sortParam == 'Quantity') {
         donorList.sort((a, b) => b.quantity.compareTo(a.quantity));
-      } else if (sortParam == 'Recent') {
-        //donorList.sort((a, b) => a..compareTo(b.createdAt));
       }
 
       donors = donorList;
     });
 
     for (var donor in donorList) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
-        if (!mounted) {
-          return;
-        }
         markers.add(
           Marker(
             //icon: image,

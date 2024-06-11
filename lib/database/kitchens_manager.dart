@@ -1,3 +1,4 @@
+import 'package:cibu/models/job_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cibu/models/kitchen_info.dart';
 import 'dart:async';
@@ -48,5 +49,19 @@ class KitchensManager {
         .doc(kitchenInfo.kitchenId)
         .set(kitchenInfo.toFirestore())
         .then((a) {}, onError: (e) => print("Error: in addKitchen"));
+  }
+
+  void setKitchenListener(String kitchenId, void Function(String) onCancellation) {
+    _db
+      .collection("kitchens")
+      .doc(kitchenId)
+      .snapshots()
+      .listen((docSnapshot) {
+        docSnapshot.data()!["attributes"];
+      });
+  }
+
+  void addKitchenCancelledJob(JobInfo job, String kitchenId) {
+
   }
 }

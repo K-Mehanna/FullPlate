@@ -121,6 +121,8 @@ class OrdersManager {
         .collection("jobs")
         .doc(job.jobId)
         .update({"status": OrderStatus.CANCELLED.value}).then((empty) {
+      // KitchensManager().
+
       getConstituentOffersCompletion(job.jobId, (constituentOffers) {
         final baseDocumentRef = _db.collection("donors").doc(job.donorId);
 
