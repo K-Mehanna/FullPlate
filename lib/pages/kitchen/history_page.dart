@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
-import 'package:cibu/pages/kitchen/job_detail_page.dart';
+import 'package:cibu/pages/kitchen/job_detail_page_for_history.dart';
 import 'package:intl/intl.dart';
 
 class HistoryPage extends StatelessWidget {
