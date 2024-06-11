@@ -32,7 +32,7 @@ void main() async {
   } else {
     print('Emulator disabled');
   }
-  //await FirebaseAuth.instance.signOut();
+  await FirebaseAuth.instance.signOut();
   runApp(MyApp());
 }
 
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
       title: 'Cibu',
       debugShowCheckedModeBanner: false,
       theme: MaterialTheme(Typography.blackCupertino).lightMediumContrast(),
-      //darkTheme: MaterialTheme(Typography.blackCupertino).dark(),  
+      //darkTheme: MaterialTheme(Typography.blackCupertino).dark(),
       home: AuthGate(),
     );
   }

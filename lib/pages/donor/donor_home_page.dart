@@ -19,6 +19,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("Reached the donor home page");
     final ThemeData theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(

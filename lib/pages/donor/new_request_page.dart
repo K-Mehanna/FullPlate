@@ -74,7 +74,8 @@ class NewRequestPageState extends State<NewRequestPage> {
         .then((date) {
       if (date != null) {
         setState(() {
-          order.expiryDate = date;
+          order.expiryDate =
+              date.add(Duration(hours: 23, minutes: 59, seconds: 50));
         });
       }
     });
@@ -369,10 +370,8 @@ class OrderItem {
     if (expiryDate == null) {
       return "None";
     }
-    int days = expiryDate!
-        .difference(DateTime.now().subtract(Duration(days: 1)))
-        .inDays;
+    int days = expiryDate!.difference(DateTime.now()).inDays;
 
-    return "$days day${days > 1 ? "s" : ""}";
+    return "$days day${days == 1 ? "" : "s"}";
   }
 }

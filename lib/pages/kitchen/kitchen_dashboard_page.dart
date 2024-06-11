@@ -1,3 +1,4 @@
+import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/database/orders_manager.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/pages/kitchen/job_detail_page.dart';
@@ -15,6 +16,7 @@ class KitchenDashboardPage extends StatefulWidget {
 
 class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   final OrdersManager ordersManager = OrdersManager();
+  final KitchensManager kitchensManager = KitchensManager();
 
   Map<String, DonorInfo> donorsInfo = {};
   List<JobInfo> acceptedJobs = [];
@@ -29,6 +31,26 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
     super.initState();
 
     kitchenId = _auth.currentUser!.uid;
+
+    kitchensManager.setJobCancellationListener(kitchenId, (cancelledJobId) {
+      print('OKMIJNUHBYGVTFCRDXESZWWAQ');
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Job Cancelled"),
+              content: Text("Job $cancelledJobId has been cancelled"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          });
+    });
 
     ordersManager.setJobsListener(OrderStatus.ACCEPTED, null, kitchenId,
         (newAccepted) {
@@ -46,7 +68,6 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: Text(
           "Dashboard",
           style: TextStyle(

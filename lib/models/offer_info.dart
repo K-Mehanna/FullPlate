@@ -100,10 +100,10 @@ class OfferInfo {
     if (isInfinite) return "None";
     
     int days = expiryDate
-        .difference(DateTime.now().subtract(Duration(days: 1)))
+        .difference(DateTime.now())
         .inDays;
 
-    return "$days day${days > 1 ? "s" : " "}";
+    return "$days day${days == 1 ? " ": "s" }";
   }
 
   Map<String, dynamic> toFirestore() {

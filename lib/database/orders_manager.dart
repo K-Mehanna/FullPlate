@@ -1,3 +1,4 @@
+import 'package:cibu/database/kitchens_manager.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -121,7 +122,8 @@ class OrdersManager {
         .collection("jobs")
         .doc(job.jobId)
         .update({"status": OrderStatus.CANCELLED.value}).then((empty) {
-      // KitchensManager().
+
+      KitchensManager().markJobCancelledInKitchen(job);
 
       getConstituentOffersCompletion(job.jobId, (constituentOffers) {
         final baseDocumentRef = _db.collection("donors").doc(job.donorId);
