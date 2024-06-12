@@ -6,6 +6,8 @@ import 'dart:async';
 class DonorsManager {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  StreamSubscription? filteredOfferDonorsListener;
+
   Future<DonorInfo> getDonor(String donorId) {
     final completer = Completer<DonorInfo>();
 
@@ -19,38 +21,50 @@ class DonorsManager {
     return completer.future;
   }
 
-  void getOfferDonorsCompletion(void Function(List<DonorInfo>) callback) {
-    final donorsRef =
-        _db.collection("donors").where("quantity", isGreaterThan: 0);
+  // void getOfferDonorsCompletion(void Function(List<DonorInfo>) callback) {
+  //   final donorsRef =
+  //       _db.collection("donors").where("quantity", isGreaterThan: 0);
 
-    donorsRef.get().then((querySnapshot) {
-      List<DonorInfo> donors = [];
+  //   donorsRef.get().then((querySnapshot) {
+  //     List<DonorInfo> donors = [];
 
-      for (var docSnapshot in querySnapshot.docs) {
-        DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
+  //     for (var docSnapshot in querySnapshot.docs) {
+  //       DonorInfo donor = DonorInfo.fromFirestore(docSnapshot, null);
 
-        assert(donor.quantity > 0);
-        donors.add(donor);
-      }
+  //       assert(donor.quantity > 0);
+  //       donors.add(donor);
+  //     }
 
-      callback(donors);
-    }, onError: (e) => print("DonorsManager\n - getDonors: $e"));
+  //     callback(donors);
+  //   }, onError: (e) => print("DonorsManager\n - getDonors: $e"));
+  // }
+
+  void _cancelFilteredOfferDonorsListener() {
+    assert(filteredOfferDonorsListener != null);
+    
+    filteredOfferDonorsListener!.cancel();
+    filteredOfferDonorsListener = null;
   }
 
-  void getFilteredOfferDonorsCompletion(
+  void setFilteredOfferDonorsListener(
       void Function(List<DonorInfo>) callback, List<OrderCategory> categories) {
-    Query<Map<String, dynamic>> donorsRef;
-    if (categories.isEmpty) {
-      donorsRef = _db.collection("donors").where("quantity", isLessThan: 0);
-    } else {
-      donorsRef = _db
-          .collection("donors")
-          .where("quantity", isGreaterThan: 0)
-          .where("offerSummary",
-              arrayContainsAny: categories.map((e) => e.code).toList());
+    if (filteredOfferDonorsListener != null) {
+      _cancelFilteredOfferDonorsListener();
     }
 
-    donorsRef.get().then((querySnapshot) {
+    Query<Map<String, dynamic>> donorsRef;
+    if (categories.isEmpty) {
+      callback([]);
+      return;
+    } else {
+      donorsRef = _db
+        .collection("donors")
+        .where("quantity", isGreaterThan: 0)
+        .where("offerSummary",
+            arrayContainsAny: categories.map((e) => e.code).toList());
+    }
+
+    filteredOfferDonorsListener = donorsRef.snapshots().listen((querySnapshot) {
       List<DonorInfo> donors = [];
 
       for (var docSnapshot in querySnapshot.docs) {

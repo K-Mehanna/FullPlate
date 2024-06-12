@@ -87,8 +87,9 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
     // })
 
     // ordersManager.setOpenOffersListener(donorId, callback)
-
-    donorsManager.getOfferDonorsCompletion(createMarkers);
+    donorsManager.setFilteredOfferDonorsListener(
+        createMarkers, selectedCategoryList);
+    //donorsManager.getOfferDonorsCompletion(createMarkers);
 
     getCurrentLocation((newLocation) {
       var newPosition = LatLng(newLocation.latitude, newLocation.longitude);
@@ -173,7 +174,8 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
             return;
           }
           selectedCategoryList = List.from(list!);
-          donorsManager.getFilteredOfferDonorsCompletion(
+          //donorsManager.cancelFilteredOfferDonorsListener();
+          donorsManager.setFilteredOfferDonorsListener(
               createMarkers, selectedCategoryList);
           print('selectedCategoryList: $selectedCategoryList');
         });
@@ -281,8 +283,8 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                         }
                         setState(() {
                           sortParam = value;
-                          donorsManager.getFilteredOfferDonorsCompletion(
-                              createMarkers, selectedCategoryList);
+                          // donorsManager.getFilteredOfferDonorsCompletion(
+                          //     createMarkers, selectedCategoryList);
                         });
                       },
                       buttonStyleData: ButtonStyleData(
@@ -327,9 +329,10 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                         donorInfo: donors[index],
                       ),
                     ),
-                  ).then((a) {
-                    donorsManager.getOfferDonorsCompletion(createMarkers);
-                  });
+                  );
+                  // .then((a) {
+                  //   donorsManager.getOfferDonorsCompletion(createMarkers);
+                  // });
                 },
                 child: Container(
                   margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -418,9 +421,10 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                       donorInfo: donor,
                     ),
                   ),
-                ).then((a) {
-                  donorsManager.getOfferDonorsCompletion(createMarkers);
-                });
+                );
+                // .then((a) {
+                //   donorsManager.getOfferDonorsCompletion(createMarkers);
+                // });
               },
             ),
           ),

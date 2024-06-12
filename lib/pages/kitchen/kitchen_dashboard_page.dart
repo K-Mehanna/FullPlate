@@ -32,25 +32,25 @@ class KitchenDashboardPageState extends State<KitchenDashboardPage> {
 
     kitchenId = _auth.currentUser!.uid;
 
-    kitchensManager.setJobCancellationListener(kitchenId, (cancelledJobId) {
-      print('OKMIJNUHBYGVTFCRDXESZWWAQ');
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Job Cancelled"),
-              content: Text("Job $cancelledJobId has been cancelled"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("OK"),
-                ),
-              ],
-            );
-          });
-    });
+    // kitchensManager.setJobCancellationListener(kitchenId, (cancelledJobId) {
+    //   print('OKMIJNUHBYGVTFCRDXESZWWAQ');
+    //   showDialog(
+    //       context: context,
+    //       builder: (BuildContext context) {
+    //         return AlertDialog(
+    //           title: Text("Job Cancelled"),
+    //           content: Text("Job $cancelledJobId has been cancelled"),
+    //           actions: [
+    //             TextButton(
+    //               onPressed: () {
+    //                 Navigator.of(context).pop();
+    //               },
+    //               child: Text("OK"),
+    //             ),
+    //           ],
+    //         );
+    //       });
+    // });
 
     ordersManager.setJobsListener(OrderStatus.ACCEPTED, null, kitchenId,
         (newAccepted) {
