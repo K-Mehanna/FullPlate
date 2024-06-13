@@ -92,7 +92,7 @@ class _MapScreenState extends State<MapScreen> {
       body: SlidingUpPanel(
         color: Colors.blueGrey.shade50,
         snapPoint: 0.5,
-        minHeight: 65.0,
+        minHeight: 80.0,
         maxHeight: 550.0,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -130,45 +130,36 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ),
         ),
+        SizedBox(height: 20),
         Expanded(
           child: ListView.builder(
             controller: sc,
             shrinkWrap: true,
             itemCount: kitchens.length,
             itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) =>
-                  //         DonorDetailPage(donorInfo: donors[index]),
-                  //   ),
-                  // );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
-                  child: Row(
-                    children: [
-                      Text(
-                        kitchens[index].name,
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  border: Border.all(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                child: Row(
+                  children: [
+                    Text(
+                      kitchens[index].name,
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(kitchens[index].address),
                       ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(kitchens[index].address),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               );
             },
