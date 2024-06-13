@@ -283,6 +283,7 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
                         }
                         setState(() {
                           sortParam = value;
+                          createMarkers(donors);
                           // donorsManager.getFilteredOfferDonorsCompletion(
                           //     createMarkers, selectedCategoryList);
                         });
