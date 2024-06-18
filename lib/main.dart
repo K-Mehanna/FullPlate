@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cibu',
+      title: 'FullPlate',
       debugShowCheckedModeBanner: false,
       theme: MaterialTheme(Typography.blackCupertino).lightMediumContrast(),
       //darkTheme: MaterialTheme(Typography.blackCupertino).dark(),

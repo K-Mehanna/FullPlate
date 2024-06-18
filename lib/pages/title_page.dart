@@ -41,16 +41,25 @@ class TitlePage extends StatelessWidget {
           Center(
             child: Card(
               elevation: 8.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
               color: theme.colorScheme.surfaceContainer,
               child: IntrinsicWidth(
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: const EdgeInsets.all(40.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 40.0, horizontal: 60.0),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text("Welcome to Cibu!", style: titleStyle),
+                          FittedBox(
+                              child: Text(
+                            "Welcome to\nFullPlate!",
+                            style: titleStyle,
+                            textAlign: TextAlign.center,
+                          )),
                           SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
