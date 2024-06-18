@@ -1,18 +1,52 @@
+import 'package:cibu/database/donors_manager.dart';
+import 'package:cibu/database/kitchens_manager.dart';
+import 'package:cibu/database/orders_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/models/kitchen_info.dart';
 import 'package:cibu/pages/donor/job_detail_page_for_history.dart';
 import 'package:intl/intl.dart';
 
-class HistoryPage extends StatelessWidget {
-  final List<JobInfo> completedJobs;
-  final Map<String, KitchenInfo> kitchensInfo;
-
-  const HistoryPage({
+class HistoryPage extends StatefulWidget {
+  HistoryPage({
     Key? key,
-    required this.completedJobs,
-    required this.kitchensInfo,
+    // required this.completedJobs,
+    // required this.kitchensInfo,
   }) : super(key: key);
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  List<JobInfo> _completedJobs = [];
+  Map<String, KitchenInfo> _kitchenInfos = {};
+  final OrdersManager _ordersManager = OrdersManager();
+  final KitchensManager _kitchensManager = KitchensManager();
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _ordersManager.setCompletedJobsListener(
+        FirebaseAuth.instance.currentUser!.uid, null, (jobs) {
+      jobs.sort((a, b) => b.timeCompleted!.compareTo(a.timeCompleted!));
+      if (!mounted) return;
+      setState(() {
+        _completedJobs = jobs;
+      });
+      for (var job in jobs) {
+        _kitchensManager.getKitchenCompletion(job.kitchenId, (kitchen) {
+          if (!mounted) return;
+          setState(() {
+            _kitchenInfos[kitchen.kitchenId] = kitchen;
+          });
+        });
+      }
+    });
+  }
 
   String getDate(JobInfo job) {
     final time = job.timeCompleted;
@@ -42,11 +76,11 @@ class HistoryPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
-          itemCount: completedJobs.length,
+          itemCount: _completedJobs.length,
           itemBuilder: (context, index) {
-            final job = completedJobs[index];
+            final job = _completedJobs[index];
             final date = getDate(job);
-            final kitchenName = kitchensInfo[job.kitchenId]?.name ?? "--";
+            final kitchenName = _kitchenInfos[job.kitchenId]?.name ?? "--";
             return Card(
               color: theme.colorScheme.tertiaryContainer,
               shadowColor: theme.colorScheme.inversePrimary,

@@ -75,17 +75,6 @@ class _KitchenMapPageState extends State<KitchenMapPage> {
   void initState() {
     super.initState();
 
-    // ordersManager.setJobsListener(OrderStatus.ACCEPTED, null, kitchenId,
-    //     (newAccepted) {
-    //   processDonorsInfo(newAccepted);
-    //   if (!mounted) return;
-    //   setState(() {
-    //     if (!mounted) return;
-    //     acceptedJobs.clear();
-    //     acceptedJobs.addAll(newAccepted);
-    //   });
-    // })
-
     // ordersManager.setOpenOffersListener(donorId, callback)
     donorsManager.setFilteredOfferDonorsListener(
         createMarkers, selectedCategoryList);

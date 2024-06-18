@@ -3,6 +3,7 @@ import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/offer_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cibu/models/job_info.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class OrdersManager {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -122,7 +123,6 @@ class OrdersManager {
         .collection("jobs")
         .doc(job.jobId)
         .update({"status": OrderStatus.CANCELLED.value}).then((empty) {
-
       KitchensManager().markJobCancelledInKitchen(job);
 
       getConstituentOffersCompletion(job.jobId, (constituentOffers) {
@@ -377,6 +377,22 @@ class OrdersManager {
   void setJobsListener(OrderStatus status, String? donorId, String? kitchenId,
       void Function(List<JobInfo>) callback) {
     var query = _buildJobsQuery(status, donorId, kitchenId);
+
+    query.snapshots().listen((querySnapshot) {
+      List<JobInfo> jobs = [];
+
+      for (var docSnapshot in querySnapshot.docs) {
+        jobs.add(JobInfo.fromFirestore(docSnapshot, null));
+      }
+
+      callback(jobs);
+    });
+  }
+
+  void setCompletedJobsListener(String? donorId, String? kitchenId,
+      void Function(List<JobInfo>) callback) {
+   
+    var query = _buildJobsQuery(OrderStatus.COMPLETED, donorId, kitchenId);
 
     query.snapshots().listen((querySnapshot) {
       List<JobInfo> jobs = [];

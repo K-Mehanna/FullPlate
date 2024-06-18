@@ -1,18 +1,54 @@
+import 'package:cibu/database/donors_manager.dart';
+import 'package:cibu/database/kitchens_manager.dart';
+import 'package:cibu/database/orders_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:cibu/models/donor_info.dart';
 import 'package:cibu/models/job_info.dart';
 import 'package:cibu/pages/kitchen/job_detail_page_for_history.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class HistoryPage extends StatelessWidget {
-  final List<JobInfo> completedJobs;
-  final Map<String, DonorInfo> donorsInfo;
+class HistoryPage extends StatefulWidget {
+  //final Map<String, DonorInfo> donorsInfo;
 
-  const HistoryPage({
+  HistoryPage({
     Key? key,
-    required this.completedJobs,
-    required this.donorsInfo,
+    //required this.completedJobs,
+    //required this.donorsInfo,
   }) : super(key: key);
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  List<JobInfo> _completedJobs = [];
+  Map<String, DonorInfo> _donorsInfo = {};
+  final OrdersManager _ordersManager = OrdersManager();
+  final DonorsManager _donorsManager = DonorsManager();
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _ordersManager.setCompletedJobsListener(
+        null, FirebaseAuth.instance.currentUser!.uid, (jobs) {
+      jobs.sort((a, b) => b.timeCompleted!.compareTo(a.timeCompleted!));
+      if (!mounted) return;
+      setState(() {
+        _completedJobs = jobs;
+      });
+      for (var job in jobs) {
+        _donorsManager.getDonorCompletion(job.donorId, (donor) {
+          if (!mounted) return;
+          setState(() {
+            _donorsInfo[donor.donorId] = donor;
+          });
+        });
+      }
+    });
+  }
 
   String getDate(JobInfo job) {
     final time = job.timeCompleted;
@@ -41,9 +77,9 @@ class HistoryPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
-          itemCount: completedJobs.length,
+          itemCount: _completedJobs.length,
           itemBuilder: (context, index) {
-            final job = completedJobs[index];
+            final job = _completedJobs[index];
             String date = getDate(job);
             return Card(
               color: theme.colorScheme.tertiaryContainer,
@@ -74,7 +110,7 @@ class HistoryPage extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      donorsInfo[job.donorId]?.name ?? "--",
+                      _donorsInfo[job.donorId]?.name ?? "--",
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,

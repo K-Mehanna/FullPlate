@@ -78,8 +78,8 @@ class _KitchenProfilePageState extends State<KitchenProfilePage> {
       context,
       MaterialPageRoute(
         builder: (context) => HistoryPage(
-          completedJobs: _completedJobs,
-          donorsInfo: _donorsInfo,
+          //completedJobs: _completedJobs,
+          //donorsInfo: _donorsInfo,
         ),
       ),
     );

@@ -181,8 +181,8 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       context,
       MaterialPageRoute(
         builder: (context) => HistoryPage(
-          completedJobs: completedJobs,
-          kitchensInfo: kitchensInfo,
+          // completedJobs: completedJobs,
+          // kitchensInfo: kitchensInfo,
         ),
       ),
     );
